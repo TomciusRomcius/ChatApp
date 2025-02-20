@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\chatapp.client\chatapp.client.esproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ProjectReference Include="../ChatApp.Server.Application/ChatApp.Server.Application.csproj" />
+    <ProjectReference
+      Include="../ChatApp.Server.Infrastructure/ChatApp.Server.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
