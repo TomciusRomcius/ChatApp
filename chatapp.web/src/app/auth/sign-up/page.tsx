@@ -27,8 +27,11 @@ export default function SignUpPage() {
                     <input
                         type="submit"
                         value="Sign in"
-                        className="bg-stone-700 border-red-700 cursor-pointer"
+                        className="text-white p-2 bg-stone-700 border-red-700 cursor-pointer"
                     />
+                    <button className="p-2 bg-stone-700">
+                        Sign in with google
+                    </button>
                 </div>
             </form>
         </div>
