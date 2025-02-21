@@ -1,0 +1,12 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-preview-ubuntu-22.04
+    container_name: mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=DevelopmentPassword.2025
+    env_file:
+      - .env.local-db
+    ports:
+      - 1433:1433

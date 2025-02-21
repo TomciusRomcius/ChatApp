@@ -1,29 +1,27 @@
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Entities.ChatRoomMessage;
-using ChatApp.Domain.Entities.User;
 using ChatApp.Domain.Entities.UserFriend;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Infrastructure.Services
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext
     {
         public DatabaseContext(DbContextOptions options) : base(options)
         {
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(
-                @"SERVER=(localdb)\mssqllocaldb;DATABASE=development;Trusted_Connection=true",
+                @"SERVER=tcp:127.0.0.1,1433;DATABASE=development;User ID=sa;Password=DevelopmentPassword.2025;TrustServerCertificate=True",
                 o => o.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)
             );
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserEntity>().HasKey(u => u.UserId);
-            modelBuilder.Entity<UserEntity>().ToTable("User");
-
             modelBuilder.Entity<UserFriendEntity>()
             .HasKey(uf => new { uf.User1Id, uf.User2Id });
 
@@ -31,13 +29,13 @@ namespace ChatApp.Infrastructure.Services
             .HasOne(uf => uf.User1)
             .WithMany()
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserFriendEntity>()
             .HasOne(uf => uf.User2)
             .WithMany()
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserFriendEntity>().ToTable("UserFriends");
 
@@ -53,9 +51,10 @@ namespace ChatApp.Infrastructure.Services
             .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ChatRoomTextMessageEntity>().ToTable("ChatRoomTextMessages");
+
+            base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<UserEntity> Users { get; set; }
         public DbSet<UserFriendEntity> UserFriends { get; set; }
         public DbSet<ChatRoomEntity> ChatRooms { get; set; }
         public DbSet<ChatRoomTextMessageEntity> ChatRoomTextMessages { get; set; }
