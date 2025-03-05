@@ -1,5 +1,5 @@
 using ChatApp.Domain.Entities.ChatRoom;
-using ChatApp.Domain.Entities.User;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Domain.Entities.ChatRoomMessage
 {
@@ -7,7 +7,7 @@ namespace ChatApp.Domain.Entities.ChatRoomMessage
     {
         public required Guid ChatRoomTextMessageId { get; set; }
         public required ChatRoomEntity ChatRoom { get; set; }
-        public required UserEntity Sender { get; set; }
+        public required IdentityUser Sender { get; set; }
         public required string Content { get; set; }
     }
 }

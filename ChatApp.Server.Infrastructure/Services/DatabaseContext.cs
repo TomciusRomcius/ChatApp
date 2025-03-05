@@ -37,20 +37,14 @@ namespace ChatApp.Infrastructure.Services
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<UserFriendEntity>().ToTable("UserFriends");
-
             modelBuilder.Entity<ChatRoomEntity>()
             .HasKey(cr => cr.ChatRoomId);
-
-            modelBuilder.Entity<ChatRoomEntity>().ToTable("ChatRooms");
 
             modelBuilder.Entity<ChatRoomTextMessageEntity>().HasKey(crt => crt.ChatRoomTextMessageId);
             modelBuilder.Entity<ChatRoomTextMessageEntity>()
             .HasOne(crt => crt.Sender)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ChatRoomTextMessageEntity>().ToTable("ChatRoomTextMessages");
 
             base.OnModelCreating(modelBuilder);
         }
