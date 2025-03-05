@@ -6,7 +6,9 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_PID=Developer
       - MSSQL_SA_PASSWORD=DevelopmentPassword.2025
-    env_file:
-      - .env.local-db
     ports:
       - 1433:1433
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
