@@ -2,8 +2,9 @@
 
 import { FormEvent } from "react";
 import { authService } from "../authService";
+import GoogleProviderButton from "../_components/googleProviderButton";
 
-export default function LoginPage() {
+export default function SignInPage() {
     const handleSignIn = (ev: FormEvent) => {
         // TODO: validate input
 
@@ -29,6 +30,7 @@ export default function LoginPage() {
                         value="Sign in"
                         className="bg-stone-700 border-red-700 cursor-pointer"
                     />
+                    <GoogleProviderButton text="Sign in with google!" />
                 </div>
             </form>
         </div>
