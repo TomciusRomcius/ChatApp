@@ -7,7 +7,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className="bg-stone-950">{children}</body>
+            {/* TODO: fix hydration, don't know why it happens.... */}
+            <body suppressHydrationWarning>{children}</body>
         </html>
     );
 }
