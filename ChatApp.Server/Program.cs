@@ -1,9 +1,23 @@
+using ChatApp.Application.Services;
+using ChatApp.Domain.Utils;
 using ChatApp.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Register oidc providers
+builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
+{
+    OidcProviderConfigMapService oidcProviderConfigMapService = new();
+
+    oidcProviderConfigMapService.AddProvider("google", new OidcProvider(
+        builder.Configuration["OIDC:GOOGLE:CLIENT_ID"]!,
+        builder.Configuration["OIDC:GOOGLE:SECRET_CLIENT_ID"]!,
+        builder.Configuration["OIDC:GOOGLE:AUTHORITY"]!
+    ));
+
+    return oidcProviderConfigMapService;
+});
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
