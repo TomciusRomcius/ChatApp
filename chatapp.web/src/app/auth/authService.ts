@@ -32,6 +32,7 @@ class AuthService {
 
         const res = await fetch(publicConfiguration.BACKEND_URL, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },

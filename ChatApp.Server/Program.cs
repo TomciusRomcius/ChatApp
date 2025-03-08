@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 // Register oidc providers
 builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
 {
@@ -39,7 +42,16 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(2);
 }).AddEntityFrameworkStores<DatabaseContext>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.HttpOnly = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -51,9 +63,13 @@ using (var scope = app.Services.CreateScope())
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+app.UseCors(options => options.WithOrigins("https://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod());
+
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapIdentityApi<IdentityUser>();
 
 app.MapControllers();
