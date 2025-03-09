@@ -8,6 +8,9 @@ services:
       - MSSQL_SA_PASSWORD=DevelopmentPassword.2025
     ports:
       - 1433:1433
+  # TODO: setup redis authentication
+  redis:
+    image: redis:7.4.2
   adminer:
     image: adminer
     ports:
