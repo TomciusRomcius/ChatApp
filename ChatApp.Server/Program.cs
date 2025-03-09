@@ -1,3 +1,4 @@
+using ChatApp.Application.Interfaces;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
 using ChatApp.Infrastructure.Services;
@@ -28,6 +29,9 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<DatabaseContext>();
 
 builder.Services.AddAuthorization();
+
+ArgumentNullException.ThrowIfNull(builder.Configuration["CsrfHashingKey"]);
+builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService(builder.Configuration["CsrfHashingKey"]!));
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 {

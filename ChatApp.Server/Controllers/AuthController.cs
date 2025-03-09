@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
+using ChatApp.Application.Interfaces;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
 using ChatApp.Dtos;
@@ -11,7 +12,7 @@ internal class OidcResponse
     public required string id_token { get; set; }
 }
 
-namespace ChatApp.Server.Presentation
+namespace ChatApp.Server.Presentation.Auth
 {
     [ApiController]
     [Route("auth")]
@@ -22,14 +23,49 @@ namespace ChatApp.Server.Presentation
         readonly ILogger<OidcAuthController> _logger;
         readonly SignInManager<IdentityUser> _signInManager;
         readonly UserManager<IdentityUser> _userManager;
+        readonly ICsrfTokenStoreService _csrfTokenStoreService;
 
-        public OidcAuthController(IHttpClientFactory httpClientFactory, OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<OidcAuthController> logger, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public OidcAuthController(IHttpClientFactory httpClientFactory, OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<OidcAuthController> logger, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ICsrfTokenStoreService csrfTokenStoreService)
         {
             _httpClientFactory = httpClientFactory;
             _oidcProviderConfigMapService = oidcProviderConfigMapService;
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
+            _csrfTokenStoreService = csrfTokenStoreService;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            IdentityUser? user = await _userManager.FindByEmailAsync(dto.Email);
+
+            if (user is null)
+            {
+                return BadRequest("Login failed");
+            }
+
+            // Automatically sets user cookie
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.PasswordSignInAsync(
+                user,
+                dto.Password,
+                true,
+                false
+            );
+
+            if (!signInResult.Succeeded)
+            {
+                return BadRequest("Login failed");
+            }
+
+            string csrfToken = _csrfTokenStoreService.CreateUserCsrfToken(dto.Email);
+
+            return Ok(
+                new
+                {
+                    csrfToken = csrfToken
+                }
+            );
         }
 
         [HttpPost("oidc")]
