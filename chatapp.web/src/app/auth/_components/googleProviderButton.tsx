@@ -1,10 +1,9 @@
-import GoogleProviderService from "@/services/oidc/googleProviderService";
+import OidcProviders from "@/services/oidc/oidcProviders";
+import OidcProviderService from "@/services/oidc/oidcProviderService";
 import axios from "axios";
 
 export default function GoogleProviderButton({ text }: { text: string }) {
-    const providerService = new GoogleProviderService(
-        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-    );
+    const providerService = new OidcProviderService();
 
     const handleClick = async () => {
         const csrf = (
@@ -13,9 +12,12 @@ export default function GoogleProviderButton({ text }: { text: string }) {
             )
         ).data.csrf;
 
-        const authorizationCode =
-            await providerService.requestAuthorizationCode(csrf);
-        alert(authorizationCode);
+        // This method redirects
+        providerService.RequestAuthorizationCode(
+            OidcProviders.GOOGLE,
+            process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+            csrf,
+        );
     };
 
     return <button onClick={handleClick}>{text}</button>;
