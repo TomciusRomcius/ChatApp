@@ -12,6 +12,7 @@ namespace ChatApp.Application.Services
 
         public bool ValidateCsrfToken(string csrfToken)
         {
+            if (csrfToken.Length == 0) return false;
             return _csrfTokens.Contains(csrfToken);
         }
 
