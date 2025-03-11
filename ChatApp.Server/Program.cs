@@ -27,11 +27,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<DatabaseContext>();
-
+builder.Services.AddAntiforgery();
 builder.Services.AddAuthorization();
 
 ArgumentNullException.ThrowIfNull(builder.Configuration["CsrfHashingKey"]);
-builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService(builder.Configuration["CsrfHashingKey"]!));
+builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService());
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 {

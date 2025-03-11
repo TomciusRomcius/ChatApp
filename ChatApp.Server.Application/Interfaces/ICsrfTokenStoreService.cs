@@ -2,8 +2,8 @@ namespace ChatApp.Application.Interfaces
 {
     public interface ICsrfTokenStoreService
     {
-        public bool ValidateCsrfToken(string email, string csrfToken);
-        public string CreateUserCsrfToken(string email);
-        public void DeleteUserCsrfToken(string email, string csrfToken);
+        public bool ValidateCsrfToken(string csrfToken);
+        public string CreateUserCsrfToken();
+        public void DeleteUserCsrfToken(string csrfToken);
     }
 }

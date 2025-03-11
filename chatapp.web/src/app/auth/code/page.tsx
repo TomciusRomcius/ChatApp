@@ -7,6 +7,9 @@ import { useEffect } from "react";
 export default function AuthorizationCodeCallbackPage() {
     const searchParams = useSearchParams();
     const authorizationCode = searchParams.get("code");
+    const state = searchParams.get("state");
+
+    const securityToken = state.substring(15);
 
     const onAuthenticationResponse = (response: AuthenticationResponse) => {
         // if (response) {
@@ -24,7 +27,7 @@ export default function AuthorizationCodeCallbackPage() {
 
         // Send authorization code to the server which retrieves id_token and authenticates the user
         new OidcAuthenticationService()
-            .Authenticate(authorizationCode)
+            .Authenticate(authorizationCode, securityToken)
             .then((response) => {
                 onAuthenticationResponse(response);
             });

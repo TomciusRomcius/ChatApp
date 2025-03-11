@@ -4,6 +4,7 @@ using ChatApp.Application.Interfaces;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
 using ChatApp.Dtos;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,8 +25,9 @@ namespace ChatApp.Server.Presentation.Auth
         readonly SignInManager<IdentityUser> _signInManager;
         readonly UserManager<IdentityUser> _userManager;
         readonly ICsrfTokenStoreService _csrfTokenStoreService;
+        readonly IAntiforgery _antiforgery;
 
-        public OidcAuthController(IHttpClientFactory httpClientFactory, OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<OidcAuthController> logger, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ICsrfTokenStoreService csrfTokenStoreService)
+        public OidcAuthController(IHttpClientFactory httpClientFactory, OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<OidcAuthController> logger, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ICsrfTokenStoreService csrfTokenStoreService, IAntiforgery antiforgery)
         {
             _httpClientFactory = httpClientFactory;
             _oidcProviderConfigMapService = oidcProviderConfigMapService;
@@ -33,6 +35,7 @@ namespace ChatApp.Server.Presentation.Auth
             _signInManager = signInManager;
             _userManager = userManager;
             _csrfTokenStoreService = csrfTokenStoreService;
+            _antiforgery = antiforgery;
         }
 
         [HttpPost("login")]
@@ -58,12 +61,18 @@ namespace ChatApp.Server.Presentation.Auth
                 return BadRequest("Login failed");
             }
 
-            string csrfToken = _csrfTokenStoreService.CreateUserCsrfToken(dto.Email);
+            _antiforgery.SetCookieTokenAndHeader(HttpContext);
 
+            return Ok();
+        }
+
+        [HttpGet("security-key")]
+        public IActionResult GenerateCsrfForOidc()
+        {
             return Ok(
                 new
                 {
-                    csrfToken = csrfToken
+                    Csrf = _csrfTokenStoreService.CreateUserCsrfToken()
                 }
             );
         }
@@ -71,6 +80,11 @@ namespace ChatApp.Server.Presentation.Auth
         [HttpPost("oidc")]
         public async Task<IActionResult> AuthenticateWithOidc([FromBody] AuthenticateWithOidcDto dto)
         {
+            if (!_csrfTokenStoreService.ValidateCsrfToken(dto.SecurityToken))
+            {
+                return Unauthorized("Invalid security token");
+            }
+
             OidcProvider? provider = _oidcProviderConfigMapService.GetProvider(dto.Provider);
             if (provider is null)
             {
@@ -94,6 +108,8 @@ namespace ChatApp.Server.Presentation.Auth
 
             var bodyString = await res.Content.ReadAsStringAsync();
             OidcResponse? json = JsonSerializer.Deserialize<OidcResponse>(bodyString);
+
+            _logger.LogInformation(bodyString);
 
             var handler = new JwtSecurityTokenHandler();
             JwtSecurityToken? jsonToken = handler.ReadJwtToken(json.id_token);
@@ -120,6 +136,8 @@ namespace ChatApp.Server.Presentation.Auth
                 Email = email,
                 UserName = email
             }, true);
+
+            _antiforgery.SetCookieTokenAndHeader(HttpContext);
 
             return Ok(jsonToken.Subject);
         }

@@ -5,8 +5,10 @@ namespace ChatApp.Dtos
     public class AuthenticateWithOidcDto
     {
         [Required(AllowEmptyStrings = false)]
-        public string Provider { get; set; }
+        public required string Provider { get; set; }
         [Required(AllowEmptyStrings = false)]
-        public string AuthorizationCode { get; set; }
+        public required string AuthorizationCode { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public required string SecurityToken { get; set; }
     }
 }

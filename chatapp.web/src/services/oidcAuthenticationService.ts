@@ -1,10 +1,14 @@
 import axios from "axios";
 
 export default class OidcAuthenticationService {
-    async Authenticate(authorizationCode: string): Promise<void> {
+    async Authenticate(
+        authorizationCode: string,
+        securityToken: string,
+    ): Promise<void> {
         const data = {
             authorizationCode: authorizationCode,
             provider: "google",
+            securityToken: securityToken,
         };
 
         await axios.post(
