@@ -32,6 +32,8 @@ builder.Services.AddAuthorization();
 
 ArgumentNullException.ThrowIfNull(builder.Configuration["CsrfHashingKey"]);
 builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService());
+builder.Services.AddSingleton<IWebSocketList, WebSocketList>();
+builder.Services.AddSingleton<IWebSocketService, WebSocketService>();
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 {
@@ -68,7 +70,7 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseCors(options => options.WithOrigins("https://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod());
-
+app.UseWebSockets();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
