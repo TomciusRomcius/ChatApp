@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Server.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250305171833_UseIdentityUser")]
-    partial class UseIdentityUser
+    [Migration("20250313172110_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +31,7 @@ namespace ChatApp.Server.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AdminUserIdId")
+                    b.Property<string>("AdminUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
@@ -40,7 +40,7 @@ namespace ChatApp.Server.Infrastructure.Migrations
 
                     b.HasKey("ChatRoomId");
 
-                    b.HasIndex("AdminUserIdId");
+                    b.HasIndex("AdminUserId");
 
                     b.ToTable("ChatRooms");
                 });
@@ -73,25 +73,15 @@ namespace ChatApp.Server.Infrastructure.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Entities.UserFriend.UserFriendEntity", b =>
                 {
-                    b.Property<Guid>("User1Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("User2Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("User1Id1")
-                        .IsRequired()
+                    b.Property<string>("User1Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("User2Id1")
-                        .IsRequired()
+                    b.Property<string>("User2Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("User1Id", "User2Id");
 
-                    b.HasIndex("User1Id1");
-
-                    b.HasIndex("User2Id1");
+                    b.HasIndex("User2Id");
 
                     b.ToTable("UserFriends");
                 });
@@ -296,11 +286,11 @@ namespace ChatApp.Server.Infrastructure.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomEntity", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "AdminUserId")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "AdminUser")
                         .WithMany()
-                        .HasForeignKey("AdminUserIdId");
+                        .HasForeignKey("AdminUserId");
 
-                    b.Navigation("AdminUserId");
+                    b.Navigation("AdminUser");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoomMessage.ChatRoomTextMessageEntity", b =>
@@ -326,13 +316,13 @@ namespace ChatApp.Server.Infrastructure.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User1")
                         .WithMany()
-                        .HasForeignKey("User1Id1")
+                        .HasForeignKey("User1Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User2")
                         .WithMany()
-                        .HasForeignKey("User2Id1")
+                        .HasForeignKey("User2Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

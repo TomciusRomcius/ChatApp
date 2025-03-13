@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Server.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250221173126_Initial")]
-    partial class Initial
+    [Migration("20250313172321_Add status")]
+    partial class Addstatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,8 +31,8 @@ namespace ChatApp.Server.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AdminUserIdId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("AdminUserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -40,9 +40,9 @@ namespace ChatApp.Server.Infrastructure.Migrations
 
                     b.HasKey("ChatRoomId");
 
-                    b.HasIndex("AdminUserIdId");
+                    b.HasIndex("AdminUserId");
 
-                    b.ToTable("ChatRooms", (string)null);
+                    b.ToTable("ChatRooms");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoomMessage.ChatRoomTextMessageEntity", b =>
@@ -58,8 +58,9 @@ namespace ChatApp.Server.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ChatRoomTextMessageId");
 
@@ -67,75 +68,25 @@ namespace ChatApp.Server.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("ChatRoomTextMessages", (string)null);
-                });
-
-            modelBuilder.Entity("ChatApp.Domain.Entities.User.UserEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserEntity");
+                    b.ToTable("ChatRoomTextMessages");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Entities.UserFriend.UserFriendEntity", b =>
                 {
-                    b.Property<Guid>("User1Id")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("User1Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("User2Id")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("User2Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("User1Id", "User2Id");
 
                     b.HasIndex("User2Id");
 
-                    b.ToTable("UserFriends", (string)null);
+                    b.ToTable("UserFriends");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -338,13 +289,11 @@ namespace ChatApp.Server.Infrastructure.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomEntity", b =>
                 {
-                    b.HasOne("ChatApp.Domain.Entities.User.UserEntity", "AdminUserId")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "AdminUser")
                         .WithMany()
-                        .HasForeignKey("AdminUserIdId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AdminUserId");
 
-                    b.Navigation("AdminUserId");
+                    b.Navigation("AdminUser");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoomMessage.ChatRoomTextMessageEntity", b =>
@@ -355,7 +304,7 @@ namespace ChatApp.Server.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ChatApp.Domain.Entities.User.UserEntity", "Sender")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -368,13 +317,13 @@ namespace ChatApp.Server.Infrastructure.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Entities.UserFriend.UserFriendEntity", b =>
                 {
-                    b.HasOne("ChatApp.Domain.Entities.User.UserEntity", "User1")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User1")
                         .WithMany()
                         .HasForeignKey("User1Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ChatApp.Domain.Entities.User.UserEntity", "User2")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User2")
                         .WithMany()
                         .HasForeignKey("User2Id")
                         .OnDelete(DeleteBehavior.Restrict)
