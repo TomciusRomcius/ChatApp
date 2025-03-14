@@ -11,10 +11,10 @@ namespace ChatApp.Domain.Entities.UserFriend
 
     public class UserFriendEntity
     {
-        public required string User1Id { get; set; }
-        public required string User2Id { get; set; }
-        public IdentityUser? User1 { get; set; }
-        public IdentityUser? User2 { get; set; }
+        public required string InitiatorId { get; set; }
+        public required string ReceiverId { get; set; }
+        public IdentityUser? Initiator { get; set; }
+        public IdentityUser? Receiver { get; set; }
         public byte Status { get; set; }
 
         public static byte StatusToByte(string status)

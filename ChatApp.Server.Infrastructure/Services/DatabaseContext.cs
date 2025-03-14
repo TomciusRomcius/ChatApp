@@ -23,20 +23,20 @@ namespace ChatApp.Infrastructure.Services
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserFriendEntity>()
-            .HasKey(uf => new { uf.User1Id, uf.User2Id });
+            .HasKey(uf => new { uf.InitiatorId, uf.ReceiverId });
 
             modelBuilder.Entity<UserFriendEntity>()
-            .HasOne(uf => uf.User1)
+            .HasOne(uf => uf.Initiator)
             .WithMany()
             .IsRequired()
-            .HasForeignKey(uf => uf.User1Id)
+            .HasForeignKey(uf => uf.InitiatorId)
             .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserFriendEntity>()
-            .HasOne(uf => uf.User2)
+            .HasOne(uf => uf.Receiver)
             .WithMany()
             .IsRequired()
-            .HasForeignKey(uf => uf.User2Id)
+            .HasForeignKey(uf => uf.ReceiverId)
             .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ChatRoomEntity>()
@@ -49,22 +49,6 @@ namespace ChatApp.Infrastructure.Services
             .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
-        }
-
-        public override int SaveChanges()
-        {
-            foreach (var entry in ChangeTracker.Entries<UserFriendEntity>())
-            {
-                if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
-                {
-                    if (String.Compare(entry.Entity.User1Id, entry.Entity.User2Id) > 0)
-                    {
-                        (entry.Entity.User1Id, entry.Entity.User2Id) = (entry.Entity.User2Id, entry.Entity.User1Id);
-                    }
-                }
-            }
-
-            return base.SaveChanges();
         }
 
         public DbSet<UserFriendEntity> UserFriends { get; set; }
