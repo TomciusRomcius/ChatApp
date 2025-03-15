@@ -2,6 +2,7 @@ using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
+using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);

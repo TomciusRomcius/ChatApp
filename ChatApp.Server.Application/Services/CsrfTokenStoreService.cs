@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
-using System.Text;
-using ChatApp.Application.Interfaces;
+using ChatApp.Server.Application.Interfaces;
 
 // TODO: use redis
 namespace ChatApp.Application.Services
