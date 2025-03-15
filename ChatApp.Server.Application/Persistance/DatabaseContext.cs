@@ -1,3 +1,5 @@
+using System.Runtime.Intrinsics.X86;
+using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Entities.ChatRoomMessage;
 using ChatApp.Domain.Entities.UserFriend;
@@ -47,17 +49,29 @@ namespace ChatApp.Application.Persistance
             modelBuilder.Entity<ChatRoomEntity>()
             .HasKey(cr => cr.ChatRoomId);
 
-            modelBuilder.Entity<ChatRoomTextMessageEntity>().HasKey(crt => crt.ChatRoomTextMessageId);
-            modelBuilder.Entity<ChatRoomTextMessageEntity>()
-            .HasOne(crt => crt.Sender)
+            modelBuilder.Entity<TextMessageEntity>().HasKey(tm => tm.TextMessageId);
+
+            modelBuilder.Entity<UserMessageEntity>()
+            .HasKey(fm => fm.TextMessageId);
+
+            modelBuilder.Entity<UserMessageEntity>()
+            .HasOne(um => um.TextMessage)
             .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
+            .IsRequired()
+            .HasForeignKey(um => um.TextMessageId);
+
+            modelBuilder.Entity<UserMessageEntity>()
+            .HasOne(fm => fm.Receiver)
+            .WithMany()
+            .IsRequired()
+            .HasForeignKey(fm => fm.ReceiverId);
 
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<UserFriendEntity> UserFriends { get; set; }
         public DbSet<ChatRoomEntity> ChatRooms { get; set; }
-        public DbSet<ChatRoomTextMessageEntity> ChatRoomTextMessages { get; set; }
+        public DbSet<TextMessageEntity> TextMessages { get; set; }
+        public DbSet<UserMessageEntity> UserMessages { get; set; }
     }
 }
