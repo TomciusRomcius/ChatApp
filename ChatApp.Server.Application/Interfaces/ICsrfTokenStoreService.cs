@@ -1,4 +1,4 @@
-namespace ChatApp.Application.Interfaces
+namespace ChatApp.Server.Application.Interfaces
 {
     public interface ICsrfTokenStoreService
     {
