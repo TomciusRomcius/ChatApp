@@ -55,7 +55,7 @@ namespace ChatApp.Application.Services
                 result.Add(row);
             }
 
-            return new Result<ArrayList>(result, null);
+            return new Result<ArrayList>(result);
         }
 
         public async Task<ResultError?> SendFriendRequest(string initiatorUserId, string receiverUserId)
@@ -66,18 +66,29 @@ namespace ChatApp.Application.Services
                 return new ResultError(ResultErrorType.VALIDATION_ERROR, "You cannot add youself");
             }
 
-            await _databaseContext.UserFriends.AddAsync(
-                new UserFriendEntity
-                {
-                    InitiatorId = initiatorUserId,
-                    ReceiverId = receiverUserId,
-                    Status = UserFriendStatus.REQUEST,
-                }
-            );
+            var entity = new UserFriendEntity
+            {
+                InitiatorId = initiatorUserId,
+                ReceiverId = receiverUserId,
+                Status = UserFriendStatus.REQUEST,
+            };
 
-            await _databaseContext.SaveChangesAsync();
+            ResultError? error = UserFriendEntity.Validate(entity);
 
-            return null;
+            if (error is not null)
+            {
+                await _databaseContext.UserFriends.AddAsync(
+                                entity
+                            );
+                await _databaseContext.SaveChangesAsync();
+
+                return null;
+            }
+
+            else
+            {
+                return error;
+            }
         }
 
         public async Task<ResultError?> AcceptFriendRequest(string initiatorUserId, string receiverUserId)

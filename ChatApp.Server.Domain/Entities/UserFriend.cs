@@ -1,3 +1,4 @@
+using ChatApp.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Domain.Entities.UserFriend
@@ -16,5 +17,20 @@ namespace ChatApp.Domain.Entities.UserFriend
         public IdentityUser? Initiator { get; set; }
         public IdentityUser? Receiver { get; set; }
         public byte Status { get; set; }
+
+        public static ResultError? Validate(UserFriendEntity entity)
+        {
+            if (entity.InitiatorId.Length == 0 || entity.ReceiverId.Length == 0)
+            {
+                return new ResultError(ResultErrorType.VALIDATION_ERROR, "Initiator id and receiver id cannot be empty");
+            }
+
+            if (entity.InitiatorId == entity.ReceiverId)
+            {
+                return new ResultError(ResultErrorType.VALIDATION_ERROR, "Initiator id cannot be equal to receiver id");
+            }
+
+            return null;
+        }
     }
 }
