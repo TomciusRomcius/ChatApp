@@ -1,6 +1,7 @@
 using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Entities.UserFriend;
+using ChatApp.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
@@ -27,10 +28,11 @@ namespace ChatApp.Server.Application.Tests.Integration
             await _databaseContext.Users.AddAsync(user2);
             await _databaseContext.SaveChangesAsync();
 
-            await _friendService.SendFriendRequest(user1.Id, user2.Id);
+            ResultError? error = await _friendService.SendFriendRequest(user1.Id, user2.Id);
 
             var friends = _databaseContext.UserFriends.Where((uf) => uf.InitiatorId == user1.Id && uf.ReceiverId == user2.Id).ToList();
 
+            Assert.Null(error);
             Assert.NotEmpty(friends);
             Assert.Equal(UserFriendStatus.REQUEST, friends[0].Status);
         }
