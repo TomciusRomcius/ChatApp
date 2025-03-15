@@ -8,6 +8,11 @@ namespace ChatApp.Application.Persistance
 {
     public class DatabaseContext : IdentityDbContext
     {
+        public DatabaseContext() : base()
+        {
+
+        }
+
         public DatabaseContext(DbContextOptions options) : base(options)
         {
 
