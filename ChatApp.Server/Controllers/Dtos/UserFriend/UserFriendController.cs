@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Security.Claims;
+using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities.UserFriend;
-using ChatApp.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

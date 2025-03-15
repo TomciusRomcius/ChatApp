@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ChatApp.Server.Infrastructure.Migrations
+namespace ChatApp.Server.Application.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -178,21 +178,22 @@ namespace ChatApp.Server.Infrastructure.Migrations
                 name: "UserFriends",
                 columns: table => new
                 {
-                    User1Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    User2Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    InitiatorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserFriends", x => new { x.User1Id, x.User2Id });
+                    table.PrimaryKey("PK_UserFriends", x => new { x.InitiatorId, x.ReceiverId });
                     table.ForeignKey(
-                        name: "FK_UserFriends_AspNetUsers_User1Id",
-                        column: x => x.User1Id,
+                        name: "FK_UserFriends_AspNetUsers_InitiatorId",
+                        column: x => x.InitiatorId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserFriends_AspNetUsers_User2Id",
-                        column: x => x.User2Id,
+                        name: "FK_UserFriends_AspNetUsers_ReceiverId",
+                        column: x => x.ReceiverId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -279,9 +280,9 @@ namespace ChatApp.Server.Infrastructure.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFriends_User2Id",
+                name: "IX_UserFriends_ReceiverId",
                 table: "UserFriends",
-                column: "User2Id");
+                column: "ReceiverId");
         }
 
         /// <inheritdoc />
