@@ -116,6 +116,7 @@ namespace ChatApp.Application.Services
                 return new ResultError(ResultErrorType.VALIDATION_ERROR, "You cannot remove youself from friends list");
             }
 
+            // TODO: Not very efficient, maybe find a better way
             await _databaseContext.UserFriends.Where((uf) => uf.InitiatorId == user1Id && uf.ReceiverId == user2Id).ExecuteDeleteAsync();
             await _databaseContext.UserFriends.Where((uf) => uf.InitiatorId == user2Id && uf.ReceiverId == user1Id).ExecuteDeleteAsync();
 
