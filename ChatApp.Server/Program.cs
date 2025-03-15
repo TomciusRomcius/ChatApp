@@ -1,4 +1,3 @@
-using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
@@ -55,6 +54,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.HttpOnly = true;
 });
+
+// Services for controllers:
+
+builder.Services.AddScoped<IUserFriendService, UserFriendService>();
 
 builder.Services.AddEndpointsApiExplorer();
 
