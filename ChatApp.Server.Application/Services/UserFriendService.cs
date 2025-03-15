@@ -71,7 +71,7 @@ namespace ChatApp.Application.Services
                 {
                     InitiatorId = initiatorUserId,
                     ReceiverId = receiverUserId,
-                    Status = UserFriendEntity.StatusToByte(UserFriendStatus.REQUEST),
+                    Status = UserFriendStatus.REQUEST,
                 }
             );
 
@@ -86,7 +86,7 @@ namespace ChatApp.Application.Services
 
             if (instance is not null)
             {
-                instance.Status = UserFriendEntity.StatusToByte(UserFriendStatus.FRIEND);
+                instance.Status = UserFriendStatus.FRIEND;
                 await _databaseContext.SaveChangesAsync();
             }
 

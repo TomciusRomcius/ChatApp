@@ -4,9 +4,9 @@ namespace ChatApp.Domain.Entities.UserFriend
 {
     public static class UserFriendStatus
     {
-        public static string REQUEST = "request";
-        public static string FRIEND = "friend";
-        public static string BLOCKED = "blocked";
+        public static byte REQUEST = 0x00;
+        public static byte FRIEND = 0x01;
+        public static byte BLOCKED = 0x10;
     }
 
     public class UserFriendEntity
@@ -16,52 +16,5 @@ namespace ChatApp.Domain.Entities.UserFriend
         public IdentityUser? Initiator { get; set; }
         public IdentityUser? Receiver { get; set; }
         public byte Status { get; set; }
-
-        public static byte StatusToByte(string status)
-        {
-            if (status == "request")
-            {
-                return 0x00;
-            }
-
-            else if (status == "friend")
-            {
-                return 0x01;
-            }
-
-            else if (status == "blocked")
-            {
-                return 0x10;
-            }
-
-            else
-            {
-                throw new ArgumentException($"Invalid status: {status}");
-            }
-        }
-
-        public static string ByteToStatus(byte statusByte)
-        {
-            if (statusByte == 0x00)
-            {
-                return "request";
-            }
-
-            else if (statusByte == 0x01)
-            {
-                return "friend";
-            }
-
-            else if (statusByte == 0x10)
-            {
-                return "blocked";
-            }
-
-            else
-            {
-                throw new ArgumentException($"Invalid status bytes: {statusByte}");
-
-            }
-        }
     }
 }

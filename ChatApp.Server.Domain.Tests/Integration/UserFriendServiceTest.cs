@@ -32,7 +32,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             var friends = _databaseContext.UserFriends.Where((uf) => uf.InitiatorId == user1.Id && uf.ReceiverId == user2.Id).ToList();
 
             Assert.NotEmpty(friends);
-            Assert.Equal(UserFriendEntity.StatusToByte(UserFriendStatus.REQUEST), friends[0].Status);
+            Assert.Equal(UserFriendStatus.REQUEST, friends[0].Status);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             {
                 InitiatorId = user1.Id,
                 ReceiverId = user2.Id,
-                Status = UserFriendEntity.StatusToByte(UserFriendStatus.REQUEST)
+                Status = UserFriendStatus.REQUEST
             });
             await _databaseContext.SaveChangesAsync();
 
@@ -56,7 +56,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             var friends = _databaseContext.UserFriends.Where((uf) => uf.InitiatorId == user1.Id && uf.ReceiverId == user2.Id).ToList();
 
             Assert.NotEmpty(friends);
-            Assert.Equal(UserFriendEntity.StatusToByte(UserFriendStatus.FRIEND), friends[0].Status);
+            Assert.Equal(UserFriendStatus.FRIEND, friends[0].Status);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             {
                 InitiatorId = user1.Id,
                 ReceiverId = user2.Id,
-                Status = UserFriendEntity.StatusToByte(UserFriendStatus.FRIEND)
+                Status = UserFriendStatus.FRIEND
             });
             await _databaseContext.SaveChangesAsync();
 
