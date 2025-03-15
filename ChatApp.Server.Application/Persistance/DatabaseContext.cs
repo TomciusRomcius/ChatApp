@@ -1,7 +1,5 @@
-using System.Runtime.Intrinsics.X86;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.ChatRoom;
-using ChatApp.Domain.Entities.ChatRoomMessage;
 using ChatApp.Domain.Entities.UserFriend;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +18,6 @@ namespace ChatApp.Application.Persistance
 
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(
-                @"SERVER=tcp:127.0.0.1,1433;DATABASE=development;User ID=sa;Password=DevelopmentPassword.2025;TrustServerCertificate=True",
-                o => o.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)
-            );
-        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserFriendEntity>()

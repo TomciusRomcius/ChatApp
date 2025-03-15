@@ -1,5 +1,4 @@
 using ChatApp.Domain.Entities.ChatRoom;
-using ChatApp.Domain.Entities.ChatRoomMessage;
 
 namespace ChatApp.Domain.Entities
 {

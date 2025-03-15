@@ -1,4 +1,3 @@
-using ChatApp.Domain.Entities.ChatRoomMessage;
 using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Domain.Entities
