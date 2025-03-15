@@ -1,8 +1,10 @@
+using System.Data;
 using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,13 @@ builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<DatabaseContext>();
+string? MSSqlConnectionString = builder.Configuration["MSSqlConnectionString"];
+if (MSSqlConnectionString is null || MSSqlConnectionString.Length == 0)
+{
+    throw new DataException("MSSqlConnectionString is not defined in appsettings.json");
+}
+
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(MSSqlConnectionString));
 builder.Services.AddAntiforgery();
 builder.Services.AddAuthorization();
 
