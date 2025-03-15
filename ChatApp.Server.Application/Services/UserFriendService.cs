@@ -75,11 +75,9 @@ namespace ChatApp.Application.Services
 
             ResultError? error = UserFriendEntity.Validate(entity);
 
-            if (error is not null)
+            if (error is null)
             {
-                await _databaseContext.UserFriends.AddAsync(
-                                entity
-                            );
+                await _databaseContext.UserFriends.AddAsync(entity);
                 await _databaseContext.SaveChangesAsync();
 
                 return null;
