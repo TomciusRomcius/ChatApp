@@ -4,18 +4,32 @@ using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Testcontainers.MsSql;
 
 namespace ChatApp.Server.Application.Tests.Integration
 {
-    public class UserFriendServiceTest
+    public class UserFriendServiceTest : IAsyncLifetime
     {
-        readonly DatabaseContext _databaseContext;
-        readonly IUserFriendService _friendService;
+        DatabaseContext? _databaseContext;
+        IUserFriendService? _friendService;
+        MsSqlContainer? _container;
 
-        public UserFriendServiceTest()
+        public async Task InitializeAsync()
         {
-            _databaseContext = new DatabaseContext();
+            _container = new MsSqlBuilder().Build();
+            await _container.StartAsync();
+            string connectionString = _container.GetConnectionString();
+
+            _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
+            await _databaseContext.Database.EnsureCreatedAsync();
+
             _friendService = new UserFriendService(_databaseContext);
+        }
+
+        public async Task DisposeAsync()
+        {
+            await _container!.StopAsync();
         }
 
         [Fact]
@@ -24,7 +38,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             var user1 = new IdentityUser("User1");
             var user2 = new IdentityUser("User2");
 
-            await _databaseContext.Users.AddAsync(user1);
+            await _databaseContext!.Users.AddAsync(user1);
             await _databaseContext.Users.AddAsync(user2);
             await _databaseContext.SaveChangesAsync();
 
@@ -43,7 +57,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             var user1 = new IdentityUser("User1");
             var user2 = new IdentityUser("User2");
 
-            await _databaseContext.Users.AddAsync(user1);
+            await _databaseContext!.Users.AddAsync(user1);
             await _databaseContext.Users.AddAsync(user2);
             await _databaseContext.UserFriends.AddAsync(new UserFriendEntity
             {
@@ -53,7 +67,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             });
             await _databaseContext.SaveChangesAsync();
 
-            await _friendService.AcceptFriendRequest(user1.Id, user2.Id);
+            await _friendService!.AcceptFriendRequest(user1.Id, user2.Id);
 
             var friends = _databaseContext.UserFriends.Where((uf) => uf.InitiatorId == user1.Id && uf.ReceiverId == user2.Id).ToList();
 
@@ -67,7 +81,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             var user1 = new IdentityUser("User1");
             var user2 = new IdentityUser("User2");
 
-            await _databaseContext.Users.AddAsync(user1);
+            await _databaseContext!.Users.AddAsync(user1);
             await _databaseContext.Users.AddAsync(user2);
             await _databaseContext.UserFriends.AddAsync(new UserFriendEntity
             {
@@ -77,7 +91,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             });
             await _databaseContext.SaveChangesAsync();
 
-            await _friendService.RemoveFromFriends(user1.Id, user2.Id);
+            await _friendService!.RemoveFromFriends(user1.Id, user2.Id);
 
             var friends = _databaseContext.UserFriends.Where((uf) => uf.InitiatorId == user1.Id && uf.ReceiverId == user2.Id).ToList();
 
