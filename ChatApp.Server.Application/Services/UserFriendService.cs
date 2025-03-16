@@ -23,7 +23,7 @@ namespace ChatApp.Application.Services
             var query1 = from friend in _databaseContext.UserFriends
                          join receiver in _databaseContext.Users
                          on friend.ReceiverId equals receiver.Id
-                         where friend.InitiatorId == userId
+                         where friend.InitiatorId == userId && friend.Status == UserFriendStatus.FRIEND
                          select new
                          {
                              UserId = receiver.Id,
@@ -35,7 +35,7 @@ namespace ChatApp.Application.Services
             var query2 = from friend in _databaseContext.UserFriends
                          join initiator in _databaseContext.Users
                          on friend.InitiatorId equals initiator.Id
-                         where friend.ReceiverId == userId
+                         where friend.ReceiverId == userId && friend.Status == UserFriendStatus.FRIEND
                          select new
                          {
                              UserId = initiator.Id,

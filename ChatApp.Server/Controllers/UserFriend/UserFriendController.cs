@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Security.Claims;
+using ChatApp.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,10 +18,33 @@ namespace ChatApp.Server.Presentation.UserFriend
         }
 
         [HttpGet]
-        public IActionResult GetUserFriends([FromBody] AddFriendDto dto)
+        public IActionResult GetUserFriends([FromBody] GetFriendsDto dto)
         {
-            var result = _userFriendService.GetUserFriends(dto.UserId);
-            return Ok(result);
+            string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
+
+            ArrayList friends = new ArrayList();
+
+            if (dto.UserId is not null)
+            {
+                Result<ArrayList> result = _userFriendService.GetUserFriends(dto.UserId);
+
+                if (result.IsError())
+                {
+
+                }
+
+                else
+                {
+                    friends = result.GetValue();
+                }
+            }
+
+            return Ok(friends);
         }
 
         [HttpPost("request")]
