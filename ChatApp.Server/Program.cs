@@ -3,6 +3,7 @@ using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
+using ChatApp.Server.Application.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -66,6 +67,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Services for controllers:
 
 builder.Services.AddScoped<IUserFriendService, UserFriendService>();
+builder.Services.AddScoped<IUserMessageService, UserMessageService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

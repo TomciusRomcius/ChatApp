@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities;
+using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Presentation.UserFriend;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +11,11 @@ namespace ChatApp.Server.Presentation.UserMessage
     [Route("[controller]")]
     public class UserMessageController : ControllerBase
     {
-        readonly DatabaseContext _databaseContext;
+        readonly IUserMessageService _userMessageService;
 
-        public UserMessageController(DatabaseContext databaseContext)
+        public UserMessageController(IUserMessageService userMessageService)
         {
-            _databaseContext = databaseContext;
+            _userMessageService = userMessageService;
         }
 
         [HttpGet]
@@ -27,20 +28,8 @@ namespace ChatApp.Server.Presentation.UserMessage
                 return Unauthorized();
             }
 
-            var query = from userMessage in _databaseContext.UserMessages
-                        join textMessage in _databaseContext.TextMessages
-                        on userMessage.TextMessageId equals textMessage.TextMessageId
-                        where userMessage.SenderId == userId || userMessage.ReceiverId == userId
-                        select new
-                        {
-                            userMessage.SenderId,
-                            userMessage.ReceiverId,
-                            userMessage.TextMessageId,
-                            textMessage.Content,
-                            userMessage.CreatedAt,
-                        };
+            var result = _userMessageService.GetMessages(userId);
 
-            List<object> result = [.. query];
             return Ok(result);
         }
 
@@ -54,31 +43,14 @@ namespace ChatApp.Server.Presentation.UserMessage
                 return Unauthorized();
             }
 
-            var msg = new TextMessageEntity
-            {
-                TextMessageId = Guid.NewGuid(),
-                Content = dto.Content,
-            };
+            await _userMessageService.SendMessage(userId, dto.ReceiverId, dto.Content);
 
-            var userMsg = new UserMessageEntity
-            {
-                TextMessageId = msg.TextMessageId,
-                SenderId = userId,
-                ReceiverId = dto.ReceiverId
-            };
-
-
-            await _databaseContext.TextMessages.AddAsync(msg);
-            await _databaseContext.UserMessages.AddAsync(userMsg);
-            await _databaseContext.SaveChangesAsync();
-
-            return Created("", msg);
+            return Created();
         }
 
         [HttpDelete]
         public async Task DeleteMessage()
         {
-
         }
     }
 }
