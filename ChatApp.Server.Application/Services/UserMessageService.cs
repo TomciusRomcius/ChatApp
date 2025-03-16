@@ -58,8 +58,6 @@ namespace ChatApp.Server.Application.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-
-
             await _databaseContext.TextMessages.AddAsync(msg);
             await _databaseContext.UserMessages.AddAsync(userMsg);
             await _databaseContext.SaveChangesAsync();
@@ -81,12 +79,11 @@ namespace ChatApp.Server.Application.Services
 
             if (userMessage.SenderId != userId)
             {
-                return new ResultError(ResultErrorType.VALIDATION_ERROR, "Trying to delete a message where user is not a sender");
+                return new ResultError(ResultErrorType.FORBIDDEN_ERROR, "Trying to delete a message where user is not a sender");
             }
 
             messageQuery.ExecuteDelete();
             return null;
-
         }
     }
 }

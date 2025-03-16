@@ -1,6 +1,5 @@
 using System.Security.Claims;
-using ChatApp.Application.Persistance;
-using ChatApp.Domain.Entities;
+using ChatApp.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Presentation.UserFriend;
 using Microsoft.AspNetCore.Mvc;
@@ -64,8 +63,26 @@ namespace ChatApp.Server.Presentation.UserMessage
         }
 
         [HttpDelete]
-        public async Task DeleteMessage()
+        public IActionResult DeleteMessage([FromBody] DeleteMessageDto dto)
         {
+            string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
+
+            ResultError? error = _userMessageService.DeleteMessage(userId, new Guid(dto.MessageId));
+
+            if (error is not null)
+            {
+                return Forbid(error.Message);
+            }
+
+            else
+            {
+                return Created();
+            }
         }
     }
 }
