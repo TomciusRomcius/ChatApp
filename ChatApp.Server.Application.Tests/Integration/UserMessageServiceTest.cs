@@ -1,5 +1,5 @@
-using ChatApp.Application.Persistance;
-using ChatApp.Domain.Entities;
+using ChatApp.Server.Application.Persistance;
+using ChatApp.Server.Domain.Entities;
 using ChatApp.Server.Application.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

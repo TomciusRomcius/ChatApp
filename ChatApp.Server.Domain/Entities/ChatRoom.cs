@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace ChatApp.Domain.Entities.ChatRoom
+namespace ChatApp.Server.Domain.Entities.ChatRoom
 {
     public class ChatRoomEntity
     {

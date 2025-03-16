@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
-using ChatApp.Application.Services;
+using ChatApp.Server.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Server.Presentation.Websocket

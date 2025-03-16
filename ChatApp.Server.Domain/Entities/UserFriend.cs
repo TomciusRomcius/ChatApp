@@ -1,7 +1,7 @@
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
 
-namespace ChatApp.Domain.Entities.UserFriend
+namespace ChatApp.Server.Domain.Entities.UserFriend
 {
     public static class UserFriendStatus
     {

@@ -1,7 +1,7 @@
 using System.Data;
-using ChatApp.Application.Persistance;
-using ChatApp.Application.Services;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Application.Persistance;
+using ChatApp.Server.Application.Services;
+using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Application.Services;
 using Microsoft.AspNetCore.Identity;

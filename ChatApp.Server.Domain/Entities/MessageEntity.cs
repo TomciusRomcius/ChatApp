@@ -1,7 +1,7 @@
-using ChatApp.Domain.Entities.ChatRoom;
+using ChatApp.Server.Domain.Entities.ChatRoom;
 using Microsoft.AspNetCore.Identity;
 
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Server.Domain.Entities
 {
     public class MessageEntity
     {

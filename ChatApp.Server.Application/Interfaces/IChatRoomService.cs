@@ -1,5 +1,5 @@
-using ChatApp.Domain.Entities.ChatRoom;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Domain.Entities.ChatRoom;
+using ChatApp.Server.Domain.Utils;
 
 namespace ChatApp.Server.Application.Interfaces
 {

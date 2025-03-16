@@ -1,4 +1,4 @@
-namespace ChatApp.Domain.Entities
+namespace ChatApp.Server.Domain.Entities
 {
     public class TextMessageEntity
     {

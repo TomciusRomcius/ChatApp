@@ -1,6 +1,6 @@
 using System.Net.WebSockets;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Server.Application.Services
 {
     /// <summary>
     /// Includes a TaskCompletionSource for ASP.Net core, to not terminate socket middleware

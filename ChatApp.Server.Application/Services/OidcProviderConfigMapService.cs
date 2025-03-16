@@ -1,6 +1,6 @@
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Domain.Utils;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Server.Application.Services
 {
     public class OidcProviderConfigMapService
     {

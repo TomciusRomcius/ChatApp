@@ -1,4 +1,4 @@
-namespace ChatApp.Application.Services
+namespace ChatApp.Server.Application.Services
 {
     public interface IAuthService
     {

@@ -1,11 +1,11 @@
 using System.Collections;
-using ChatApp.Application.Persistance;
-using ChatApp.Domain.Entities.UserFriend;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Application.Persistance;
+using ChatApp.Server.Domain.Entities.UserFriend;
+using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Server.Application.Services
 {
     public class UserFriendService : IUserFriendService
     {

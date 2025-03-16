@@ -2,7 +2,7 @@ using System.Net.WebSockets;
 using System.Text;
 using Microsoft.Extensions.Hosting;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Server.Application.Services
 {
     public interface IWebSocketService
     {

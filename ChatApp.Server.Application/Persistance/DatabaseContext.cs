@@ -1,10 +1,10 @@
-using ChatApp.Domain.Entities;
-using ChatApp.Domain.Entities.ChatRoom;
-using ChatApp.Domain.Entities.UserFriend;
+using ChatApp.Server.Domain.Entities;
+using ChatApp.Server.Domain.Entities.ChatRoom;
+using ChatApp.Server.Domain.Entities.UserFriend;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChatApp.Application.Persistance
+namespace ChatApp.Server.Application.Persistance
 {
     public class DatabaseContext : IdentityDbContext
     {

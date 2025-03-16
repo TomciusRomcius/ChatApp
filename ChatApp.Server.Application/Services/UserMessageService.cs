@@ -1,7 +1,7 @@
-using ChatApp.Application.Persistance;
-using ChatApp.Domain.Entities;
-using ChatApp.Domain.Models;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Application.Persistance;
+using ChatApp.Server.Domain.Entities;
+using ChatApp.Server.Domain.Models;
+using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

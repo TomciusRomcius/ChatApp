@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using ChatApp.Server.Application.Interfaces;
 
 // TODO: use redis
-namespace ChatApp.Application.Services
+namespace ChatApp.Server.Application.Services
 {
     public class CsrfTokenStoreService : ICsrfTokenStoreService
     {

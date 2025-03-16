@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Security.Claims;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

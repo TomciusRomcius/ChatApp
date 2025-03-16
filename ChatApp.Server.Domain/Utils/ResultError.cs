@@ -1,4 +1,4 @@
-namespace ChatApp.Domain.Utils
+namespace ChatApp.Server.Domain.Utils
 {
     public enum ResultErrorType
     {

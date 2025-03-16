@@ -1,7 +1,7 @@
-using ChatApp.Application.Persistance;
-using ChatApp.Application.Services;
-using ChatApp.Domain.Entities.UserFriend;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Application.Persistance;
+using ChatApp.Server.Application.Services;
+using ChatApp.Server.Domain.Entities.UserFriend;
+using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

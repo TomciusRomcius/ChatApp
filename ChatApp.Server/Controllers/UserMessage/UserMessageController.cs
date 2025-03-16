@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Presentation.UserFriend;
 using Microsoft.AspNetCore.Mvc;

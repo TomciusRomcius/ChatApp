@@ -1,4 +1,4 @@
-namespace ChatApp.Domain.Models
+namespace ChatApp.Server.Domain.Models
 {
     public class UserTextMessageModel
     {

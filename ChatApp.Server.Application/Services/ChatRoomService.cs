@@ -1,6 +1,6 @@
-using ChatApp.Application.Persistance;
-using ChatApp.Domain.Entities.ChatRoom;
-using ChatApp.Domain.Utils;
+using ChatApp.Server.Application.Persistance;
+using ChatApp.Server.Domain.Entities.ChatRoom;
+using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
