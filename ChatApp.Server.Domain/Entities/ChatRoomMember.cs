@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Domain.Entities.ChatRoom
 {
-    public class ChatRoomMember
+    public class ChatRoomMemberEntity
     {
         public required string ChatRoomId { get; set; }
         public required string MemberId { get; set; }

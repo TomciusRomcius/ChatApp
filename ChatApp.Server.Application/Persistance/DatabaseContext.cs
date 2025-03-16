@@ -46,15 +46,15 @@ namespace ChatApp.Application.Persistance
             .HasForeignKey(cr => cr.AdminUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<ChatRoomMember>()
+            modelBuilder.Entity<ChatRoomMemberEntity>()
             .HasKey(crm => new { crm.ChatRoomId, crm.MemberId });
 
-            modelBuilder.Entity<ChatRoomMember>()
+            modelBuilder.Entity<ChatRoomMemberEntity>()
             .HasOne(crm => crm.ChatRoom)
             .WithMany()
             .HasForeignKey(crm => crm.ChatRoomId);
 
-            modelBuilder.Entity<ChatRoomMember>()
+            modelBuilder.Entity<ChatRoomMemberEntity>()
             .HasOne(crm => crm.Member)
             .WithMany()
             .HasForeignKey(crm => crm.MemberId);
@@ -85,7 +85,7 @@ namespace ChatApp.Application.Persistance
 
         public DbSet<UserFriendEntity> UserFriends { get; set; }
         public DbSet<ChatRoomEntity> ChatRooms { get; set; }
-        public DbSet<ChatRoomMember> ChatRoomMembers { get; set; }
+        public DbSet<ChatRoomMemberEntity> ChatRoomMembers { get; set; }
         public DbSet<TextMessageEntity> TextMessages { get; set; }
         public DbSet<MessageEntity> UserMessages { get; set; }
     }
