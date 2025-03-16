@@ -2,7 +2,8 @@ namespace ChatApp.Domain.Utils
 {
     public enum ResultErrorType
     {
-        VALIDATION_ERROR
+        VALIDATION_ERROR,
+        FORBIDDEN_ERROR,
     }
 
     public class ResultError
