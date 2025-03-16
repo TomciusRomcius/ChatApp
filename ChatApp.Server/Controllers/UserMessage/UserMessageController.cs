@@ -19,7 +19,7 @@ namespace ChatApp.Server.Presentation.UserMessage
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMessages()
+        public IActionResult GetMessages()
         {
             string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
