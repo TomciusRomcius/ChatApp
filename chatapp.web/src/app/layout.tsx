@@ -8,7 +8,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             {/* TODO: fix hydration, don't know why it happens.... */}
-            <body className="bg-black" suppressHydrationWarning>
+            <body className="bg-background-0" suppressHydrationWarning>
                 {children}
             </body>
         </html>

@@ -10,5 +10,12 @@ h5,
 h6,
 p,
 button {
-    color: white;
+    color: var(--color-text);
+}
+
+:root {
+    --color-background-0: #f4f4f9;
+    --color-background-100: #eeeef4;
+    --color-text: #050528;
+    --color-text-lighter: #050528;
 }
