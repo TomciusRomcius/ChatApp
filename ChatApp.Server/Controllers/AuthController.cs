@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using ChatApp.Server.Application.Services;
 using ChatApp.Server.Domain.Utils;
-using ChatApp.Dtos;
+using ChatApp.Server.Presentation.Dtos;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;

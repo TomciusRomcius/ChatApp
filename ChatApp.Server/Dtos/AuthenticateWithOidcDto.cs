@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChatApp.Dtos
+namespace ChatApp.Server.Presentation.Dtos
 {
     public class AuthenticateWithOidcDto
     {
