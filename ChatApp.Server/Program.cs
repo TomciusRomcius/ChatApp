@@ -68,6 +68,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<IUserFriendService, UserFriendService>();
 builder.Services.AddScoped<IUserMessageService, UserMessageService>();
+builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities.ChatRoom;
+using ChatApp.Domain.Utils;
+using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Server.Presentation.ChatRoom
 {
@@ -10,11 +10,11 @@ namespace ChatApp.Server.Presentation.ChatRoom
     [Route("[controller]")]
     public class ChatRoomController : ControllerBase
     {
-        readonly DatabaseContext _databaseContext;
+        readonly IChatRoomService _chatRoomService;
 
-        public ChatRoomController(DatabaseContext databaseContext)
+        public ChatRoomController(IChatRoomService chatRoomService)
         {
-            _databaseContext = databaseContext;
+            _chatRoomService = chatRoomService;
         }
 
         [HttpGet]
@@ -27,13 +27,26 @@ namespace ChatApp.Server.Presentation.ChatRoom
                 return Unauthorized();
             }
 
-            var query = from chatroomMember in _databaseContext.ChatRoomMembers
-                        where chatroomMember.MemberId == userId
-                        join chatroom in _databaseContext.ChatRooms
-                        on chatroomMember.ChatRoomId equals chatroom.ChatRoomId
-                        select chatroom;
+            Result<List<ChatRoomEntity>> result = _chatRoomService.GetChatRooms(userId);
 
-            List<ChatRoomEntity> result = [.. query];
+            if (result.IsError())
+            {
+                var error = result.Errors.First();
+                if (error.Type == ResultErrorType.VALIDATION_ERROR)
+                {
+                    return BadRequest(error.Message);
+                }
+
+                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
+                {
+                    return BadRequest(error.Message);
+                }
+
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+            }
 
             return Ok(result);
         }
@@ -48,28 +61,28 @@ namespace ChatApp.Server.Presentation.ChatRoom
                 return Unauthorized();
             }
 
-            var chatroom = new ChatRoomEntity
-            {
-                ChatRoomId = Guid.NewGuid().ToString(),
-                AdminUserId = userId,
-                Name = dto.Name,
-            };
+            Result<string> result = await _chatRoomService.CreateChatRoomAsync(userId, dto.Name, dto.Members ?? []);
 
-            await _databaseContext.ChatRooms.AddAsync(chatroom);
-
-            // If user provides initial chat room members, add them 
-            if (dto.Members.Any())
+            if (result.IsError())
             {
-                await _databaseContext.ChatRoomMembers.AddRangeAsync(dto.Members.Select(uid => new ChatRoomMemberEntity
+                var error = result.Errors.First();
+                if (error.Type == ResultErrorType.VALIDATION_ERROR)
                 {
-                    ChatRoomId = chatroom.ChatRoomId,
-                    MemberId = uid
-                }));
+                    return BadRequest(error.Message);
+                }
 
-                await _databaseContext.SaveChangesAsync();
+                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
+                {
+                    return Forbid(error.Message);
+                }
+
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
             }
 
-            return Created("", new { ChatRoomId = chatroom.ChatRoomId });
+            return Created("", new { ChatRoomId = result.GetValue() });
         }
 
         [HttpDelete]
@@ -82,20 +95,25 @@ namespace ChatApp.Server.Presentation.ChatRoom
                 return Unauthorized();
             }
 
-            var query = _databaseContext.ChatRooms.Where(cr => cr.ChatRoomId == dto.ChatRoomId);
-            ChatRoomEntity? chatRoom = query.FirstOrDefault();
+            ResultError? error = await _chatRoomService.DeleteChatRoomAsync(userId, dto.ChatRoomId);
 
-            if (chatRoom is null)
+            if (error is not null)
             {
-                return BadRequest("Chat room does not exist");
-            }
+                if (error.Type == ResultErrorType.VALIDATION_ERROR)
+                {
+                    return BadRequest(error.Message);
+                }
 
-            if (userId != chatRoom.AdminUserId)
-            {
-                return Forbid();
-            }
+                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
+                {
+                    return Forbid(error.Message);
+                }
 
-            await query.ExecuteDeleteAsync();
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+            }
 
             return Created();
         }
