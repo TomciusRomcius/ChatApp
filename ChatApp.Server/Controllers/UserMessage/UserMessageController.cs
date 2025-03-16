@@ -72,7 +72,7 @@ namespace ChatApp.Server.Presentation.UserMessage
                 return Unauthorized();
             }
 
-            ResultError? error = _userMessageService.DeleteMessage(userId, new Guid(dto.MessageId));
+            ResultError? error = _userMessageService.DeleteMessage(userId, dto.MessageId);
 
             if (error is not null)
             {

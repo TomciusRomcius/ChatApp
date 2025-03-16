@@ -41,14 +41,14 @@ namespace ChatApp.Server.Application.Tests.Integration
             await _userMessageService.SendMessage(user1.Id, user2.Id, messageContent);
 
             TextMessageEntity? textMessage = _databaseContext.TextMessages.Where(_ => true).FirstOrDefault();
-            UserMessageEntity? userMessage = _databaseContext.UserMessages.Where(um => um.SenderId == user1.Id && um.ReceiverId == user2.Id).FirstOrDefault();
+            MessageEntity? userMessage = _databaseContext.UserMessages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
 
             Assert.NotNull(textMessage);
             Assert.NotNull(userMessage);
 
             Assert.Equal(messageContent, textMessage.Content);
             Assert.Equal(userMessage.SenderId, user1.Id);
-            Assert.Equal(userMessage.ReceiverId, user2.Id);
+            Assert.Equal(userMessage.ReceiverUserId, user2.Id);
         }
 
         [Fact]
@@ -59,14 +59,15 @@ namespace ChatApp.Server.Application.Tests.Integration
             _databaseContext.AddRange([user1, user2]);
             var message = new TextMessageEntity
             {
-                TextMessageId = Guid.NewGuid(),
+                TextMessageId = Guid.NewGuid().ToString(),
                 Content = "Content"
             };
 
-            var userMessage = new UserMessageEntity
+            var userMessage = new MessageEntity
             {
                 SenderId = user1.Id,
-                ReceiverId = user2.Id,
+                ChatRoomId = null,
+                ReceiverUserId = user2.Id,
                 TextMessageId = message.TextMessageId
             };
 
@@ -77,7 +78,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             _userMessageService.DeleteMessage(user1.Id, message.TextMessageId);
 
             TextMessageEntity? receivedTextMessage = _databaseContext.TextMessages.Where(_ => true).FirstOrDefault();
-            UserMessageEntity? receivedUserMessage = _databaseContext.UserMessages.Where(um => um.SenderId == user1.Id && um.ReceiverId == user2.Id).FirstOrDefault();
+            MessageEntity? receivedUserMessage = _databaseContext.UserMessages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
 
             Assert.Null(receivedTextMessage);
             Assert.Null(receivedUserMessage);

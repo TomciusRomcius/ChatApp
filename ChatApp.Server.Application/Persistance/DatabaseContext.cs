@@ -40,29 +40,53 @@ namespace ChatApp.Application.Persistance
             modelBuilder.Entity<ChatRoomEntity>()
             .HasKey(cr => cr.ChatRoomId);
 
+            modelBuilder.Entity<ChatRoomEntity>()
+            .HasOne(cr => cr.AdminUser)
+            .WithMany()
+            .HasForeignKey(cr => cr.AdminUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChatRoomMember>()
+            .HasKey(crm => new { crm.ChatRoomId, crm.MemberId });
+
+            modelBuilder.Entity<ChatRoomMember>()
+            .HasOne(crm => crm.ChatRoom)
+            .WithMany()
+            .HasForeignKey(crm => crm.ChatRoomId);
+
+            modelBuilder.Entity<ChatRoomMember>()
+            .HasOne(crm => crm.Member)
+            .WithMany()
+            .HasForeignKey(crm => crm.MemberId);
+
             modelBuilder.Entity<TextMessageEntity>().HasKey(tm => tm.TextMessageId);
 
-            modelBuilder.Entity<UserMessageEntity>()
+            modelBuilder.Entity<MessageEntity>()
             .HasKey(fm => fm.TextMessageId);
 
-            modelBuilder.Entity<UserMessageEntity>()
+            modelBuilder.Entity<MessageEntity>()
             .HasOne(um => um.TextMessage)
             .WithMany()
             .IsRequired()
             .HasForeignKey(um => um.TextMessageId);
 
-            modelBuilder.Entity<UserMessageEntity>()
-            .HasOne(fm => fm.Receiver)
+            modelBuilder.Entity<MessageEntity>()
+            .HasOne(fm => fm.ChatRoom)
             .WithMany()
-            .IsRequired()
-            .HasForeignKey(fm => fm.ReceiverId);
+            .HasForeignKey(fm => fm.ChatRoomId);
+
+            modelBuilder.Entity<MessageEntity>()
+            .HasOne(fm => fm.ReceiverUser)
+            .WithMany()
+            .HasForeignKey(fm => fm.ReceiverUserId);
 
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<UserFriendEntity> UserFriends { get; set; }
         public DbSet<ChatRoomEntity> ChatRooms { get; set; }
+        public DbSet<ChatRoomMember> ChatRoomMembers { get; set; }
         public DbSet<TextMessageEntity> TextMessages { get; set; }
-        public DbSet<UserMessageEntity> UserMessages { get; set; }
+        public DbSet<MessageEntity> UserMessages { get; set; }
     }
 }

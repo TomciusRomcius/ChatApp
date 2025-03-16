@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Server.Application.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250315061250_Initial")]
+    [Migration("20250316084839_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -27,11 +27,11 @@ namespace ChatApp.Server.Application.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomEntity", b =>
                 {
-                    b.Property<Guid>("ChatRoomId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ChatRoomId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AdminUserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
@@ -45,30 +45,60 @@ namespace ChatApp.Server.Application.Migrations
                     b.ToTable("ChatRooms");
                 });
 
-            modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoomMessage.ChatRoomTextMessageEntity", b =>
+            modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomMember", b =>
                 {
-                    b.Property<Guid>("ChatRoomTextMessageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ChatRoomId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("ChatRoomId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("MemberId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ChatRoomId", "MemberId");
+
+                    b.HasIndex("MemberId");
+
+                    b.ToTable("ChatRoomMembers");
+                });
+
+            modelBuilder.Entity("ChatApp.Domain.Entities.MessageEntity", b =>
+                {
+                    b.Property<string>("TextMessageId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ChatRoomId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiverUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TextMessageId");
+
+                    b.HasIndex("ChatRoomId");
+
+                    b.HasIndex("ReceiverUserId");
+
+                    b.ToTable("UserMessages");
+                });
+
+            modelBuilder.Entity("ChatApp.Domain.Entities.TextMessageEntity", b =>
+                {
+                    b.Property<string>("TextMessageId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.HasKey("TextMessageId");
 
-                    b.HasKey("ChatRoomTextMessageId");
-
-                    b.HasIndex("ChatRoomId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("ChatRoomTextMessages");
+                    b.ToTable("TextMessages");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Entities.UserFriend.UserFriendEntity", b =>
@@ -291,28 +321,53 @@ namespace ChatApp.Server.Application.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "AdminUser")
                         .WithMany()
-                        .HasForeignKey("AdminUserId");
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("AdminUser");
                 });
 
-            modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoomMessage.ChatRoomTextMessageEntity", b =>
+            modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomMember", b =>
                 {
                     b.HasOne("ChatApp.Domain.Entities.ChatRoom.ChatRoomEntity", "ChatRoom")
-                        .WithMany("TextMessages")
+                        .WithMany()
                         .HasForeignKey("ChatRoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Sender")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Member")
                         .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ChatRoom");
 
-                    b.Navigation("Sender");
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("ChatApp.Domain.Entities.MessageEntity", b =>
+                {
+                    b.HasOne("ChatApp.Domain.Entities.ChatRoom.ChatRoomEntity", "ChatRoom")
+                        .WithMany()
+                        .HasForeignKey("ChatRoomId");
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "ReceiverUser")
+                        .WithMany()
+                        .HasForeignKey("ReceiverUserId");
+
+                    b.HasOne("ChatApp.Domain.Entities.TextMessageEntity", "TextMessage")
+                        .WithMany()
+                        .HasForeignKey("TextMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChatRoom");
+
+                    b.Navigation("ReceiverUser");
+
+                    b.Navigation("TextMessage");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Entities.UserFriend.UserFriendEntity", b =>
@@ -383,11 +438,6 @@ namespace ChatApp.Server.Application.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomEntity", b =>
-                {
-                    b.Navigation("TextMessages");
                 });
 #pragma warning restore 612, 618
         }

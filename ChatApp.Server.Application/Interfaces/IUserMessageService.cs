@@ -5,8 +5,8 @@ namespace ChatApp.Server.Application.Interfaces
 {
     public interface IUserMessageService
     {
-        ResultError? DeleteMessage(string userId, Guid messageId);
+        ResultError? DeleteMessage(string userId, string messageId);
         Result<List<UserTextMessageModel>> GetMessages(string userId);
-        Task<Result<Guid>> SendMessage(string senderId, string receiverId, string messageContent);
+        Task<Result<string>> SendMessage(string senderId, string receiverId, string messageContent);
     }
 }

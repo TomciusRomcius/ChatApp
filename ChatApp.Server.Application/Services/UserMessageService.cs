@@ -22,7 +22,7 @@ namespace ChatApp.Server.Application.Services
             var query = from userMessage in _databaseContext.UserMessages
                         join textMessage in _databaseContext.TextMessages
                         on userMessage.TextMessageId equals textMessage.TextMessageId
-                        where userMessage.SenderId == userId || userMessage.ReceiverId == userId
+                        where userMessage.SenderId == userId || userMessage.ReceiverUserId == userId
                         select new UserTextMessageModel(
                             textMessage.TextMessageId,
                             userMessage.SenderId,
@@ -35,26 +35,27 @@ namespace ChatApp.Server.Application.Services
         }
 
         /// <returns>Message id</returns>
-        public async Task<Result<Guid>> SendMessage(string senderId, string receiverId, string messageContent)
+        public async Task<Result<string>> SendMessage(string senderId, string receiverId, string messageContent)
         {
             if (senderId == receiverId)
             {
-                return new Result<Guid>([
+                return new Result<string>([
                     new ResultError(ResultErrorType.VALIDATION_ERROR, "Sender and receiver id cannot be the same")
                 ]);
             }
 
             var msg = new TextMessageEntity
             {
-                TextMessageId = Guid.NewGuid(),
+                TextMessageId = Guid.NewGuid().ToString(),
                 Content = messageContent,
             };
 
-            var userMsg = new UserMessageEntity
+            var userMsg = new MessageEntity
             {
                 TextMessageId = msg.TextMessageId,
                 SenderId = senderId,
-                ReceiverId = receiverId,
+                ChatRoomId = null,
+                ReceiverUserId = receiverId,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -62,10 +63,10 @@ namespace ChatApp.Server.Application.Services
             await _databaseContext.UserMessages.AddAsync(userMsg);
             await _databaseContext.SaveChangesAsync();
 
-            return new Result<Guid>(msg.TextMessageId);
+            return new Result<string>(msg.TextMessageId);
         }
 
-        public ResultError? DeleteMessage(string userId, Guid messageId)
+        public ResultError? DeleteMessage(string userId, string messageId)
         {
             var messageQuery = _databaseContext.TextMessages.Where(tm => tm.TextMessageId == messageId);
             var userMessageQuery = _databaseContext.UserMessages.Where(tm => tm.TextMessageId == messageId);

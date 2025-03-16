@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Domain.Entities
 {
-    public class ChatRoomMessageEntity
+    public class MessageEntity
     {
-        public Guid TextMessageId { get; set; }
-        public Guid ChatRoomId { get; set; }
+        public required string TextMessageId { get; set; }
         public required string SenderId { get; set; }
+        public required string? ChatRoomId { get; set; }
+        public required string? ReceiverUserId { get; set; }
         public TextMessageEntity? TextMessage { get; set; }
         public ChatRoomEntity? ChatRoom { get; set; }
-        public IdentityUser? Sender { get; set; }
+        public IdentityUser? ReceiverUser { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

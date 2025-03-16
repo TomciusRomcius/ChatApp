@@ -51,6 +51,18 @@ namespace ChatApp.Server.Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TextMessages",
+                columns: table => new
+                {
+                    TextMessageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TextMessages", x => x.TextMessageId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -160,9 +172,9 @@ namespace ChatApp.Server.Application.Migrations
                 name: "ChatRooms",
                 columns: table => new
                 {
-                    ChatRoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AdminUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ChatRoomId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdminUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -171,7 +183,8 @@ namespace ChatApp.Server.Application.Migrations
                         name: "FK_ChatRooms_AspNetUsers_AdminUserId",
                         column: x => x.AdminUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -200,28 +213,57 @@ namespace ChatApp.Server.Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatRoomTextMessages",
+                name: "ChatRoomMembers",
                 columns: table => new
                 {
-                    ChatRoomTextMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ChatRoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ChatRoomId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MemberId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatRoomTextMessages", x => x.ChatRoomTextMessageId);
+                    table.PrimaryKey("PK_ChatRoomMembers", x => new { x.ChatRoomId, x.MemberId });
                     table.ForeignKey(
-                        name: "FK_ChatRoomTextMessages_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
+                        name: "FK_ChatRoomMembers_AspNetUsers_MemberId",
+                        column: x => x.MemberId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChatRoomTextMessages_ChatRooms_ChatRoomId",
+                        name: "FK_ChatRoomMembers_ChatRooms_ChatRoomId",
                         column: x => x.ChatRoomId,
                         principalTable: "ChatRooms",
                         principalColumn: "ChatRoomId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserMessages",
+                columns: table => new
+                {
+                    TextMessageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SenderId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChatRoomId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ReceiverUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserMessages", x => x.TextMessageId);
+                    table.ForeignKey(
+                        name: "FK_UserMessages_AspNetUsers_ReceiverUserId",
+                        column: x => x.ReceiverUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserMessages_ChatRooms_ChatRoomId",
+                        column: x => x.ChatRoomId,
+                        principalTable: "ChatRooms",
+                        principalColumn: "ChatRoomId");
+                    table.ForeignKey(
+                        name: "FK_UserMessages_TextMessages_TextMessageId",
+                        column: x => x.TextMessageId,
+                        principalTable: "TextMessages",
+                        principalColumn: "TextMessageId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -265,24 +307,29 @@ namespace ChatApp.Server.Application.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChatRoomMembers_MemberId",
+                table: "ChatRoomMembers",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ChatRooms_AdminUserId",
                 table: "ChatRooms",
                 column: "AdminUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChatRoomTextMessages_ChatRoomId",
-                table: "ChatRoomTextMessages",
-                column: "ChatRoomId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatRoomTextMessages_SenderId",
-                table: "ChatRoomTextMessages",
-                column: "SenderId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserFriends_ReceiverId",
                 table: "UserFriends",
                 column: "ReceiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserMessages_ChatRoomId",
+                table: "UserMessages",
+                column: "ChatRoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserMessages_ReceiverUserId",
+                table: "UserMessages",
+                column: "ReceiverUserId");
         }
 
         /// <inheritdoc />
@@ -304,16 +351,22 @@ namespace ChatApp.Server.Application.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ChatRoomTextMessages");
+                name: "ChatRoomMembers");
 
             migrationBuilder.DropTable(
                 name: "UserFriends");
+
+            migrationBuilder.DropTable(
+                name: "UserMessages");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "ChatRooms");
+
+            migrationBuilder.DropTable(
+                name: "TextMessages");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
