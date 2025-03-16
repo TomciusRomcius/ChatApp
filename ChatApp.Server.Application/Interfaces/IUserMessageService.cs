@@ -7,6 +7,6 @@ namespace ChatApp.Server.Application.Interfaces
     {
         ResultError? DeleteMessage(string userId, Guid messageId);
         Result<List<UserTextMessageModel>> GetMessages(string userId);
-        Task<ResultError?> SendMessage(string senderId, string receiverId, string messageContent);
+        Task<Result<Guid>> SendMessage(string senderId, string receiverId, string messageContent);
     }
 }

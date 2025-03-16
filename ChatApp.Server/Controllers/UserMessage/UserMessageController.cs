@@ -43,9 +43,24 @@ namespace ChatApp.Server.Presentation.UserMessage
                 return Unauthorized();
             }
 
-            await _userMessageService.SendMessage(userId, dto.ReceiverId, dto.Content);
+            var result = await _userMessageService.SendMessage(userId, dto.ReceiverId, dto.Content);
 
-            return Created();
+            if (result.IsError())
+            {
+                var error = result.Errors.First();
+
+                if (error.Type == ResultErrorType.VALIDATION_ERROR)
+                {
+                    return BadRequest(error.Message);
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            else
+            {
+                return Created("", new { TextMessageId = result.GetValue() });
+            }
         }
 
         [HttpDelete]

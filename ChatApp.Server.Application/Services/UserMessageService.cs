@@ -34,8 +34,16 @@ namespace ChatApp.Server.Application.Services
             return new Result<List<UserTextMessageModel>>(result);
         }
 
-        public async Task<ResultError?> SendMessage(string senderId, string receiverId, string messageContent)
+        /// <returns>Message id</returns>
+        public async Task<Result<Guid>> SendMessage(string senderId, string receiverId, string messageContent)
         {
+            if (senderId == receiverId)
+            {
+                return new Result<Guid>([
+                    new ResultError(ResultErrorType.VALIDATION_ERROR, "Sender and receiver id cannot be the same")
+                ]);
+            }
+
             var msg = new TextMessageEntity
             {
                 TextMessageId = Guid.NewGuid(),
@@ -56,7 +64,7 @@ namespace ChatApp.Server.Application.Services
             await _databaseContext.UserMessages.AddAsync(userMsg);
             await _databaseContext.SaveChangesAsync();
 
-            return null;
+            return new Result<Guid>(msg.TextMessageId);
         }
 
         public ResultError? DeleteMessage(string userId, Guid messageId)
