@@ -40,15 +40,13 @@ namespace ChatApp.Server.Application.Tests.Integration
             string messageContent = "Hello";
             await _userMessageService.SendMessage(user1.Id, user2.Id, messageContent);
 
-            TextMessageEntity? textMessage = _databaseContext.TextMessages.Where(_ => true).FirstOrDefault();
-            MessageEntity? userMessage = _databaseContext.Messages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
+            TextMessageEntity? textMessage = _databaseContext.TextMessages.FirstOrDefault();
 
             Assert.NotNull(textMessage);
-            Assert.NotNull(userMessage);
 
             Assert.Equal(messageContent, textMessage.Content);
-            Assert.Equal(userMessage.SenderId, user1.Id);
-            Assert.Equal(userMessage.ReceiverUserId, user2.Id);
+            Assert.Equal(textMessage.SenderId, user1.Id);
+            Assert.Equal(textMessage.ReceiverUserId, user2.Id);
         }
 
         [Fact]
@@ -60,28 +58,21 @@ namespace ChatApp.Server.Application.Tests.Integration
             var message = new TextMessageEntity
             {
                 TextMessageId = Guid.NewGuid().ToString(),
-                Content = "Content"
-            };
-
-            var userMessage = new MessageEntity
-            {
+                Content = "Content",
                 SenderId = user1.Id,
                 ChatRoomId = null,
                 ReceiverUserId = user2.Id,
-                TextMessageId = message.TextMessageId
+                CreatedAt = DateTime.UtcNow
             };
 
             _databaseContext.TextMessages.Add(message);
-            _databaseContext.Messages.Add(userMessage);
             _databaseContext.SaveChanges();
 
             _userMessageService.DeleteMessage(user1.Id, message.TextMessageId);
 
             TextMessageEntity? receivedTextMessage = _databaseContext.TextMessages.Where(_ => true).FirstOrDefault();
-            MessageEntity? receivedUserMessage = _databaseContext.Messages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
 
             Assert.Null(receivedTextMessage);
-            Assert.Null(receivedUserMessage);
         }
     }
 }

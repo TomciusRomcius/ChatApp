@@ -61,24 +61,23 @@ namespace ChatApp.Server.Application.Persistance
 
             modelBuilder.Entity<TextMessageEntity>().HasKey(tm => tm.TextMessageId);
 
-            modelBuilder.Entity<MessageEntity>()
-            .HasKey(fm => fm.TextMessageId);
+            modelBuilder.Entity<TextMessageEntity>()
+            .HasKey(tm => tm.TextMessageId);
 
-            modelBuilder.Entity<MessageEntity>()
-            .HasOne(um => um.TextMessage)
+            modelBuilder.Entity<TextMessageEntity>()
+            .HasOne(tm => tm.ChatRoom)
             .WithMany()
-            .IsRequired()
-            .HasForeignKey(um => um.TextMessageId);
+            .HasForeignKey(tm => tm.ChatRoomId);
 
-            modelBuilder.Entity<MessageEntity>()
-            .HasOne(fm => fm.ChatRoom)
+            modelBuilder.Entity<TextMessageEntity>()
+            .HasOne(tm => tm.Sender)
             .WithMany()
-            .HasForeignKey(fm => fm.ChatRoomId);
+            .HasForeignKey(tm => tm.SenderId);
 
-            modelBuilder.Entity<MessageEntity>()
-            .HasOne(fm => fm.ReceiverUser)
+            modelBuilder.Entity<TextMessageEntity>()
+            .HasOne(tm => tm.ReceiverUser)
             .WithMany()
-            .HasForeignKey(fm => fm.ReceiverUserId);
+            .HasForeignKey(tm => tm.ReceiverUserId);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -87,6 +86,5 @@ namespace ChatApp.Server.Application.Persistance
         public DbSet<ChatRoomEntity> ChatRooms { get; set; }
         public DbSet<ChatRoomMemberEntity> ChatRoomMembers { get; set; }
         public DbSet<TextMessageEntity> TextMessages { get; set; }
-        public DbSet<MessageEntity> Messages { get; set; }
     }
 }

@@ -1,8 +1,6 @@
 using System.Security.Claims;
-using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Application.Services;
 using ChatApp.Server.Domain.Entities;
-using ChatApp.Server.Domain.Entities.ChatRoom;
 using ChatApp.Server.Domain.Utils;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +28,7 @@ namespace ChatApp.Server.Presentation.ChatRoomMessaging
                 return Unauthorized();
             }
 
-            Result<List<MessageEntity>> result = _chatRoomMessagingService.GetChatRoomMessages(userId, dto.ChatRoomId, dto.Offset, dto.NumberOfMessages);
+            Result<List<TextMessageEntity>> result = _chatRoomMessagingService.GetChatRoomMessages(userId, dto.ChatRoomId, dto.Offset, dto.NumberOfMessages);
             if (result.IsError())
             {
                 var error = result.Errors.First();

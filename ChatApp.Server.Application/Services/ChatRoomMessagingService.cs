@@ -13,16 +13,16 @@ namespace ChatApp.Server.Application.Services
             _databaseContext = databaseContext;
         }
 
-        public Result<List<MessageEntity>> GetChatRoomMessages(string userId, string chatRoomId, int offset, int count)
+        public Result<List<TextMessageEntity>> GetChatRoomMessages(string userId, string chatRoomId, int offset, int count)
         {
-            var query = (from message in _databaseContext.Messages
+            var query = (from message in _databaseContext.TextMessages
                          where message.ChatRoomId == chatRoomId
                          orderby message.CreatedAt
                          select message).Skip(offset).Take(count);
 
             var results = query.ToList();
 
-            return new Result<List<MessageEntity>>(results);
+            return new Result<List<TextMessageEntity>>(results);
         }
 
         /// <returns>Message id</returns>
@@ -31,16 +31,12 @@ namespace ChatApp.Server.Application.Services
             var textMessage = new TextMessageEntity
             {
                 TextMessageId = Guid.NewGuid().ToString(),
-                Content = content
-            };
-            await _databaseContext.TextMessages.AddAsync(textMessage);
-            await _databaseContext.Messages.AddAsync(new MessageEntity
-            {
+                Content = content,
                 SenderId = userId,
                 ChatRoomId = chatRoomId,
                 CreatedAt = DateTime.UtcNow,
-                TextMessageId = textMessage.TextMessageId
-            });
+            };
+            await _databaseContext.TextMessages.AddAsync(textMessage);
             await _databaseContext.SaveChangesAsync();
 
             return new Result<string>(textMessage.TextMessageId);

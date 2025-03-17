@@ -19,15 +19,13 @@ namespace ChatApp.Server.Application.Services
 
         public Result<List<UserTextMessageModel>> GetMessages(string userId)
         {
-            var query = from userMessage in _databaseContext.Messages
-                        join textMessage in _databaseContext.TextMessages
-                        on userMessage.TextMessageId equals textMessage.TextMessageId
-                        where userMessage.SenderId == userId || userMessage.ReceiverUserId == userId
+            var query = from textMessage in _databaseContext.TextMessages
+                        where textMessage.SenderId == userId || textMessage.ReceiverUserId == userId
                         select new UserTextMessageModel(
                             textMessage.TextMessageId,
-                            userMessage.SenderId,
+                            textMessage.SenderId,
                             textMessage.Content,
-                            userMessage.CreatedAt
+                            textMessage.CreatedAt
                         );
 
             List<UserTextMessageModel> result = [.. query];
@@ -48,19 +46,12 @@ namespace ChatApp.Server.Application.Services
             {
                 TextMessageId = Guid.NewGuid().ToString(),
                 Content = messageContent,
-            };
-
-            var userMsg = new MessageEntity
-            {
-                TextMessageId = msg.TextMessageId,
                 SenderId = senderId,
                 ChatRoomId = null,
                 ReceiverUserId = receiverId,
                 CreatedAt = DateTime.UtcNow
             };
-
             await _databaseContext.TextMessages.AddAsync(msg);
-            await _databaseContext.Messages.AddAsync(userMsg);
             await _databaseContext.SaveChangesAsync();
 
             return new Result<string>(msg.TextMessageId);
@@ -69,16 +60,15 @@ namespace ChatApp.Server.Application.Services
         public ResultError? DeleteMessage(string userId, string messageId)
         {
             var messageQuery = _databaseContext.TextMessages.Where(tm => tm.TextMessageId == messageId);
-            var userMessageQuery = _databaseContext.Messages.Where(tm => tm.TextMessageId == messageId);
 
-            if (messageQuery.IsNullOrEmpty() || userMessageQuery.IsNullOrEmpty())
+            if (messageQuery.IsNullOrEmpty())
             {
                 return new ResultError(ResultErrorType.VALIDATION_ERROR, "Message does not exist");
             }
 
-            var userMessage = userMessageQuery.First();
+            var message = messageQuery.First();
 
-            if (userMessage.SenderId != userId)
+            if (message.SenderId != userId)
             {
                 return new ResultError(ResultErrorType.FORBIDDEN_ERROR, "Trying to delete a message where user is not a sender");
             }

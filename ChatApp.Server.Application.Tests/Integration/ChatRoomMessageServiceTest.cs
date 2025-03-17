@@ -51,15 +51,13 @@ namespace ChatApp.Server.Application.Tests.Integration
             Assert.False(result.IsError());
 
             string textMessageId = result.GetValue();
-            MessageEntity? userMessage = _databaseContext.Messages.Where(m => textMessageId == m.TextMessageId).FirstOrDefault();
             TextMessageEntity? textMessage = _databaseContext.TextMessages.Where(tm => textMessageId == tm.TextMessageId).FirstOrDefault();
 
-            Assert.NotNull(userMessage);
             Assert.NotNull(textMessage);
 
             Assert.Equal(messageContent, textMessage.Content);
-            Assert.Equal(userMessage.SenderId, user1.Id);
-            Assert.Equal(userMessage.ChatRoomId, chatRoom.ChatRoomId);
+            Assert.Equal(textMessage.SenderId, user1.Id);
+            Assert.Equal(textMessage.ChatRoomId, chatRoom.ChatRoomId);
         }
 
         [Fact]
@@ -76,32 +74,27 @@ namespace ChatApp.Server.Application.Tests.Integration
             var textMessage = new TextMessageEntity
             {
                 TextMessageId = Guid.NewGuid().ToString(),
-                Content = "Content"
-            };
-
-            var message = new MessageEntity
-            {
+                Content = "Content",
                 SenderId = user1.Id,
                 ChatRoomId = chatRoom.ChatRoomId,
-                TextMessageId = textMessage.TextMessageId
+                CreatedAt = DateTime.UtcNow
             };
+
             _databaseContext.Users.Add(user1);
             _databaseContext.ChatRooms.Add(chatRoom);
             _databaseContext.TextMessages.Add(textMessage);
-            _databaseContext.Messages.Add(message);
             _databaseContext.SaveChanges();
 
-            Result<List<MessageEntity>> result = _chatRoomMessagingService.GetChatRoomMessages(user1.Id, chatRoom.ChatRoomId, 0, 1);
+            Result<List<TextMessageEntity>> result = _chatRoomMessagingService.GetChatRoomMessages(user1.Id, chatRoom.ChatRoomId, 0, 1);
 
             Assert.False(result.IsError());
 
-            List<MessageEntity> retrievedMessages = result.GetValue();
+            List<TextMessageEntity> retrievedMessages = result.GetValue();
 
             Assert.Single(retrievedMessages);
-            Assert.NotNull(retrievedMessages[0].TextMessage);
-            Assert.Equal(message.ChatRoomId, retrievedMessages[0].ChatRoomId);
-            Assert.Equal(message.SenderId, retrievedMessages[0].SenderId);
-            Assert.Equal(textMessage.Content, retrievedMessages[0].TextMessage!.Content);
+            Assert.Equal(textMessage.ChatRoomId, retrievedMessages[0].ChatRoomId);
+            Assert.Equal(textMessage.SenderId, retrievedMessages[0].SenderId);
+            Assert.Equal(textMessage.Content, retrievedMessages[0].Content);
         }
     }
 }
