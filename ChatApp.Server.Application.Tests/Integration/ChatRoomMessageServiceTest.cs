@@ -96,5 +96,36 @@ namespace ChatApp.Server.Application.Tests.Integration
             Assert.Equal(textMessage.SenderId, retrievedMessages[0].SenderId);
             Assert.Equal(textMessage.Content, retrievedMessages[0].Content);
         }
+
+        [Fact]
+        public async Task SendChatRoomMessageAsyncShouldGiveAnErrorWhenUserIsNotInTheChatRoomAsync()
+        {
+            var user1 = new IdentityUser("User1");
+            var user2 = new IdentityUser("User2");
+
+            var chatRoom = new ChatRoomEntity
+            {
+                ChatRoomId = Guid.NewGuid().ToString(),
+                Name = "Name",
+                AdminUserId = user1.Id
+            };
+
+            var user1Member = new ChatRoomMemberEntity
+            {
+                ChatRoomId = chatRoom.ChatRoomId,
+                MemberId = user1.Id,
+            };
+
+            _databaseContext.Users.AddRange([user1, user2]);
+            _databaseContext.ChatRooms.Add(chatRoom);
+            _databaseContext.ChatRoomMembers.Add(user1Member);
+            _databaseContext.SaveChanges();
+
+            Result<string> result = await _chatRoomMessagingService.SendChatRoomMessageAsync(user2.Id, chatRoom.ChatRoomId, "Message");
+
+            Assert.True(result.IsError());
+            Assert.Equal(ResultErrorType.FORBIDDEN_ERROR, result.Errors.First().Type);
+        }
+
     }
 }
