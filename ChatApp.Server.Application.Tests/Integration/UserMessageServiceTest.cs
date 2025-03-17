@@ -41,7 +41,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             await _userMessageService.SendMessage(user1.Id, user2.Id, messageContent);
 
             TextMessageEntity? textMessage = _databaseContext.TextMessages.Where(_ => true).FirstOrDefault();
-            MessageEntity? userMessage = _databaseContext.UserMessages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
+            MessageEntity? userMessage = _databaseContext.Messages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
 
             Assert.NotNull(textMessage);
             Assert.NotNull(userMessage);
@@ -72,13 +72,13 @@ namespace ChatApp.Server.Application.Tests.Integration
             };
 
             _databaseContext.TextMessages.Add(message);
-            _databaseContext.UserMessages.Add(userMessage);
+            _databaseContext.Messages.Add(userMessage);
             _databaseContext.SaveChanges();
 
             _userMessageService.DeleteMessage(user1.Id, message.TextMessageId);
 
             TextMessageEntity? receivedTextMessage = _databaseContext.TextMessages.Where(_ => true).FirstOrDefault();
-            MessageEntity? receivedUserMessage = _databaseContext.UserMessages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
+            MessageEntity? receivedUserMessage = _databaseContext.Messages.Where(um => um.SenderId == user1.Id && um.ReceiverUserId == user2.Id).FirstOrDefault();
 
             Assert.Null(receivedTextMessage);
             Assert.Null(receivedUserMessage);

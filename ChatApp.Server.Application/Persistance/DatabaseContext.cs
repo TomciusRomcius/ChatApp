@@ -87,6 +87,6 @@ namespace ChatApp.Server.Application.Persistance
         public DbSet<ChatRoomEntity> ChatRooms { get; set; }
         public DbSet<ChatRoomMemberEntity> ChatRoomMembers { get; set; }
         public DbSet<TextMessageEntity> TextMessages { get; set; }
-        public DbSet<MessageEntity> UserMessages { get; set; }
+        public DbSet<MessageEntity> Messages { get; set; }
     }
 }

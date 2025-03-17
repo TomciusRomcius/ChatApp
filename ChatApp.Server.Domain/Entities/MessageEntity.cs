@@ -7,8 +7,8 @@ namespace ChatApp.Server.Domain.Entities
     {
         public required string TextMessageId { get; set; }
         public required string SenderId { get; set; }
-        public required string? ChatRoomId { get; set; }
-        public required string? ReceiverUserId { get; set; }
+        public string? ChatRoomId { get; set; }
+        public string? ReceiverUserId { get; set; }
         public TextMessageEntity? TextMessage { get; set; }
         public ChatRoomEntity? ChatRoom { get; set; }
         public IdentityUser? ReceiverUser { get; set; }

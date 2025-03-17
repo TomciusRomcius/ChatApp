@@ -19,7 +19,7 @@ namespace ChatApp.Server.Application.Services
 
         public Result<List<UserTextMessageModel>> GetMessages(string userId)
         {
-            var query = from userMessage in _databaseContext.UserMessages
+            var query = from userMessage in _databaseContext.Messages
                         join textMessage in _databaseContext.TextMessages
                         on userMessage.TextMessageId equals textMessage.TextMessageId
                         where userMessage.SenderId == userId || userMessage.ReceiverUserId == userId
@@ -60,7 +60,7 @@ namespace ChatApp.Server.Application.Services
             };
 
             await _databaseContext.TextMessages.AddAsync(msg);
-            await _databaseContext.UserMessages.AddAsync(userMsg);
+            await _databaseContext.Messages.AddAsync(userMsg);
             await _databaseContext.SaveChangesAsync();
 
             return new Result<string>(msg.TextMessageId);
@@ -69,7 +69,7 @@ namespace ChatApp.Server.Application.Services
         public ResultError? DeleteMessage(string userId, string messageId)
         {
             var messageQuery = _databaseContext.TextMessages.Where(tm => tm.TextMessageId == messageId);
-            var userMessageQuery = _databaseContext.UserMessages.Where(tm => tm.TextMessageId == messageId);
+            var userMessageQuery = _databaseContext.Messages.Where(tm => tm.TextMessageId == messageId);
 
             if (messageQuery.IsNullOrEmpty() || userMessageQuery.IsNullOrEmpty())
             {
