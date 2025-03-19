@@ -3,7 +3,6 @@ using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Application.Services;
 using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
-using ChatApp.Server.Application.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,8 +40,6 @@ builder.Services.AddAuthorization();
 
 ArgumentNullException.ThrowIfNull(builder.Configuration["CsrfHashingKey"]);
 builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService());
-builder.Services.AddSingleton<IWebSocketList, WebSocketList>();
-builder.Services.AddSingleton<IWebSocketService, WebSocketService>();
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 {
@@ -64,11 +61,19 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
 });
 
-// Services for controllers:
+builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+builder.Services.AddHostedService<BackgroundTaskRunner>();
 
+// Websockets
+builder.Services.AddSingleton<IWebSocketList, WebSocketList>();
+builder.Services.AddSingleton<IWebSocketOperations, WebSocketOperations>();
+builder.Services.AddSignalR();
+
+// Services for controllers:
 builder.Services.AddScoped<IUserFriendService, UserFriendService>();
 builder.Services.AddScoped<IUserMessageService, UserMessageService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
+builder.Services.AddScoped<IChatRoomMessagingService, ChatRoomMessagingService>();
 
 builder.Services.AddEndpointsApiExplorer();
 
