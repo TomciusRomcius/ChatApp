@@ -10,14 +10,12 @@ namespace ChatApp.Server.Presentation.Websocket
     [ApiController]
     public class WebsocketController : ControllerBase
     {
-        readonly IWebSocketService _webSocketService;
 
         readonly IWebSocketList _webSocketList;
 
-        public WebsocketController(IWebSocketList webSocketList, IWebSocketService webSocketBackgroundService)
+        public WebsocketController(IWebSocketList webSocketList)
         {
             _webSocketList = webSocketList;
-            _webSocketService = webSocketBackgroundService;
         }
 
         [HttpGet()]
