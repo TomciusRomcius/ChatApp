@@ -43,7 +43,7 @@ namespace ChatApp.Server.Application.Services
                     await socketConnection.CloseConnection();
                 }
                 ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
-                await sock.SendAsync(buffer, WebSocketMessageType.Text, false, CancellationToken.None);
+                await sock.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
     }
