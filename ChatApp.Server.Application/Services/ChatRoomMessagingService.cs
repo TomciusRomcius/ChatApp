@@ -84,7 +84,7 @@ namespace ChatApp.Server.Application.Services
             // Very simple, temporary
             var socketMessageObj = new
             {
-                Type = "message",
+                Type = "chatroom-message",
                 Body = textMessage
             };
 
