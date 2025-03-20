@@ -1,4 +1,5 @@
 using System.Net.WebSockets;
+using Microsoft.Extensions.Logging;
 
 namespace ChatApp.Server.Application.Services
 {
@@ -26,7 +27,6 @@ namespace ChatApp.Server.Application.Services
 
     public interface IWebSocketList
     {
-        Dictionary<string, List<WebSocketConnection>> _userToWebSockets { get; set; }
         void AddConnection(string userId, WebSocketConnection socket);
         Task CloseConnection(string userId, string connectionId);
         List<WebSocketConnection> GetUserSockets(string userId);
@@ -34,10 +34,17 @@ namespace ChatApp.Server.Application.Services
 
     public class WebSocketList : IWebSocketList
     {
-        public Dictionary<string, List<WebSocketConnection>> _userToWebSockets { get; set; } = new Dictionary<string, List<WebSocketConnection>>();
+        Dictionary<string, List<WebSocketConnection>> _userToWebSockets { get; set; } = new Dictionary<string, List<WebSocketConnection>>();
+        readonly ILogger<WebSocketList> _logger;
+
+        public WebSocketList(ILogger<WebSocketList> logger)
+        {
+            _logger = logger;
+        }
 
         public void AddConnection(string userId, WebSocketConnection socket)
         {
+            _logger.LogDebug("New WebSocket connection, userId: {UserId}", userId);
             var pair = _userToWebSockets.FirstOrDefault((item) => item.Key == userId);
             if (pair.Equals(default(KeyValuePair<string, List<WebSocketConnection>>)))
             {
@@ -63,7 +70,10 @@ namespace ChatApp.Server.Application.Services
 
         public List<WebSocketConnection> GetUserSockets(string userId)
         {
-            throw new NotImplementedException();
+            List<WebSocketConnection>? result = null;
+            _userToWebSockets.TryGetValue(userId, out result);
+
+            return result ?? [];
         }
     }
 }
