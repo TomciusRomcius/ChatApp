@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Domain.Entities;
@@ -81,7 +82,14 @@ namespace ChatApp.Server.Application.Services
             List<string> memberIds = [.. membersQuery];
 
             // Very simple, temporary
-            _webSocketOperations.EnqueueSendMessage(memberIds, content);
+            var socketMessageObj = new
+            {
+                Type = "message",
+                Body = textMessage
+            };
+
+            string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
+            _webSocketOperations.EnqueueSendMessage(memberIds, socketMessageObjStr);
 
             return new Result<string>(textMessage.TextMessageId);
         }
