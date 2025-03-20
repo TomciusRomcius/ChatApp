@@ -49,11 +49,21 @@ namespace ChatApp.Server.Application.Services
             // TODO: check if all members are friends
             if (members.Any())
             {
-                await _databaseContext.ChatRoomMembers.AddRangeAsync(members.Select(uid => new ChatRoomMemberEntity
+                ChatRoomMemberEntity adminMember = new ChatRoomMemberEntity
                 {
                     ChatRoomId = chatroom.ChatRoomId,
-                    MemberId = uid
-                }));
+                    MemberId = adminUserId,
+                };
+
+                await _databaseContext.ChatRoomMembers.AddRangeAsync(
+                    [..members.Select(uid => new ChatRoomMemberEntity
+                    {
+                        ChatRoomId = chatroom.ChatRoomId,
+                        MemberId = uid
+                    }),
+                    adminMember
+                    ]
+                );
 
                 await _databaseContext.SaveChangesAsync();
             }
