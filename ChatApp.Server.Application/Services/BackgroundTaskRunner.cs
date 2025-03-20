@@ -36,6 +36,7 @@ namespace ChatApp.Server.Application.Services
                     Func<Task>? task = _backgroundTaskQueue.Dequeue();
                     if (task is not null)
                     {
+                        _logger.LogDebug("Executing a background task");
                         await task();
                     }
                 }
