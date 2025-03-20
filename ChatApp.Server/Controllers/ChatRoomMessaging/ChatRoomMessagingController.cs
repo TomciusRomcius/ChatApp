@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using ChatApp.Server.Application.Services;
+using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Domain.Entities;
 using ChatApp.Server.Domain.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace ChatApp.Server.Presentation.ChatRoomMessaging
     [Route("[controller]")]
     public class ChatRoomMessagingController : ControllerBase
     {
-        readonly ChatRoomMessagingService _chatRoomMessagingService;
+        readonly IChatRoomMessagingService _chatRoomMessagingService;
 
-        public ChatRoomMessagingController(ChatRoomMessagingService chatRoomMessagingService)
+        public ChatRoomMessagingController(IChatRoomMessagingService chatRoomMessagingService)
         {
             _chatRoomMessagingService = chatRoomMessagingService;
         }

@@ -1,16 +1,19 @@
+using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Domain.Entities;
 using ChatApp.Server.Domain.Utils;
 
 namespace ChatApp.Server.Application.Services
 {
-    public class ChatRoomMessagingService
+    public class ChatRoomMessagingService : IChatRoomMessagingService
     {
         readonly DatabaseContext _databaseContext;
+        readonly IWebSocketOperations _webSocketOperations;
 
-        public ChatRoomMessagingService(DatabaseContext databaseContext)
+        public ChatRoomMessagingService(DatabaseContext databaseContext, IWebSocketOperations webSocketOperations)
         {
             _databaseContext = databaseContext;
+            _webSocketOperations = webSocketOperations;
         }
 
         public Result<List<TextMessageEntity>> GetChatRoomMessages(string userId, string chatRoomId, int offset, int count)
@@ -70,6 +73,15 @@ namespace ChatApp.Server.Application.Services
             };
             await _databaseContext.TextMessages.AddAsync(textMessage);
             await _databaseContext.SaveChangesAsync();
+
+            var membersQuery = from member in _databaseContext.ChatRoomMembers
+                               where member.ChatRoomId == chatRoomId
+                               select member.MemberId;
+
+            List<string> memberIds = [.. membersQuery];
+
+            // Very simple, temporary
+            _webSocketOperations.EnqueueSendMessage(memberIds, content);
 
             return new Result<string>(textMessage.TextMessageId);
         }
