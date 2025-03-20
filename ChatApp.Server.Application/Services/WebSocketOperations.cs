@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace ChatApp.Server.Application.Services
 {
@@ -12,11 +13,13 @@ namespace ChatApp.Server.Application.Services
     {
         readonly IWebSocketList _webSocketList;
         readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        readonly ILogger<WebSocketOperations> _logger;
 
-        public WebSocketOperations(IWebSocketList webSocketList, IBackgroundTaskQueue backgroundTaskQueue)
+        public WebSocketOperations(IWebSocketList webSocketList, IBackgroundTaskQueue backgroundTaskQueue, ILogger<WebSocketOperations> logger)
         {
             _webSocketList = webSocketList;
             _backgroundTaskQueue = backgroundTaskQueue;
+            _logger = logger;
         }
 
         public void EnqueueSendMessage(List<string> userIds, string message)
@@ -33,6 +36,8 @@ namespace ChatApp.Server.Application.Services
                 List<WebSocketConnection> receivedSocks = _webSocketList.GetUserSockets(userId);
                 socks.AddRange([.. receivedSocks]);
             }
+
+            _logger.LogDebug("Sending a WebSocket message to {Number} of sockets", socks.Count());
 
             foreach (var socketConnection in socks)
             {
