@@ -16,33 +16,44 @@ namespace ChatApp.Server.Application.Services
             _databaseContext = databaseContext;
         }
 
-        public Result<ArrayList> GetUserFriends(string userId)
+        public Result<ArrayList> GetUserFriends(string userId, byte status = UserFriendStatus.FRIEND)
         {
             // Where the given user is the initiator and a friend is a receiver
+            IQueryable? query1 = null;
 
-            var query1 = from friend in _databaseContext.UserFriends
+            if (status == UserFriendStatus.FRIEND)
+            {
+                query1 = from friend in _databaseContext.UserFriends
                          join receiver in _databaseContext.Users
                          on friend.ReceiverId equals receiver.Id
-                         where friend.InitiatorId == userId && friend.Status == UserFriendStatus.FRIEND
+                         where friend.InitiatorId == userId && friend.Status == status
                          select new
                          {
                              UserId = receiver.Id,
                              UserName = receiver.UserName
                          };
+            }
 
             // Where the given user is the receiver and a friend is an initiator
-
             var query2 = from friend in _databaseContext.UserFriends
                          join initiator in _databaseContext.Users
                          on friend.InitiatorId equals initiator.Id
-                         where friend.ReceiverId == userId && friend.Status == UserFriendStatus.FRIEND
+                         where friend.ReceiverId == userId && friend.Status == status
                          select new
                          {
                              UserId = initiator.Id,
                              UserName = initiator.UserName
                          };
 
-            ArrayList result = [.. query1, .. query2];
+            ArrayList result = [];
+            if (query1 is not null)
+            {
+                result = [.. query1, .. query2];
+            }
+            else
+            {
+                result = [.. query2];
+            }
 
             return new Result<ArrayList>(result);
         }

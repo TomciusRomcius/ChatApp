@@ -3,6 +3,7 @@ using System.Security.Claims;
 using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using ChatApp.Server.Domain.Entities.UserFriend;
 
 namespace ChatApp.Server.Presentation.UserFriend
 {
@@ -29,7 +30,7 @@ namespace ChatApp.Server.Presentation.UserFriend
 
             ArrayList friends = new ArrayList();
 
-            Result<ArrayList> result = _userFriendService.GetUserFriends(dto.UserId ?? userId);
+            Result<ArrayList> result = _userFriendService.GetUserFriends(dto.UserId ?? userId, dto.Status ?? UserFriendStatus.FRIEND);
 
             if (result.IsError())
             {
