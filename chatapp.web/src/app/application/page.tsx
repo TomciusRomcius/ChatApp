@@ -1,7 +1,6 @@
 "use client";
 
 import UserFriendsService from "@/services/userFriendsService";
-import ChatView from "./_components/chat/chatView";
 import { useEffect, useState } from "react";
 import User from "./_utils/user";
 import Sidebar from "./_components/_sidebar/sidebar";
@@ -10,7 +9,7 @@ import AddFriend from "./_components/_popupElements/addFriend";
 import { AppState, AppStateContext } from "@/context/appStateContext";
 import FriendRequests from "./_components/_popupElements/friendRequests";
 import { CurrentChat, CurrentChatContext } from "@/context/currentChatContext";
-import ChatWindow from "./_components/_chat/ChatWindow";
+import ChatWindow from "./_components/_chat/chatWindow";
 
 export default function ApplicationPage() {
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
