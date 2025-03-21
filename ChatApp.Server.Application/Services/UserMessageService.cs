@@ -20,9 +20,15 @@ namespace ChatApp.Server.Application.Services
             _webSocketOperations = webSocketOperations;
         }
 
-        public Result<List<UserTextMessageModel>> GetMessages(string userId)
+        public Result<List<UserTextMessageModel>> GetMessages(string userId, string? friendId = null)
         {
-            var query = from textMessage in _databaseContext.TextMessages
+            // If sender id is null, set the condition func to get all messages from all users
+            // else, get messages from a specific user with senderId 
+
+            IQueryable<UserTextMessageModel> query;
+            if (friendId is null)
+            {
+                query = from textMessage in _databaseContext.TextMessages
                         where textMessage.SenderId == userId || textMessage.ReceiverUserId == userId
                         select new UserTextMessageModel(
                             textMessage.TextMessageId,
@@ -30,7 +36,22 @@ namespace ChatApp.Server.Application.Services
                             textMessage.Content,
                             textMessage.CreatedAt
                         );
+            }
 
+            else
+            {
+                query = from textMessage in _databaseContext.TextMessages
+                        where
+                        (textMessage.SenderId == userId && textMessage.ReceiverUserId == friendId) ||
+                        (textMessage.SenderId == friendId && textMessage.ReceiverUserId == userId)
+
+                        select new UserTextMessageModel(
+                            textMessage.TextMessageId,
+                            textMessage.SenderId,
+                            textMessage.Content,
+                            textMessage.CreatedAt
+                        );
+            }
             List<UserTextMessageModel> result = [.. query];
             return new Result<List<UserTextMessageModel>>(result);
         }

@@ -18,7 +18,7 @@ namespace ChatApp.Server.Presentation.UserMessage
         }
 
         [HttpGet]
-        public IActionResult GetMessages()
+        public IActionResult GetMessages([FromQuery] GetMesssagesDto dto)
         {
             string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -27,9 +27,9 @@ namespace ChatApp.Server.Presentation.UserMessage
                 return Unauthorized();
             }
 
-            var result = _userMessageService.GetMessages(userId);
+            var result = _userMessageService.GetMessages(userId, dto.UserId);
 
-            return Ok(result);
+            return Ok(result.GetValue());
         }
 
         [HttpPost]
