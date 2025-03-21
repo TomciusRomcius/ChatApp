@@ -13,6 +13,7 @@ import ChatWindow from "./_components/_chat/chatWindow";
 import CurrentUser from "./_utils/user";
 import UserService from "@/services/userService";
 import CurrentUserContext from "@/context/currentUserContext";
+import CreateChatroom from "./_components/_popupElements/createChatRoom";
 
 export default function ApplicationPage() {
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -79,6 +80,15 @@ export default function ApplicationPage() {
                                 <FriendRequests
                                     friendRequests={friendRequests}
                                 />
+                            </Popup>
+                        ) : null}
+
+                        {appState == AppState.CREATE_CHATROOM ? (
+                            <Popup
+                                onClose={() => setAppState(AppState.DEFAULT)}
+                                className="flex flex-col gap-2"
+                            >
+                                <CreateChatroom friends={friends} />
                             </Popup>
                         ) : null}
                         <Sidebar friends={friends} />

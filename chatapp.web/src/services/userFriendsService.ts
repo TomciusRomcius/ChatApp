@@ -7,6 +7,8 @@ class _UserFriendsService {
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend`,
             { withCredentials: true },
         );
+
+        console.log(res.data);
         return (res.data ?? []) as User[];
     }
 
