@@ -2,11 +2,12 @@ import User from "@/app/application/_utils/user";
 import axios from "axios";
 
 class _UserFriendsService {
-    async GetAllFriends(): Promise<User> {
+    async GetAllFriends(): Promise<User[]> {
         const res = await axios.get(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend`,
+            { withCredentials: true },
         );
-        return res.data as User;
+        return (res.data ?? []) as User[];
     }
 }
 
