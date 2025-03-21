@@ -42,18 +42,7 @@ namespace ChatApp.Server.Application.Services
                              UserName = initiator.UserName
                          };
 
-            ArrayList result = new ArrayList();
-
-            foreach (var row in query1)
-            {
-                result.Add(row);
-            }
-
-
-            foreach (var row in query2)
-            {
-                result.Add(row);
-            }
+            ArrayList result = [.. query1, .. query2];
 
             return new Result<ArrayList>(result);
         }
