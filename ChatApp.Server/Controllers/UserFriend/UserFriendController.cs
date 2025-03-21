@@ -18,7 +18,7 @@ namespace ChatApp.Server.Presentation.UserFriend
         }
 
         [HttpGet]
-        public IActionResult GetUserFriends([FromBody] GetFriendsDto dto)
+        public IActionResult GetUserFriends([FromQuery] GetFriendsDto dto)
         {
             string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -29,22 +29,19 @@ namespace ChatApp.Server.Presentation.UserFriend
 
             ArrayList friends = new ArrayList();
 
-            if (dto.UserId is not null)
+            Result<ArrayList> result = _userFriendService.GetUserFriends(dto.UserId ?? userId);
+
+            if (result.IsError())
             {
-                Result<ArrayList> result = _userFriendService.GetUserFriends(dto.UserId);
-
-                if (result.IsError())
-                {
-
-                }
-
-                else
-                {
-                    friends = result.GetValue();
-                }
+                // TODO: better error description
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
 
-            return Ok(friends);
+            else
+            {
+                friends = result.GetValue();
+                return Ok(friends);
+            }
         }
 
         [HttpPost("request")]
