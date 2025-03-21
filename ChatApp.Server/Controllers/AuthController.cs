@@ -129,14 +129,11 @@ namespace ChatApp.Server.Presentation.Auth
                     Email = email,
                     UserName = email
                 });
+
+                user = await _userManager.FindByEmailAsync(email);
             }
 
-            await _signInManager.SignInAsync(new IdentityUser
-            {
-                Email = email,
-                UserName = email
-            }, true);
-
+            await _signInManager.SignInAsync(user, true);
             _antiforgery.SetCookieTokenAndHeader(HttpContext);
 
             return Ok(jsonToken.Subject);
