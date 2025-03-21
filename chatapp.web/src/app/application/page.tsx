@@ -10,14 +10,22 @@ import { AppState, AppStateContext } from "@/context/appStateContext";
 import FriendRequests from "./_components/_popupElements/friendRequests";
 import { CurrentChat, CurrentChatContext } from "@/context/currentChatContext";
 import ChatWindow from "./_components/_chat/chatWindow";
+import CurrentUser from "./_utils/user";
+import UserService from "@/services/userService";
+import CurrentUserContext from "@/context/currentUserContext";
 
 export default function ApplicationPage() {
+    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
     const [currentChat, setCurrentChat] = useState<CurrentChat | null>(null);
     const [friends, setFriends] = useState<User[]>([]);
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
 
     useEffect(() => {
+        UserService.WhoAmI().then((retrievedUser) => {
+            setCurrentUser(retrievedUser);
+        });
+
         UserFriendsService.GetAllFriends().then((friends) =>
             setFriends(friends),
         );
@@ -29,42 +37,55 @@ export default function ApplicationPage() {
 
     console.log(`Current chat: ${currentChat?.id}`);
 
+    if (!currentUser) {
+        return "Getting current user";
+    }
+
     return (
         <div className="w-screen min-h-screen grid grid-cols-6 grid-rows-1 gap-0">
-            <AppStateContext.Provider
-                value={{ appState: appState, setAppState: setAppState }}
+            <CurrentUserContext.Provider
+                value={{
+                    currentUser: currentUser,
+                    setCurrentUser: setCurrentUser,
+                }}
             >
-                <CurrentChatContext.Provider
-                    value={{
-                        currentChat: currentChat,
-                        setCurrentChat: setCurrentChat,
-                    }}
+                <AppStateContext.Provider
+                    value={{ appState: appState, setAppState: setAppState }}
                 >
-                    {appState == AppState.ADD_FRIEND ? (
-                        <Popup
-                            onClose={() => setAppState(AppState.DEFAULT)}
-                            className="flex flex-col gap-2"
-                        >
-                            <AddFriend
-                                onSendFriendRequest={() =>
-                                    setAppState(AppState.DEFAULT)
-                                }
-                            />
-                        </Popup>
-                    ) : null}
+                    <CurrentChatContext.Provider
+                        value={{
+                            currentChat: currentChat,
+                            setCurrentChat: setCurrentChat,
+                        }}
+                    >
+                        {appState == AppState.ADD_FRIEND ? (
+                            <Popup
+                                onClose={() => setAppState(AppState.DEFAULT)}
+                                className="flex flex-col gap-2"
+                            >
+                                <AddFriend
+                                    onSendFriendRequest={() =>
+                                        setAppState(AppState.DEFAULT)
+                                    }
+                                />
+                            </Popup>
+                        ) : null}
 
-                    {appState == AppState.ACCEPT_FRIEND_REQUEST ? (
-                        <Popup
-                            onClose={() => setAppState(AppState.DEFAULT)}
-                            className="flex flex-col gap-2"
-                        >
-                            <FriendRequests friendRequests={friendRequests} />
-                        </Popup>
-                    ) : null}
-                    <Sidebar friends={friends} />
-                    <ChatWindow />
-                </CurrentChatContext.Provider>
-            </AppStateContext.Provider>
+                        {appState == AppState.ACCEPT_FRIEND_REQUEST ? (
+                            <Popup
+                                onClose={() => setAppState(AppState.DEFAULT)}
+                                className="flex flex-col gap-2"
+                            >
+                                <FriendRequests
+                                    friendRequests={friendRequests}
+                                />
+                            </Popup>
+                        ) : null}
+                        <Sidebar friends={friends} />
+                        <ChatWindow />
+                    </CurrentChatContext.Provider>
+                </AppStateContext.Provider>
+            </CurrentUserContext.Provider>
         </div>
     );
 }
