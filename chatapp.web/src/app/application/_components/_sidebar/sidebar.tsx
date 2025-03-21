@@ -2,6 +2,7 @@ import { useContext } from "react";
 import User from "../../_utils/user";
 import SidebarUser from "./sidebarUser";
 import { AppState, AppStateContext } from "@/context/appStateContext";
+import { CurrentChatContext } from "@/context/currentChatContext";
 
 interface SidebarProps {
     friends: User[];
@@ -9,6 +10,7 @@ interface SidebarProps {
 
 export default function Sidebar(props: SidebarProps) {
     const { setAppState } = useContext(AppStateContext);
+    const { setCurrentChat } = useContext(CurrentChatContext);
 
     const onClickAddFriend = () => {
         setAppState(AppState.ADD_FRIEND);
@@ -22,6 +24,13 @@ export default function Sidebar(props: SidebarProps) {
         setAppState(AppState.CREATE_CHATROOM);
     };
 
+    const onSelectChat = (userId: string) => {
+        setCurrentChat({
+            type: "user",
+            id: userId,
+        });
+    };
+
     return (
         <div className="p-8 flex flex-col items-start gap-12 bg-background-100">
             <div className="w-full flex flex-col gap-4 items-start">
@@ -32,11 +41,15 @@ export default function Sidebar(props: SidebarProps) {
             {/* Friends and group list */}
             <div className="w-full flex flex-col gap-4 items-start">
                 {props.friends.map((friend) => (
-                    <SidebarUser
+                    <button
                         key={friend.userId}
-                        userId={friend.userId}
-                        username={friend.userName}
-                    ></SidebarUser>
+                        onClick={() => onSelectChat(friend.userId)}
+                    >
+                        <SidebarUser
+                            key={friend.userId}
+                            username={friend.userName}
+                        ></SidebarUser>
+                    </button>
                 ))}
             </div>
         </div>
