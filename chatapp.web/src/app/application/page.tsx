@@ -8,16 +8,22 @@ import Sidebar from "./_components/_sidebar/sidebar";
 import Popup from "@/components/popup";
 import AddFriend from "./_components/_popupElements/addFriend";
 import { AppState, AppStateContext } from "@/context/appStateContext";
+import FriendRequests from "./_components/_popupElements/friendRequests";
 
 export default function ApplicationPage() {
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
 
     const [friends, setFriends] = useState<User[]>([]);
+    const [friendRequests, setFriendRequests] = useState<User[]>([]);
 
     useEffect(() => {
         UserFriendsService.GetAllFriends().then((friends) =>
             setFriends(friends),
         );
+
+        UserFriendsService.GetAllFriendRequests().then((requests) => {
+            setFriendRequests(requests);
+        });
     }, []);
 
     console.log(friends);
@@ -37,6 +43,15 @@ export default function ApplicationPage() {
                                 setAppState(AppState.DEFAULT)
                             }
                         />
+                    </Popup>
+                ) : null}
+
+                {appState == AppState.ACCEPT_FRIEND_REQUEST ? (
+                    <Popup
+                        onClose={() => setAppState(AppState.DEFAULT)}
+                        className="flex flex-col gap-2"
+                    >
+                        <FriendRequests friendRequests={friendRequests} />
                     </Popup>
                 ) : null}
                 <Sidebar friends={friends} />

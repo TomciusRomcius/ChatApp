@@ -10,6 +10,15 @@ class _UserFriendsService {
         return (res.data ?? []) as User[];
     }
 
+    async GetAllFriendRequests(): Promise<User[]> {
+        // TODO: add enum to avoid hard coded status
+        const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend?status=0`,
+            { withCredentials: true },
+        );
+        return (res.data ?? []) as User[];
+    }
+
     async SendFriendRequest(userId: string): Promise<void> {
         await axios.post(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend/request`,
@@ -22,7 +31,7 @@ class _UserFriendsService {
 
     async AcceptFriendRequest(userId: string): Promise<void> {
         await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend/request`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend/accept`,
             { userId: userId },
             {
                 withCredentials: true,
