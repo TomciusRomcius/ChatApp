@@ -9,6 +9,16 @@ class _UserFriendsService {
         );
         return (res.data ?? []) as User[];
     }
+
+    async SendFriendRequest(userId: string): Promise<void> {
+        await axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend/request`,
+            { userId: userId },
+            {
+                withCredentials: true,
+            },
+        );
+    }
 }
 
 const UserFriendsService = new _UserFriendsService();

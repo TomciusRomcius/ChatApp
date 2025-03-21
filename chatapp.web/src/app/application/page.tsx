@@ -5,9 +5,12 @@ import ChatView from "./_components/chat/chatView";
 import { useEffect, useState } from "react";
 import User from "./_utils/user";
 import Sidebar from "./_components/_sidebar/sidebar";
+import Popup from "@/components/popup";
+import AddFriend from "./_components/_popupElements/addFriend";
 
 export default function ApplicationPage() {
     const [friends, setFriends] = useState<User[]>([]);
+    const [popupVisible, setPopupVisible] = useState(true);
 
     useEffect(() => {
         UserFriendsService.GetAllFriends().then((friends) =>
@@ -19,6 +22,14 @@ export default function ApplicationPage() {
 
     return (
         <div className="w-screen min-h-screen grid grid-cols-6 grid-rows-1 gap-0">
+            {popupVisible ? (
+                <Popup
+                    onClose={() => setPopupVisible(false)}
+                    className="flex flex-col gap-2"
+                >
+                    <AddFriend />
+                </Popup>
+            ) : null}
             <Sidebar friends={friends} />
             <div className="px-64 py-8 col-span-5 row-span flex flex-col">
                 <div className="flex flex-col gap-4">
