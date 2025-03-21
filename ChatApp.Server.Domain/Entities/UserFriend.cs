@@ -5,9 +5,9 @@ namespace ChatApp.Server.Domain.Entities.UserFriend
 {
     public static class UserFriendStatus
     {
-        public static byte REQUEST = 0x00;
-        public static byte FRIEND = 0x01;
-        public static byte BLOCKED = 0x10;
+        public const byte REQUEST = 0x00;
+        public const byte FRIEND = 0x01;
+        public const byte BLOCKED = 0x10;
     }
 
     public class UserFriendEntity
