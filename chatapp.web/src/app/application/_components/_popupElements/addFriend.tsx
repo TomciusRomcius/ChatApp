@@ -1,7 +1,11 @@
 import UserFriendsService from "@/services/userFriendsService";
 import { useRef } from "react";
 
-export default function AddFriend() {
+interface AddFriendProps {
+    onSendFriendRequest: () => void;
+}
+
+export default function AddFriend(props: AddFriendProps) {
     const userIdRef = useRef<HTMLInputElement>(null);
 
     const onSendFriendRequest = () => {
@@ -11,7 +15,7 @@ export default function AddFriend() {
 
         UserFriendsService.SendFriendRequest(userIdRef.current.value).then(
             () => {
-                alert("Success");
+                props.onSendFriendRequest();
             },
         );
     };

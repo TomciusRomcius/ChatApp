@@ -27,7 +27,9 @@ export default function ApplicationPage() {
                     onClose={() => setPopupVisible(false)}
                     className="flex flex-col gap-2"
                 >
-                    <AddFriend />
+                    <AddFriend
+                        onSendFriendRequest={() => setPopupVisible(false)}
+                    />
                 </Popup>
             ) : null}
             <Sidebar friends={friends} />
