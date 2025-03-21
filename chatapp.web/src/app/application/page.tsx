@@ -7,10 +7,12 @@ import User from "./_utils/user";
 import Sidebar from "./_components/_sidebar/sidebar";
 import Popup from "@/components/popup";
 import AddFriend from "./_components/_popupElements/addFriend";
+import { AppState, AppStateContext } from "@/context/appStateContext";
 
 export default function ApplicationPage() {
+    const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
+
     const [friends, setFriends] = useState<User[]>([]);
-    const [popupVisible, setPopupVisible] = useState(true);
 
     useEffect(() => {
         UserFriendsService.GetAllFriends().then((friends) =>
@@ -22,27 +24,33 @@ export default function ApplicationPage() {
 
     return (
         <div className="w-screen min-h-screen grid grid-cols-6 grid-rows-1 gap-0">
-            {popupVisible ? (
-                <Popup
-                    onClose={() => setPopupVisible(false)}
-                    className="flex flex-col gap-2"
-                >
-                    <AddFriend
-                        onSendFriendRequest={() => setPopupVisible(false)}
-                    />
-                </Popup>
-            ) : null}
-            <Sidebar friends={friends} />
-            <div className="px-64 py-8 col-span-5 row-span flex flex-col">
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <small>Username</small>
-                        <small>Date</small>
+            <AppStateContext.Provider
+                value={{ appState: appState, setAppState: setAppState }}
+            >
+                {appState == AppState.ADD_FRIEND ? (
+                    <Popup
+                        onClose={() => setAppState(AppState.DEFAULT)}
+                        className="flex flex-col gap-2"
+                    >
+                        <AddFriend
+                            onSendFriendRequest={() =>
+                                setAppState(AppState.DEFAULT)
+                            }
+                        />
+                    </Popup>
+                ) : null}
+                <Sidebar friends={friends} />
+                <div className="px-64 py-8 col-span-5 row-span flex flex-col">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                            <small>Username</small>
+                            <small>Date</small>
+                        </div>
+                        <p>Long Long Long message</p>
                     </div>
-                    <p>Long Long Long message</p>
+                    <ChatView />
                 </div>
-                <ChatView />
-            </div>
+            </AppStateContext.Provider>
         </div>
     );
 }
