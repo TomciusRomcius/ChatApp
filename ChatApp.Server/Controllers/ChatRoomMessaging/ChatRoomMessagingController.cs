@@ -19,7 +19,7 @@ namespace ChatApp.Server.Presentation.ChatRoomMessaging
 
         // TODO: may be susceptable to CSRF attacks
         [HttpGet()]
-        public IActionResult GetChatRoomMessages([FromBody] GetChatRoomMessageDto dto)
+        public IActionResult GetChatRoomMessages([FromQuery] GetChatRoomMessageDto dto)
         {
             string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
