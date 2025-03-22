@@ -6,7 +6,11 @@ import CurrentUserContext from "@/context/currentUserContext";
 import ChatRoomMessagingService from "@/services/chatRoomMessagingService";
 import ChatWindowRenderer from "./chatWindowRenderer";
 
-export default function ChatWindow() {
+interface ChatWindowProps {
+    newMessages: TextMessage[];
+}
+
+export default function ChatWindow(props: ChatWindowProps) {
     const { currentUser } = useContext(CurrentUserContext);
     const { currentChat } = useContext(CurrentChatContext);
     const [messages, setMessages] = useState<TextMessage[]>([]);
@@ -53,6 +57,10 @@ export default function ChatWindow() {
             );
         }
     }, [currentChat]);
+
+    useEffect(() => {
+        setMessages([...messages, ...props.newMessages]);
+    }, [props.newMessages]);
 
     return (
         <ChatWindowRenderer sendMessage={onSendMessage} messages={messages} />

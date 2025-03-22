@@ -1,7 +1,7 @@
 "use client";
 
 import UserFriendsService from "@/services/userFriendsService";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Sidebar from "./_components/_sidebar/sidebar";
 import Popup from "@/components/popup";
 import AddFriend from "./_components/_popupElements/addFriend";
@@ -12,9 +12,10 @@ import ChatWindow from "./_components/_chat/chatWindow";
 import UserService from "@/services/userService";
 import CurrentUserContext from "@/context/currentUserContext";
 import CreateChatroom from "./_components/_popupElements/createChatRoom";
-import { ChatRoom } from "@/types";
+import TextMessage, { ChatRoom } from "@/types";
 import ChatRoomService from "@/services/chatRoomService";
 import User, { CurrentUser } from "./_utils/user";
+import { publicConfiguration } from "@/utils/configuration";
 
 export default function ApplicationPage() {
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -23,6 +24,32 @@ export default function ApplicationPage() {
     const [friends, setFriends] = useState<User[]>([]);
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
     const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+    const [newMessages, setNewMessages] = useState<TextMessage[]>([]);
+
+    const webSocket = useMemo(
+        () => new WebSocket(`${publicConfiguration.BACKEND_URL}/ws`),
+        [currentUser],
+    );
+
+    const handleWsMessage = (ev: MessageEvent) => {
+        const msg = JSON.parse(ev.data);
+
+        if (msg.Type == "user-message") {
+            const ent = msg.Body;
+            const textMessage: TextMessage = {
+                content: ent.Content,
+                senderId: ent.SenderId,
+                receiverId: ent.ReceiverId,
+                chatRoomId: ent.ChatRoomId,
+                createdAt: ent.CreatedAt,
+            };
+            setNewMessages([...newMessages, textMessage]);
+        }
+    };
+
+    const webSocketSetup = () => {
+        webSocket.addEventListener("message", handleWsMessage);
+    };
 
     useEffect(() => {
         UserService.WhoAmI().then((retrievedUser) => {
@@ -40,6 +67,8 @@ export default function ApplicationPage() {
         ChatRoomService.GetChatRooms().then((result) => {
             setChatRooms(result);
         });
+
+        webSocketSetup();
     }, []);
 
     console.log(`Current chat: ${currentChat?.id}`);
@@ -47,6 +76,20 @@ export default function ApplicationPage() {
     if (!currentUser) {
         return "Getting current user";
     }
+
+    const filteredChatNewMessages = !currentChat
+        ? []
+        : newMessages.filter((msg) => {
+              if (currentChat.type == "user") {
+                  return currentChat.id == msg.senderId;
+              }
+
+              if (currentChat.type == "chatroom") {
+                  return currentChat.id == msg.chatRoomId;
+              }
+          });
+
+    console.log(filteredChatNewMessages, newMessages, currentChat);
 
     return (
         <div className="w-screen min-h-screen grid grid-cols-6 grid-rows-1 gap-0">
@@ -98,7 +141,7 @@ export default function ApplicationPage() {
                             </Popup>
                         ) : null}
                         <Sidebar friends={friends} chatRooms={chatRooms} />
-                        <ChatWindow />
+                        <ChatWindow newMessages={filteredChatNewMessages} />
                     </CurrentChatContext.Provider>
                 </AppStateContext.Provider>
             </CurrentUserContext.Provider>
