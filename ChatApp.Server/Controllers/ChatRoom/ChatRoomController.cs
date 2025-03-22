@@ -48,7 +48,7 @@ namespace ChatApp.Server.Presentation.ChatRoom
                 }
             }
 
-            return Ok(result);
+            return Ok(result.GetValue());
         }
 
         [HttpPost]
