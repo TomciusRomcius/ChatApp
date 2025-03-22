@@ -1,0 +1,8 @@
+.gitignore
+.git
+
+.vs
+.vscode
+
+**/obj
+**/bin
