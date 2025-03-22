@@ -3,9 +3,11 @@ import User from "../../_utils/user";
 import SidebarUser from "./sidebarUser";
 import { AppState, AppStateContext } from "@/context/appStateContext";
 import { CurrentChatContext } from "@/context/currentChatContext";
+import { ChatRoom } from "@/types";
 
 interface SidebarProps {
     friends: User[];
+    chatRooms: ChatRoom[];
 }
 
 export default function Sidebar(props: SidebarProps) {
@@ -24,12 +26,21 @@ export default function Sidebar(props: SidebarProps) {
         setAppState(AppState.CREATE_CHATROOM);
     };
 
-    const onSelectChat = (userId: string) => {
+    const onSelectUserChat = (userId: string) => {
         setCurrentChat({
             type: "user",
             id: userId,
         });
     };
+
+    const onSelectChatRoom = (chatRoomId: string) => {
+        setCurrentChat({
+            type: "chatroom",
+            id: chatRoomId,
+        });
+    };
+
+    console.log(props.chatRooms);
 
     return (
         <div className="p-8 flex flex-col items-start gap-12 bg-background-100">
@@ -43,11 +54,23 @@ export default function Sidebar(props: SidebarProps) {
                 {props.friends.map((friend) => (
                     <button
                         key={friend.userId}
-                        onClick={() => onSelectChat(friend.userId)}
+                        onClick={() => onSelectUserChat(friend.userId)}
                     >
                         <SidebarUser
                             key={friend.userId}
                             username={friend.userName}
+                        ></SidebarUser>
+                    </button>
+                ))}
+
+                {props.chatRooms.map((chatRoom) => (
+                    <button
+                        key={chatRoom.chatRoomId}
+                        onClick={() => onSelectChatRoom(chatRoom.chatRoomId)}
+                    >
+                        <SidebarUser
+                            key={chatRoom.chatRoomId}
+                            username={chatRoom.name}
                         ></SidebarUser>
                     </button>
                 ))}

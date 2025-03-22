@@ -4,6 +4,7 @@ import TextMessage from "@/types";
 import UserMessagingService from "@/services/userMessagingService";
 import Message from "./message";
 import CurrentUserContext from "@/context/currentUserContext";
+import ChatRoomMessagingService from "@/services/chatRoomMessagingService";
 
 export default function ChatWindow() {
     const { currentUser } = useContext(CurrentUserContext);
@@ -13,29 +14,45 @@ export default function ChatWindow() {
 
     const onSendMessage = () => {
         const content = sendMessageRef.current?.value;
-
-        if (currentChat?.id && content) {
-            UserMessagingService.SendMessageToFriend(currentChat.id, content);
-            // TODO: set createdAt
-            setMessages([
-                ...messages,
-                {
-                    senderId: currentUser.id,
-                    receiverId: currentChat.id,
-                    content: content,
-                    createdAt: null,
-                },
-            ]);
+        if (!currentChat?.id || !content) {
+            return;
         }
+
+        if (currentChat.type == "user") {
+            UserMessagingService.SendMessageToFriend(currentChat.id, content);
+        } else {
+            ChatRoomMessagingService.SendMessage(currentChat.id, content);
+            // TODO: set createdAt
+        }
+        // TODO: set createdAt
+        setMessages([
+            ...messages,
+            {
+                senderId: currentUser.id,
+                receiverId: currentChat.id,
+                content: content,
+                createdAt: null,
+            },
+        ]);
     };
 
     useEffect(() => {
         if (currentChat) {
-            UserMessagingService.GetMessagesFromFriend(currentChat.id).then(
-                (messages) => {
+            if (currentChat.type == "user") {
+                UserMessagingService.GetMessagesFromFriend(currentChat.id).then(
+                    (messages) => {
+                        setMessages(messages);
+                    },
+                );
+            } else {
+                ChatRoomMessagingService.GetMessages(
+                    currentChat.id,
+                    0,
+                    20,
+                ).then((messages) => {
                     setMessages(messages);
-                },
-            );
+                });
+            }
         }
     }, [currentChat]);
 

@@ -19,9 +19,8 @@ export default function Message(props: MessageProps) {
                 className={`flex flex-col gap-2 ${isSender ? "items-end" : "items-start"}`}
             >
                 <small>{props.message.senderId}</small>
-                <small>{props.message.content}</small>
             </div>
-            <p>Long LongLongLongLong message</p>
+            <p>{props.message.content}</p>
         </div>
     );
 }

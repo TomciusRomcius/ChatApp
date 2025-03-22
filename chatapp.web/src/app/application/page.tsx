@@ -2,7 +2,6 @@
 
 import UserFriendsService from "@/services/userFriendsService";
 import { useEffect, useState } from "react";
-import User from "./_utils/user";
 import Sidebar from "./_components/_sidebar/sidebar";
 import Popup from "@/components/popup";
 import AddFriend from "./_components/_popupElements/addFriend";
@@ -10,10 +9,12 @@ import { AppState, AppStateContext } from "@/context/appStateContext";
 import FriendRequests from "./_components/_popupElements/friendRequests";
 import { CurrentChat, CurrentChatContext } from "@/context/currentChatContext";
 import ChatWindow from "./_components/_chat/chatWindow";
-import CurrentUser from "./_utils/user";
 import UserService from "@/services/userService";
 import CurrentUserContext from "@/context/currentUserContext";
 import CreateChatroom from "./_components/_popupElements/createChatRoom";
+import { ChatRoom } from "@/types";
+import ChatRoomService from "@/services/chatRoomService";
+import User, { CurrentUser } from "./_utils/user";
 
 export default function ApplicationPage() {
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -21,6 +22,7 @@ export default function ApplicationPage() {
     const [currentChat, setCurrentChat] = useState<CurrentChat | null>(null);
     const [friends, setFriends] = useState<User[]>([]);
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
+    const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
     useEffect(() => {
         UserService.WhoAmI().then((retrievedUser) => {
@@ -33,6 +35,10 @@ export default function ApplicationPage() {
 
         UserFriendsService.GetAllFriendRequests().then((requests) => {
             setFriendRequests(requests);
+        });
+
+        ChatRoomService.GetChatRooms().then((result) => {
+            setChatRooms(result);
         });
     }, []);
 
@@ -91,7 +97,7 @@ export default function ApplicationPage() {
                                 <CreateChatroom friends={friends} />
                             </Popup>
                         ) : null}
-                        <Sidebar friends={friends} />
+                        <Sidebar friends={friends} chatRooms={chatRooms} />
                         <ChatWindow />
                     </CurrentChatContext.Provider>
                 </AppStateContext.Provider>

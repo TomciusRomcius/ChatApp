@@ -4,3 +4,9 @@ export default interface TextMessage {
     content: string;
     createdAt: Date;
 }
+
+export interface ChatRoom {
+    chatRoomId: string;
+    name: string;
+    adminUserId: string;
+}

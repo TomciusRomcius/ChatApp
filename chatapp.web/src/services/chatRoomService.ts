@@ -1,3 +1,4 @@
+import { ChatRoom } from "@/types";
 import { publicConfiguration } from "@/utils/configuration";
 import axios from "axios";
 
@@ -16,6 +17,15 @@ class _ChatRoomService {
         );
         // TODO: may return error
         return res.data as string;
+    }
+
+    async GetChatRooms(): Promise<ChatRoom[]> {
+        const res = await axios.get(
+            `${publicConfiguration.BACKEND_URL}/chatroom`,
+            { withCredentials: true },
+        );
+        // TODO: may return error
+        return (res.data ?? []) as ChatRoom[];
     }
 }
 
