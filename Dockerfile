@@ -11,12 +11,11 @@ COPY ./ChatApp.Server.Domain/ChatApp.Server.Domain.csproj ./ChatApp.Server.Domai
 COPY ./ChatApp.Server.Application.Tests/ChatApp.Server.Application.Tests.csproj ./ChatApp.Server.Application.Tests/
 RUN dotnet restore
 COPY . .
-RUN cd ChatApp.Server && lsx
+RUN cd ChatApp.Server && ls
 RUN dotnet build --no-restore
 
 FROM build as test
 CMD dotnet test --no-restore
 
-FROM test as RUN
+FROM test as run
 CMD [ "dotnet", "run", "--environment", "production", "--project", "ChatApp.Server" ]
-
