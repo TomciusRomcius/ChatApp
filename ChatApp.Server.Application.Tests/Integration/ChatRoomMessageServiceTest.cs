@@ -36,14 +36,21 @@ namespace ChatApp.Server.Application.Tests.Integration
         public async Task UserShouldBeSendMessagesInTheChatRoomAsync()
         {
             var user1 = new IdentityUser("User1");
-            _databaseContext.Add(user1);
             var chatRoom = new ChatRoomEntity
             {
                 ChatRoomId = Guid.NewGuid().ToString(),
                 Name = "Name",
                 AdminUserId = user1.Id
             };
-            _databaseContext.Add(chatRoom);
+
+            var chatRoomMember = new ChatRoomMemberEntity
+            {
+                ChatRoomId = chatRoom.ChatRoomId,
+                MemberId = user1.Id
+            };
+            _databaseContext.Users.Add(user1);
+            _databaseContext.ChatRooms.Add(chatRoom);
+            _databaseContext.ChatRoomMembers.Add(chatRoomMember);
             _databaseContext.SaveChanges();
 
             string messageContent = "Hello";
@@ -72,6 +79,14 @@ namespace ChatApp.Server.Application.Tests.Integration
                 Name = "Name",
                 AdminUserId = user1.Id
             };
+
+
+            var chatRoomMember = new ChatRoomMemberEntity
+            {
+                ChatRoomId = chatRoom.ChatRoomId,
+                MemberId = user1.Id
+            };
+
             var textMessage = new TextMessageEntity
             {
                 TextMessageId = Guid.NewGuid().ToString(),
@@ -83,6 +98,7 @@ namespace ChatApp.Server.Application.Tests.Integration
 
             _databaseContext.Users.Add(user1);
             _databaseContext.ChatRooms.Add(chatRoom);
+            _databaseContext.ChatRoomMembers.Add(chatRoomMember);
             _databaseContext.TextMessages.Add(textMessage);
             _databaseContext.SaveChanges();
 

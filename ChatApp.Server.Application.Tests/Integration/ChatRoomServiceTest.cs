@@ -60,10 +60,10 @@ namespace ChatApp.Server.Application.Tests.Integration
             var retrievedMembers = membersQuery.ToList();
 
             Assert.NotNull(retrievedChatRoom);
-            Assert.Single(retrievedMembers);
+            Assert.Equal(2, retrievedMembers.Count());
 
             Assert.Equal(chatRoomName, retrievedChatRoom.Name);
-            Assert.Equal(user2.Id, retrievedMembers[0].MemberId);
+            Assert.Equal(adminUser.Id, retrievedChatRoom.AdminUserId);
         }
 
         [Fact]
