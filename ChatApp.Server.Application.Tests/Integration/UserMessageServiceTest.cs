@@ -4,6 +4,7 @@ using ChatApp.Server.Application.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.MsSql;
+using Moq;
 
 namespace ChatApp.Server.Application.Tests.Integration
 {
@@ -20,7 +21,7 @@ namespace ChatApp.Server.Application.Tests.Integration
             string connectionString = _msSqlContainer.GetConnectionString();
             _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
             await _databaseContext.Database.EnsureCreatedAsync();
-            _userMessageService = new UserMessageService(_databaseContext);
+            _userMessageService = new UserMessageService(_databaseContext, new Mock<IWebSocketOperations>().Object);
         }
 
         public async Task DisposeAsync()
