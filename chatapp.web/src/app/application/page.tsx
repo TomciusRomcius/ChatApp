@@ -34,7 +34,7 @@ export default function ApplicationPage() {
     const handleWsMessage = (ev: MessageEvent) => {
         const msg = JSON.parse(ev.data);
 
-        if (msg.Type == "user-message") {
+        if (msg.Type == "user-message" || msg.Type == "chatroom-message") {
             const ent = msg.Body;
             const textMessage: TextMessage = {
                 content: ent.Content,
