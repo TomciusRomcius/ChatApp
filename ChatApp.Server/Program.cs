@@ -16,11 +16,39 @@ builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
 {
     OidcProviderConfigMapService oidcProviderConfigMapService = new();
 
-    oidcProviderConfigMapService.AddProvider("google", new OidcProvider(
-        builder.Configuration["OIDC:GOOGLE:CLIENT_ID"]!,
-        builder.Configuration["OIDC:GOOGLE:SECRET_CLIENT_ID"]!,
-        builder.Configuration["OIDC:GOOGLE:AUTHORITY"]!
-    ));
+    if (builder.Environment.IsDevelopment())
+    {
+        string? googleClientId = builder.Configuration["OIDC:GOOGLE:CLIENT_ID"];
+        string? googleSecretClientId = builder.Configuration["OIDC:GOOGLE:SECRET_CLIENT_ID"];
+        string? googleAuthority = builder.Configuration["OIDC:GOOGLE:AUTHORITY"];
+
+        oidcProviderConfigMapService.AddProvider("google", new OidcProvider(
+            builder.Configuration["OIDC:GOOGLE:CLIENT_ID"]!,
+            builder.Configuration["OIDC:GOOGLE:SECRET_CLIENT_ID"]!,
+            builder.Configuration["OIDC:GOOGLE:AUTHORITY"]!
+        ));
+
+        ArgumentNullException.ThrowIfNull(googleClientId);
+        ArgumentNullException.ThrowIfNull(googleSecretClientId);
+        ArgumentNullException.ThrowIfNull(googleAuthority);
+    }
+
+    else
+    {
+        string? googleClientId = Environment.GetEnvironmentVariable("CA_OIDC_GOOGLE_CLIENT_ID");
+        string? googleSecretClientId = Environment.GetEnvironmentVariable("CA_OIDC_GOOGLE_SECRET_CLIENT_ID");
+        string? googleAuthority = Environment.GetEnvironmentVariable("CA_OIDC_GOOGLE_AUTHORITY");
+
+        ArgumentNullException.ThrowIfNull(googleClientId);
+        ArgumentNullException.ThrowIfNull(googleSecretClientId);
+        ArgumentNullException.ThrowIfNull(googleAuthority);
+
+        oidcProviderConfigMapService.AddProvider("google", new OidcProvider(
+            googleClientId,
+            googleSecretClientId,
+            googleAuthority
+        ));
+    }
 
     return oidcProviderConfigMapService;
 });
@@ -28,13 +56,20 @@ builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-string? MSSqlConnectionString = builder.Configuration["MSSqlConnectionString"];
-if (MSSqlConnectionString is null || MSSqlConnectionString.Length == 0)
+string? MSSqlConnectionString = null;
+if (builder.Environment.IsDevelopment())
 {
-    throw new DataException("MSSqlConnectionString is not defined in appsettings.json");
+    MSSqlConnectionString = builder.Configuration["MSSqlConnectionString"];
 }
 
+else
+{
+    MSSqlConnectionString = Environment.GetEnvironmentVariable("CA_MSSQL_CONNECTION_STRING");
+}
+ArgumentNullException.ThrowIfNull(MSSqlConnectionString);
+
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(MSSqlConnectionString));
+
 builder.Services.AddAntiforgery();
 builder.Services.AddAuthorization();
 
@@ -67,7 +102,6 @@ builder.Services.AddHostedService<BackgroundTaskRunner>();
 // Websockets
 builder.Services.AddSingleton<IWebSocketList, WebSocketList>();
 builder.Services.AddSingleton<IWebSocketOperations, WebSocketOperations>();
-builder.Services.AddSignalR();
 
 // Services for controllers:
 builder.Services.AddScoped<IUserFriendService, UserFriendService>();
@@ -107,4 +141,4 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.Run();
+app.Run("http://0.0.0.0:5112");

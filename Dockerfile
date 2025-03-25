@@ -17,5 +17,10 @@ RUN dotnet build --no-restore
 FROM build as test
 CMD dotnet test --no-restore
 
-FROM test as run
-CMD [ "dotnet", "run", "--environment", "production", "--project", "ChatApp.Server" ]
+# not ideal, but for now
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS run
+WORKDIR /app
+RUN dotnet tool install --global dotnet-ef --version 9.* && dotnet tool restore
+COPY --from=build /app .
+CMD "dotnet dotnet-ef database update --project ChatApp.Server.Application --startup-project ChatApp.Server --environment Production"
+CMD [ "dotnet", "run", "--environment", "Production", "--project", "ChatApp.Server" ]
