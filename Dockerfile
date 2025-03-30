@@ -1,7 +1,4 @@
-FROM docker:dind as base
-RUN apk add --no-cache dotnet-sdk-9.0
-
-FROM base as build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 EXPOSE 5112
 COPY ./ChatApp.sln .
@@ -10,17 +7,25 @@ COPY ./ChatApp.Server.Application/ChatApp.Server.Application.csproj ./ChatApp.Se
 COPY ./ChatApp.Server.Domain/ChatApp.Server.Domain.csproj ./ChatApp.Server.Domain/
 COPY ./ChatApp.Server.Application.Tests/ChatApp.Server.Application.Tests.csproj ./ChatApp.Server.Application.Tests/
 RUN dotnet restore
+COPY ./ChatApp.Server/appsettings.json ./ChatApp.Server/appsettings.json
 COPY . .
-RUN cd ChatApp.Server && ls
 RUN dotnet build --no-restore
 
-FROM build as test
-CMD dotnet test --no-restore
-
-# not ideal, but for now
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS run
+FROM build AS test
 WORKDIR /app
-RUN dotnet tool install --global dotnet-ef --version 9.* && dotnet tool restore
 COPY --from=build /app .
-CMD "dotnet dotnet-ef database update --project ChatApp.Server.Application --startup-project ChatApp.Server --environment Production"
-CMD [ "dotnet", "run", "--environment", "Production", "--project", "ChatApp.Server" ]
+CMD ["dotnet", "test", "--no-build", "--no-restore"]
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS development
+WORKDIR /app
+COPY --from=build /app .
+CMD [ "dotnet", "watch", "--project", "ChatApp.Server" ]
+
+FROM build AS publish
+WORKDIR /app
+RUN dotnet publish -o ./publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "ChatApp.Server.dll"]
