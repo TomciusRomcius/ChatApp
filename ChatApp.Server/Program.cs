@@ -43,7 +43,6 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(M
 builder.Services.AddAntiforgery();
 builder.Services.AddAuthorization();
 
-ArgumentNullException.ThrowIfNull(builder.Configuration["CsrfHashingKey"]);
 builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService());
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
@@ -93,9 +92,9 @@ using (var scope = app.Services.CreateScope())
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.UseCors(options => options.WithOrigins("https://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod());
 app.UseWebSockets();
 app.UseHttpsRedirection();
+app.UseCors(options => options.WithOrigins("https://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -111,4 +110,4 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.Run("http://0.0.0.0:5112");
+app.Run();
