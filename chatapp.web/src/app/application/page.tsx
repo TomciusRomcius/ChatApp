@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import UserFriendsService from "@/services/userFriendsService";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Sidebar from "./_components/_sidebar/sidebar";
 import Popup from "@/components/popup";
 import AddFriend from "./_components/_popupElements/addFriend";
@@ -88,7 +88,7 @@ export default function ApplicationPage() {
     console.log(filteredChatNewMessages, newMessages, currentChat);
 
     return (
-        <div className="w-screen min-h-screen grid grid-cols-6 grid-rows-1 gap-0">
+        <div className="gap-0 grid min-h-screen w-screen grid-cols-6 grid-rows-1">
             <CurrentUserContext.Provider
                 value={{
                     currentUser: currentUser,
