@@ -1,9 +1,8 @@
-using System.Buffers;
-using System.Net.WebSockets;
-using System.Security.Claims;
-using System.Text;
 using ChatApp.Server.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Buffers;
+using System.Security.Claims;
+using System.Text;
 
 namespace ChatApp.Server.Presentation.Websocket
 {
@@ -17,7 +16,6 @@ namespace ChatApp.Server.Presentation.Websocket
             _webSocketList = webSocketList;
         }
 
-        [HttpGet()]
         [Route("ws")]
         public async Task Get()
         {
