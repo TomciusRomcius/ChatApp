@@ -3,7 +3,6 @@
 import { FormEvent } from "react";
 import { authService } from "../authService";
 import GoogleProviderButton from "../_components/googleProviderButton";
-import axios from "axios";
 
 export default function SignInPage() {
     const handleSignIn = (ev: FormEvent) => {

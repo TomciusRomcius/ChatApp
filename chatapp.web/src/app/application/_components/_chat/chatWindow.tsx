@@ -26,15 +26,15 @@ export default function ChatWindow(props: ChatWindowProps) {
             ChatRoomMessagingService.SendMessage(currentChat.id, content);
             // TODO: set createdAt
         }
-        // TODO: set createdAt
+        // TODO: set createdAt properly
         setMessages([
             ...messages,
             {
                 senderId: currentUser.id,
                 receiverId: currentChat.id,
                 content: content,
-                createdAt: null,
-            },
+                createdAt: new Date(),
+            } as TextMessage,
         ]);
     };
 
@@ -60,6 +60,8 @@ export default function ChatWindow(props: ChatWindowProps) {
 
     useEffect(() => {
         setMessages([...messages, ...props.newMessages]);
+        // TODO: temp fix
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.newMessages]);
 
     return (
