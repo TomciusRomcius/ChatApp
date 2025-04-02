@@ -1,7 +1,7 @@
 "use client";
 
 import UserFriendsService from "@/services/userFriendsService";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Sidebar from "./_components/_sidebar/sidebar";
 import Popup from "@/components/popup";
 import AddFriend from "./_components/_popupElements/addFriend";
@@ -15,7 +15,6 @@ import CreateChatroom from "./_components/_popupElements/createChatRoom";
 import TextMessage, { ChatRoom } from "@/types";
 import ChatRoomService from "@/services/chatRoomService";
 import User, { CurrentUser } from "./_utils/user";
-import { publicConfiguration } from "@/utils/configuration";
 
 export default function ApplicationPage() {
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -25,11 +24,7 @@ export default function ApplicationPage() {
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
     const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
     const [newMessages, setNewMessages] = useState<TextMessage[]>([]);
-
-    const webSocket = useMemo(
-        () => new WebSocket(`${publicConfiguration.BACKEND_URL}/ws`),
-        [currentUser],
-    );
+    const webSocket = useRef<WebSocket | null>(null);
 
     const handleWsMessage = (ev: MessageEvent) => {
         const msg = JSON.parse(ev.data);
@@ -47,13 +42,16 @@ export default function ApplicationPage() {
         }
     };
 
-    const webSocketSetup = () => {
-        webSocket.addEventListener("message", handleWsMessage);
+    const webSocketSetup = (ws: WebSocket) => {
+        ws.addEventListener("message", handleWsMessage);
     };
 
     useEffect(() => {
         UserService.WhoAmI().then((retrievedUser) => {
             setCurrentUser(retrievedUser);
+
+            webSocket.current = new WebSocket(`https://localhost:5112/ws`);
+            webSocketSetup(webSocket.current);
         });
 
         UserFriendsService.GetAllFriends().then((friends) =>
@@ -67,8 +65,6 @@ export default function ApplicationPage() {
         ChatRoomService.GetChatRooms().then((result) => {
             setChatRooms(result);
         });
-
-        webSocketSetup();
     }, []);
 
     console.log(`Current chat: ${currentChat?.id}`);
