@@ -6,3 +6,7 @@ node_modules
 .env.local*
 appsettings.json
 /publish
+credentials.txt
+*.pem
+*.pfx
+**/.terraform

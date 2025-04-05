@@ -8,5 +8,5 @@ RUN npm run build --no-lint
 
 FROM node:21-alpine AS final
 WORKDIR /app
-COPY --from=build /app/.next/standalone ./standalone
+COPY --from=build /app/.next .
 ENTRYPOINT [ "node", "./standalone/server.js", "start" ]
