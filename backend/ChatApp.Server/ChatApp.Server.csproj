@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../ChatApp.Server.Application/ChatApp.Server.Application.csproj" />
+    <ProjectReference Include="..\ChatApp.Infrastructure\ChatApp.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

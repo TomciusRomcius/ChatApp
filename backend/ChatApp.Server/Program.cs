@@ -1,6 +1,8 @@
+using ChatApp.Infrastructure.Services;
 using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Application.Services;
+using ChatApp.Server.Domain.Interfaces;
 using ChatApp.Server.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+
+builder.Services.AddSingleton<ISecretsManager, AwsSecretsManager>(_ => new AwsSecretsManager(new SecretManagerConfiguration("chatapp-secrets")));
 
 // Register oidc providers
 builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
