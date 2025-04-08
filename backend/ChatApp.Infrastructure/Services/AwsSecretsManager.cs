@@ -35,17 +35,11 @@ namespace ChatApp.Infrastructure.Services
             _client = new AmazonSecretsManagerClient(RegionEndpoint.GetBySystemName(configuration.Region));
         }
 
-        public async Task<string> GetSecret(string secretName)
+        public string GetSecret(string secretName)
         {
             if (_secretJson is null)
             {
-                var request = new GetSecretValueRequest
-                {
-                    SecretId = _configuration.SecretId,
-                };
-                GetSecretValueResponse response = await _client.GetSecretValueAsync(request);
-
-                JsonElement a = JsonDocument.Parse(response.SecretString).RootElement;
+                throw new InvalidOperationException("Loaded secrets are null. Did you forget to call Load()?");
             }
 
             try
@@ -57,6 +51,17 @@ namespace ChatApp.Infrastructure.Services
             {
                 return "";
             }
+        }
+
+        public async Task Load()
+        {
+            var request = new GetSecretValueRequest
+            {
+                SecretId = _configuration.SecretId,
+            };
+            GetSecretValueResponse response = await _client.GetSecretValueAsync(request);
+
+            JsonElement a = JsonDocument.Parse(response.SecretString).RootElement;
         }
     }
 }

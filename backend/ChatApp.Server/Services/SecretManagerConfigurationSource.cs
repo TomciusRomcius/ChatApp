@@ -1,19 +1,24 @@
 ﻿using ChatApp.Server.Domain.Interfaces;
 
-namespace ChatApp.Server.Services
+namespace ChatApp.Server.Presentation.Services
 {
     public class SecretManagerConfigurationSource : IConfigurationSource
     {
-        readonly ISecretsManager _secretsManager;
+        public ISecretsManager SecretsManager;
+
+        public SecretManagerConfigurationSource()
+        {
+            
+        }
 
         public SecretManagerConfigurationSource(ISecretsManager secretsManager)
         {
-            _secretsManager = secretsManager;
+            SecretsManager = secretsManager;
         }
 
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            throw new NotImplementedException();
+            return new SecretManagerConfigurationProvider(SecretsManager);
         }
     }
 }

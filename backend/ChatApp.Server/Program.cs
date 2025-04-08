@@ -4,10 +4,18 @@ using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Application.Services;
 using ChatApp.Server.Domain.Interfaces;
 using ChatApp.Server.Domain.Utils;
+using ChatApp.Server.Presentation.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var awsConfiguration = new SecretManagerConfiguration("chatapp-secrets", "eu-west-1");
+var secretsManager = new AwsSecretsManager(awsConfiguration);
+
+builder.Configuration.Add<SecretManagerConfigurationSource>(source => {
+    source.SecretsManager = secretsManager;
+});
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

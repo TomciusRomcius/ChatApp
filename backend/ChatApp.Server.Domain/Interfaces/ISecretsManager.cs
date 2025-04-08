@@ -2,6 +2,7 @@
 {
     public interface ISecretsManager
     {
-        public Task<string> GetSecret(string secretName);
+        public Task Load();
+        public string GetSecret(string secretName);
     }
 }
