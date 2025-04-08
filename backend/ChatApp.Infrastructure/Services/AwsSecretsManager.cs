@@ -61,7 +61,7 @@ namespace ChatApp.Infrastructure.Services
             };
             GetSecretValueResponse response = await _client.GetSecretValueAsync(request);
 
-            JsonElement a = JsonDocument.Parse(response.SecretString).RootElement;
+            _secretJson = JsonDocument.Parse(response.SecretString).RootElement;
         }
     }
 }
