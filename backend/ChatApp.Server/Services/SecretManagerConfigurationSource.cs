@@ -6,14 +6,10 @@ namespace ChatApp.Server.Presentation.Services
     {
         public ISecretsManager SecretsManager;
 
+        // Secrets manager is defined while adding configuration source to builder.Configuration
         public SecretManagerConfigurationSource()
         {
-            
-        }
 
-        public SecretManagerConfigurationSource(ISecretsManager secretsManager)
-        {
-            SecretsManager = secretsManager;
         }
 
         public IConfigurationProvider Build(IConfigurationBuilder builder)
