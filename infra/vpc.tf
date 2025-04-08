@@ -52,3 +52,9 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private-route-table.id
   subnet_id      = aws_subnet.chatapp-private.id
 }
+
+
+resource "aws_service_discovery_private_dns_namespace" "chatapp_private" {
+  vpc  = aws_vpc.chatapp-vpc.id
+  name = "chatapp_private"
+}

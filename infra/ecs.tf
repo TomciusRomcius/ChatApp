@@ -21,6 +21,10 @@ resource "aws_secretsmanager_secret_version" "test-secrets-value" {
   })
 }
 
+data "aws_secretsmanager_secret_version" "chatapp-secrets" {
+  secret_id = aws_secretsmanager_secret.chatapp-secrets.id
+}
+
 resource "aws_iam_policy" "aws_secrets_policy" {
   name = "ecs-secrets-access"
   policy = jsonencode({
@@ -39,6 +43,93 @@ resource "aws_iam_policy" "aws_secrets_policy" {
   })
 }
 
+# Setup ecs dns resolution
+resource "aws_service_discovery_service" "frontend" {
+  name = "frontend"
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.chatapp_private.id
+    dns_records {
+      ttl  = 30
+      type = "A"
+    }
+
+    routing_policy = "MULTIVALUE"
+  }
+}
+
+resource "aws_service_discovery_service" "mssql" {
+  name = "mssql"
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.chatapp_private.id
+    dns_records {
+      ttl  = 30
+      type = "A"
+    }
+
+    routing_policy = "MULTIVALUE"
+  }
+}
+
+resource "aws_service_discovery_service" "backend" {
+  name = "backend"
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.chatapp_private.id
+    dns_records {
+      ttl  = 30
+      type = "A"
+    }
+
+    routing_policy = "MULTIVALUE"
+  }
+}
+
+resource "aws_ecs_task_definition" "chatapp_mssql_task_definition" {
+  network_mode             = "awsvpc"
+  family                   = "chatapp-msqql"
+  cpu                      = "1024"
+  memory                   = "2048"
+  requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.ecs-task-exec-role.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "chatapp-mssql"
+      image     = "mcr.microsoft.com/mssql/server:2022-preview-ubuntu-22.04"
+      essential = true
+      environment = [
+        {
+          name  = "ACCEPT_EULA"
+          value = "Y"
+        },
+        {
+          name  = "MSSQL_PID"
+          value = "Developer"
+        },
+        {
+          name  = "MSSQL_SA_PASSWORD"
+          value = jsondecode(data.aws_secretsmanager_secret_version.chatapp-secrets.secret_string)["CA_MSSQL_SA_PASSWORD"]
+        }
+      ]
+      portMappings = [
+        {
+          containerPort = 1433
+          hostPort      = 1433
+          protocol      = "tcp"
+        }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "${aws_cloudwatch_log_group.chatapp.name}"
+          awslogs-region        = "eu-west-1"
+          awslogs-stream-prefix = "streaming"
+        }
+      }
+    }
+  ])
+}
+
 resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
   network_mode             = "awsvpc"
   family                   = "chatapp-frontend"
@@ -55,7 +146,7 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
       environment = [
         {
           name  = "NEXT_PUBLIC_BACKEND_URL",
-          value = "no url"
+          value = "http://backend:5142"
         }
       ]
       portMappings = [
@@ -107,11 +198,15 @@ resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
           name  = "CA_OIDC_GOOGLE_AUTHORITY",
           value = "https://accounts.google.com"
         },
+        {
+          name  = "CA_MSSQL_HOST"
+          value = "mssql,1433"
+        }
       ]
       portMappings = [
         {
-          containerPort = 3000
-          hostPort      = 3000
+          containerPort = 5142
+          hostPort      = 5142
           protocol      = "tcp"
         }
       ]
@@ -140,8 +235,33 @@ resource "aws_ecs_service" "frontend" {
     security_groups  = [aws_security_group.allow-all.id]
     assign_public_ip = true
   }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.frontend.arn
+  }
+
   launch_type = "FARGATE"
 }
+
+resource "aws_ecs_service" "mssql" {
+  cluster         = aws_ecs_cluster.chatapp-cluster.id
+  name            = "mssql"
+  task_definition = aws_ecs_task_definition.chatapp_mssql_task_definition.arn
+  desired_count   = 0
+
+  network_configuration {
+    subnets          = [aws_subnet.chatapp-public.id]
+    security_groups  = [aws_security_group.allow-all.id]
+    assign_public_ip = true
+  }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.mssql.arn
+  }
+
+  launch_type = "FARGATE"
+}
+
 
 resource "aws_ecs_service" "backend" {
   cluster         = aws_ecs_cluster.chatapp-cluster.id
@@ -153,6 +273,10 @@ resource "aws_ecs_service" "backend" {
     subnets          = [aws_subnet.chatapp-public.id]
     security_groups  = [aws_security_group.allow-all.id]
     assign_public_ip = true
+  }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.backend.arn
   }
 
   launch_type = "FARGATE"
