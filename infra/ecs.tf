@@ -169,6 +169,15 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
   ])
 }
 
+resource "local_file" "backend_task_definition" {
+  content  = jsonencode(jsondecode(aws_ecs_task_definition.chatapp-backend-task-definition.container_definitions))
+  filename = "${path.module}/.aws/backend_task_definition.json"
+}
+
+resource "local_file" "frontend_task_definition" {
+  content  = jsonencode(jsondecode(aws_ecs_task_definition.chatapp-frontend-task-definition.container_definitions))
+  filename = "${path.module}/.aws/frontend_task_definition.json"
+}
 
 resource "aws_iam_role_policy_attachment" "secrets-attatchement" {
   role       = aws_iam_role.ecs-task-exec-role.name
