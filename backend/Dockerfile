@@ -6,7 +6,8 @@ COPY ./ChatApp.Server/ChatApp.Server.csproj ./ChatApp.Server/
 COPY ./ChatApp.Server.Application/ChatApp.Server.Application.csproj ./ChatApp.Server.Application/
 COPY ./ChatApp.Server.Domain/ChatApp.Server.Domain.csproj ./ChatApp.Server.Domain/
 COPY ./ChatApp.Server.Application.Tests/ChatApp.Server.Application.Tests.csproj ./ChatApp.Server.Application.Tests/
-COPY ./ChatApp.Infrastructure/ChatApp.Server.Infrastructure.csproj ./ChatApp.Server.Infrastructure/
+COPY ./ChatApp.Infrastructure/ChatApp.Server.Infrastructure.csproj ./ChatApp.Infrastructure/
+COPY ./ChatApp.Infrastructure.Tests/ChatApp.Infrastructure.Tests.csproj ./ChatApp.Infrastructure.Tests/
 RUN dotnet restore
 COPY . .
 RUN dotnet build --no-restore

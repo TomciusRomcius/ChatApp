@@ -9,4 +9,8 @@ appsettings.json
 credentials.txt
 *.pem
 *.pfx
+
 **/.terraform
+.tfstate
+.tfstate.backup
+.infra/.aws
