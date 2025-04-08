@@ -7,6 +7,20 @@ resource "aws_secretsmanager_secret" "chatapp-secrets" {
   name = "chatapp-secrets"
 }
 
+# used for integration testing to make sure that dotnet app can retrieve secrets
+resource "aws_secretsmanager_secret" "test-secrets" {
+  name = "test-secrets"
+}
+
+resource "aws_secretsmanager_secret_version" "test-secrets-value" {
+  secret_id = aws_secretsmanager_secret.test-secrets.id
+
+  secret_string = jsonencode({
+    KEY1 = "Key 1"
+    KEY2 = "Key 2"
+  })
+}
+
 resource "aws_iam_policy" "aws_secrets_policy" {
   name = "ecs-secrets-access"
   policy = jsonencode({
