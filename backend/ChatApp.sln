@@ -23,6 +23,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Infrastructure", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Infrastructure.Tests", "ChatApp.Infrastructure.Tests\ChatApp.Infrastructure.Tests.csproj", "{8690E266-C208-47C3-BE22-36A5AD8878B9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{0E0914D6-478C-4EB4-8D5E-87C6666CA005}"
+	ProjectSection(SolutionItems) = preProject
+		..\infra\.terraform.lock.hcl = ..\infra\.terraform.lock.hcl
+		..\infra\ecr.tf = ..\infra\ecr.tf
+		..\infra\ecs.tf = ..\infra\ecs.tf
+		..\infra\iam.tf = ..\infra\iam.tf
+		..\infra\logs.tf = ..\infra\logs.tf
+		..\infra\main.tf = ..\infra\main.tf
+		..\infra\security.tf = ..\infra\security.tf
+		..\infra\terraform.tfstate = ..\infra\terraform.tfstate
+		..\infra\terraform.tfstate.backup = ..\infra\terraform.tfstate.backup
+		..\infra\vpc.tf = ..\infra\vpc.tf
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
