@@ -1,9 +1,8 @@
 using ChatApp.Server.Domain.Interfaces;
-using Microsoft.Extensions.Primitives;
 
 namespace ChatApp.Server.Presentation.Services
 {
-    public class SecretManagerConfigurationProvider : IConfigurationProvider
+    public class SecretManagerConfigurationProvider : ConfigurationProvider
     {
         readonly ISecretsManager _secretsManager;
 
@@ -12,28 +11,18 @@ namespace ChatApp.Server.Presentation.Services
             _secretsManager = secretsManager;
         }
 
-        public IEnumerable<string> GetChildKeys(IEnumerable<string> earlierKeys, string? parentPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IChangeToken GetReloadToken()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Load()
+        public override void Load()
         {
             // TODO: not ideal
             _secretsManager.Load().Wait();
         }
 
-        public void Set(string key, string? value)
+        public override void Set(string key, string? value)
         {
             throw new NotImplementedException();
         }
 
-        public bool TryGet(string key, out string? value)
+        public override bool TryGet(string key, out string? value)
         {
             value = _secretsManager.GetSecret(key);
             return value.Length > 0;
