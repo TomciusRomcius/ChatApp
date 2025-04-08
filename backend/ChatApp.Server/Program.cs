@@ -13,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 var awsConfiguration = new SecretManagerConfiguration("chatapp-secrets", "eu-west-1");
 var secretsManager = new AwsSecretsManager(awsConfiguration);
 
-builder.Configuration.Add<SecretManagerConfigurationSource>(source => {
+builder.Configuration.Add<SecretManagerConfigurationSource>(source =>
+{
     source.SecretsManager = secretsManager;
 });
 
@@ -26,9 +27,9 @@ builder.Services.AddSingleton<ISecretsManager, AwsSecretsManager>(_ => new AwsSe
 builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
 {
     OidcProviderConfigMapService oidcProviderConfigMapService = new();
-    string? googleClientId = builder.Configuration["CA:OIDC:GOOGLE:CLIENT_ID"];
-    string? googleSecretClientId = builder.Configuration["CA:OIDC:GOOGLE:SECRET_CLIENT_ID"];
-    string? googleAuthority = builder.Configuration["CA:OIDC:GOOGLE:AUTHORITY"];
+    string? googleClientId = builder.Configuration["CA_OIDC_GOOGLE_CLIENT_ID"];
+    string? googleSecretClientId = builder.Configuration["CA_OIDC_GOOGLE_SECRET_CLIENT_ID"];
+    string? googleAuthority = builder.Configuration["CA_OIDC_GOOGLE_AUTHORITY"];
 
     ArgumentNullException.ThrowIfNull(googleClientId);
     ArgumentNullException.ThrowIfNull(googleSecretClientId);
@@ -46,7 +47,13 @@ builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-string? MSSqlConnectionString = builder.Configuration["CA:MSSQL_CONNECTION_STRING"];
+string? mssqlHost = builder.Configuration["CA_MSSQL_HOST"];
+string? mssqlSaPassword = builder.Configuration["CA_MSSQL_SA_PASSWORD"];
+
+ArgumentNullException.ThrowIfNull(mssqlHost);
+ArgumentNullException.ThrowIfNull(mssqlSaPassword);
+
+string? MSSqlConnectionString = $"Server={mssqlHost};Database=chatapp;User Id=sa;Password={mssqlSaPassword};";
 ArgumentNullException.ThrowIfNull(MSSqlConnectionString);
 
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(MSSqlConnectionString));
