@@ -2,47 +2,25 @@ using ChatApp.Infrastructure.Services;
 using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Application.Services;
-using ChatApp.Server.Domain.Interfaces;
-using ChatApp.Server.Domain.Utils;
 using ChatApp.Server.Presentation.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var awsConfiguration = new SecretManagerConfiguration("chatapp-secrets", "eu-west-1");
-var secretsManager = new AwsSecretsManager(awsConfiguration);
-
-builder.Configuration.Add<SecretManagerConfigurationSource>(source =>
+if (builder.Environment.IsProduction())
 {
-    source.SecretsManager = secretsManager;
-});
+    var awsConfiguration = new SecretManagerConfiguration("chatapp-secrets", "eu-west-1");
+    var secretsManager = new AwsSecretsManager(awsConfiguration);
+
+    builder.Configuration.Add<SecretManagerConfigurationSource>(source =>
+    {
+        source.SecretsManager = secretsManager;
+    });
+}
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-
-builder.Services.AddSingleton<ISecretsManager, AwsSecretsManager>(_ => new AwsSecretsManager(new SecretManagerConfiguration("chatapp-secrets")));
-
-// Register oidc providers
-builder.Services.AddSingleton<OidcProviderConfigMapService>(_ =>
-{
-    OidcProviderConfigMapService oidcProviderConfigMapService = new();
-    string? googleClientId = builder.Configuration["CA_OIDC_GOOGLE_CLIENT_ID"];
-    string? googleSecretClientId = builder.Configuration["CA_OIDC_GOOGLE_SECRET_CLIENT_ID"];
-    string? googleAuthority = builder.Configuration["CA_OIDC_GOOGLE_AUTHORITY"];
-
-    ArgumentNullException.ThrowIfNull(googleClientId);
-    ArgumentNullException.ThrowIfNull(googleSecretClientId);
-    ArgumentNullException.ThrowIfNull(googleAuthority);
-
-    oidcProviderConfigMapService.AddProvider("google", new OidcProvider(
-        googleClientId,
-        googleSecretClientId,
-        googleAuthority
-    ));
-
-    return oidcProviderConfigMapService;
-});
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -50,10 +28,11 @@ builder.Services.AddControllers();
 string? mssqlHost = builder.Configuration["CA_MSSQL_HOST"];
 string? mssqlSaPassword = builder.Configuration["CA_MSSQL_SA_PASSWORD"];
 
-ArgumentNullException.ThrowIfNull(mssqlHost);
-ArgumentNullException.ThrowIfNull(mssqlSaPassword);
+ArgumentNullException.ThrowIfNull(mssqlHost, "CA_MSSQL_HOST");
+ArgumentNullException.ThrowIfNull(mssqlSaPassword, "CA_MSSQL_SA_PASSWORD");
 
-string? MSSqlConnectionString = $"Server={mssqlHost};Database=chatapp;User Id=sa;Password={mssqlSaPassword};";
+// TODO: SSL
+string? MSSqlConnectionString = $"Server={mssqlHost};Database=chatapp;User Id=sa;Password={mssqlSaPassword};TrustServerCertificate=True";
 ArgumentNullException.ThrowIfNull(MSSqlConnectionString);
 
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(MSSqlConnectionString));
@@ -86,6 +65,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 builder.Services.AddHostedService<BackgroundTaskRunner>();
 
+builder.Services.AddSingleton<OidcProviderConfigMapService>();
+
 // Websockets
 builder.Services.AddSingleton<IWebSocketList, WebSocketList>();
 builder.Services.AddSingleton<IWebSocketOperations, WebSocketOperations>();
@@ -112,7 +93,10 @@ app.UseStaticFiles();
 
 app.UseWebSockets();
 app.UseHttpsRedirection();
-app.UseCors(options => options.WithOrigins("https://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod());
+
+string? frontendURL = builder.Configuration["CA_FRONTEND_URL"];
+ArgumentNullException.ThrowIfNull(frontendURL, "CA_FRONTEND_URL");
+app.UseCors(options => options.WithOrigins(frontendURL).AllowCredentials().AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthentication();
 app.UseAuthorization();
