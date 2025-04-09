@@ -141,7 +141,7 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
   container_definitions = jsonencode([
     {
       name      = "chatapp-frontend"
-      image     = aws_ecr_repository.chatapp-frontend.repository_url
+      image     = data.aws_ecr_repository.chatapp-frontend.repository_url
       essential = true
       environment = [
         {
@@ -196,7 +196,7 @@ resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
   container_definitions = jsonencode([
     {
       name      = "chatapp-backend"
-      image     = aws_ecr_repository.chatapp-backend.repository_url
+      image     = data.aws_ecr_repository.chatapp-backend.repository_url
       essential = true
       environment = [
         {
