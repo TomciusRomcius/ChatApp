@@ -3,17 +3,17 @@ resource "aws_ecs_cluster" "chatapp-cluster" {
 }
 
 # secrets setup
-resource "aws_secretsmanager_secret" "chatapp-secrets" {
+data "aws_secretsmanager_secret" "chatapp-secrets" {
   name = "chatapp-secrets"
 }
 
 # used for integration testing to make sure that dotnet app can retrieve secrets
-resource "aws_secretsmanager_secret" "test-secrets" {
+data "aws_secretsmanager_secret" "test-secrets" {
   name = "test-secrets"
 }
 
 resource "aws_secretsmanager_secret_version" "test-secrets-value" {
-  secret_id = aws_secretsmanager_secret.test-secrets.id
+  secret_id = data.aws_secretsmanager_secret.test-secrets.id
 
   secret_string = jsonencode({
     KEY1 = "Key 1"
@@ -22,7 +22,7 @@ resource "aws_secretsmanager_secret_version" "test-secrets-value" {
 }
 
 data "aws_secretsmanager_secret_version" "chatapp-secrets" {
-  secret_id = aws_secretsmanager_secret.chatapp-secrets.id
+  secret_id = data.aws_secretsmanager_secret.chatapp-secrets.id
 }
 
 resource "aws_iam_policy" "aws_secrets_policy" {
@@ -36,7 +36,7 @@ resource "aws_iam_policy" "aws_secrets_policy" {
           "secretsmanager:GetSecretValue"
         ],
         Resource = [
-          aws_secretsmanager_secret.chatapp-secrets.arn,
+          data.aws_secretsmanager_secret.chatapp-secrets.arn,
         ]
       }
     ]
@@ -170,12 +170,30 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
 }
 
 resource "local_file" "backend_task_definition" {
-  content  = jsonencode(jsondecode(aws_ecs_task_definition.chatapp-backend-task-definition.container_definitions))
+  content = jsonencode({
+    containerDefinitions    = jsondecode(aws_ecs_task_definition.chatapp-backend-task-definition.container_definitions)
+    family                  = aws_ecs_task_definition.chatapp-backend-task-definition.family
+    cpu                     = aws_ecs_task_definition.chatapp-backend-task-definition.cpu
+    memory                  = aws_ecs_task_definition.chatapp-backend-task-definition.memory
+    networkMode             = aws_ecs_task_definition.chatapp-backend-task-definition.network_mode
+    volumes                 = aws_ecs_task_definition.chatapp-backend-task-definition.volume
+    requiresCompatibilities = aws_ecs_task_definition.chatapp-backend-task-definition.requires_compatibilities
+    executionRoleArn        = aws_ecs_task_definition.chatapp-backend-task-definition.execution_role_arn
+  })
   filename = "${path.module}/.aws/backend_task_definition.json"
 }
 
 resource "local_file" "frontend_task_definition" {
-  content  = jsonencode(jsondecode(aws_ecs_task_definition.chatapp-frontend-task-definition.container_definitions))
+  content = jsonencode({
+    containerDefinitions    = jsondecode(aws_ecs_task_definition.chatapp-frontend-task-definition.container_definitions)
+    family                  = aws_ecs_task_definition.chatapp-frontend-task-definition.family
+    cpu                     = aws_ecs_task_definition.chatapp-frontend-task-definition.cpu
+    memory                  = aws_ecs_task_definition.chatapp-frontend-task-definition.memory
+    networkMode             = aws_ecs_task_definition.chatapp-frontend-task-definition.network_mode
+    volumes                 = aws_ecs_task_definition.chatapp-frontend-task-definition.volume
+    requiresCompatibilities = aws_ecs_task_definition.chatapp-frontend-task-definition.requires_compatibilities
+    executionRoleArn        = aws_ecs_task_definition.chatapp-backend-task-definition.execution_role_arn
+  })
   filename = "${path.module}/.aws/frontend_task_definition.json"
 }
 

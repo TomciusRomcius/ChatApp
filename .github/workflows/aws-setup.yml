@@ -1,0 +1,102 @@
+name: Upload backend and frontend to ECR(and optionally deploy to ECS)
+on:
+  push:
+    branches: ["gh-actions"]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        type: choice
+        description: Who to greet
+        required: true
+        options:
+          - true
+          - false
+env:
+  AWS_REGION: eu-west-1
+  FRONTEND_ECR_REPOSITORY: chatapp-frontend
+  BACKEND_ECR_REPOSITORY: chatapp-backend
+  ECR_REGISTRY: 471112615800.dkr.ecr.eu-west-1.amazonaws.com
+  IMAGE_TAG: latest
+  FRONTEND_ECS_SERVICE: frontend
+  BACKEND_ECS_SERVICE: backend
+  ECS_CLUSTER: chatapp-cluster
+  FRONTEND_ECS_TASK_DEFINITION: ./infra/.aws/frontend_task_definition.json
+  BACKEND_ECS_TASK_DEFINITION: ./infra/.aws/backend_task_definition.json
+  FRONTEND_CONTAINER_NAME: chatapp-frontend
+  BACKEND_CONTAINER_NAME: chatapp-backend
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build image and push to ECR
+        id: build-push
+        run: |
+          cd chatapp.web
+          docker build -t $ECR_REGISTRY/$FRONTEND_ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$FRONTEND_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$FRONTEND_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        # if: ${{ github.event.inputs.deploy == 'true' }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.FRONTEND_ECS_TASK_DEFINITION }}
+          container-name: ${{ env.FRONTEND_CONTAINER_NAME }}
+          image: ${{ steps.build-push.outputs.image }}
+
+      - name: Deploy to ECS
+        # if: ${{ github.event.inputs.deploy == 'true' }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        with:
+          task-definition: ${{steps.task-def.outputs.task-definition}}
+          service: ${{env.FRONTEND_ECS_SERVICE}}
+          cluster: ${{env.ECS_CLUSTER}}
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build image and push to ECR
+        id: build-push
+        run: |
+          cd backend
+          docker build -t $ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$BACKEND_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        # if: ${{ github.event.inputs.deploy == 'true' }}
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.BACKEND_ECS_TASK_DEFINITION }}
+          container-name: ${{ env.BACKEND_CONTAINER_NAME }}
+          image: ${{ steps.build-push.outputs.image }}
+
+      - name: Deploy to ECS
+        # if: ${{ github.event.inputs.deploy == 'true' }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        with:
+          task-definition: ${{steps.task-def.outputs.task-definition}}
+          service: ${{env.BACKEND_ECS_SERVICE}}
+          cluster: ${{env.ECS_CLUSTER}}
