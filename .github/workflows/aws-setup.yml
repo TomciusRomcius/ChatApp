@@ -1,16 +1,7 @@
 name: Upload backend and frontend to ECR(and optionally deploy to ECS)
 on:
   push:
-    branches: ["gh-actions"]
-  workflow_dispatch:
-    inputs:
-      deploy:
-        type: choice
-        description: Who to greet
-        required: true
-        options:
-          - true
-          - false
+    branches: ["main"]
 env:
   AWS_REGION: eu-west-1
   FRONTEND_ECR_REPOSITORY: chatapp-frontend

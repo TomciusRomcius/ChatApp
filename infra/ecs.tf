@@ -255,7 +255,7 @@ resource "aws_ecs_service" "frontend" {
   cluster         = aws_ecs_cluster.chatapp-cluster.id
   name            = "frontend"
   task_definition = aws_ecs_task_definition.chatapp-frontend-task-definition.arn
-  desired_count   = 0
+  desired_count   = 1
 
   network_configuration {
     subnets          = [aws_subnet.chatapp-public.id]
@@ -274,7 +274,7 @@ resource "aws_ecs_service" "mssql" {
   cluster         = aws_ecs_cluster.chatapp-cluster.id
   name            = "mssql"
   task_definition = aws_ecs_task_definition.chatapp_mssql_task_definition.arn
-  desired_count   = 0
+  desired_count   = 1
 
   network_configuration {
     subnets          = [aws_subnet.chatapp-public.id]
@@ -294,7 +294,7 @@ resource "aws_ecs_service" "backend" {
   cluster         = aws_ecs_cluster.chatapp-cluster.id
   name            = "backend"
   task_definition = aws_ecs_task_definition.chatapp-backend-task-definition.arn
-  desired_count   = 0
+  desired_count   = 1
 
   network_configuration {
     subnets          = [aws_subnet.chatapp-public.id]
