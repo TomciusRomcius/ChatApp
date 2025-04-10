@@ -11,6 +11,5 @@ credentials.txt
 *.pfx
 
 **/.terraform
-.tfstate
-.tfstate.backup
-.infra/.aws
+*.tfstate
+*.tfstate.backup
