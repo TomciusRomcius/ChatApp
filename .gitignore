@@ -13,3 +13,4 @@ credentials.txt
 **/.terraform
 *.tfstate
 *.tfstate.backup
+/infra/.aws

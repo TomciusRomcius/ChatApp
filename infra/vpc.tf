@@ -54,7 +54,6 @@ resource "aws_route_table_association" "private" {
 }
 
 
-resource "aws_service_discovery_private_dns_namespace" "chatapp_private" {
-  vpc  = aws_vpc.chatapp-vpc.id
-  name = "chatapp_private"
+resource "aws_service_discovery_http_namespace" "chatapp-private" {
+  name = "chatapp.private"
 }

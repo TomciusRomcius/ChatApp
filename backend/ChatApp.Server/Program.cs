@@ -2,6 +2,7 @@ using ChatApp.Infrastructure.Services;
 using ChatApp.Server.Application.Interfaces;
 using ChatApp.Server.Application.Persistance;
 using ChatApp.Server.Application.Services;
+using ChatApp.Server.Application.Utils;
 using ChatApp.Server.Presentation.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,16 +27,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 string? mssqlHost = builder.Configuration["CA_MSSQL_HOST"];
-string? mssqlSaPassword = builder.Configuration["CA_MSSQL_SA_PASSWORD"];
+string? mssqlSaPassword = builder.Configuration["CA_MSSQL_PASSWORD"];
 
 ArgumentNullException.ThrowIfNull(mssqlHost, "CA_MSSQL_HOST");
 ArgumentNullException.ThrowIfNull(mssqlSaPassword, "CA_MSSQL_SA_PASSWORD");
 
-// TODO: SSL
-string? MSSqlConnectionString = $"Server={mssqlHost};Database=chatapp;User Id=sa;Password={mssqlSaPassword};TrustServerCertificate=True";
-ArgumentNullException.ThrowIfNull(MSSqlConnectionString);
-
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(MSSqlConnectionString));
+builder.Services.AddSingleton<MsSqlOptions>();
+builder.Services.AddDbContext<DatabaseContext>((serviceProvider, options) =>
+{
+    var sqlOptions = serviceProvider.GetRequiredService<MsSqlOptions>();
+    options.UseSqlServer(sqlOptions.GetConnectionString());
+});
 
 builder.Services.AddAntiforgery();
 builder.Services.AddAuthorization();

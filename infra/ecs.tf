@@ -43,44 +43,60 @@ resource "aws_iam_policy" "aws_secrets_policy" {
   })
 }
 
-# Setup ecs dns resolution
-resource "aws_service_discovery_service" "frontend" {
-  name = "frontend"
-  dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.chatapp_private.id
-    dns_records {
-      ttl  = 30
-      type = "A"
+# task definitions
+resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
+  network_mode             = "awsvpc"
+  family                   = "chatapp-backend"
+  cpu                      = "1024"
+  memory                   = "2048"
+  requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.ecs-task-exec-role.arn
+  task_role_arn            = aws_iam_role.ecs-task-exec-role.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "chatapp-backend"
+      image     = data.aws_ecr_repository.chatapp-backend.repository_url
+      essential = true
+      environment = [
+        {
+          name  = "CA_OIDC_GOOGLE_CLIENT_ID",
+          value = "178336905267-g69rdobhf6ivt0p5nq0lbnmec86r0tgu.apps.googleusercontent.com"
+        },
+        {
+          name  = "CA_OIDC_GOOGLE_AUTHORITY",
+          value = "https://accounts.google.com"
+        },
+        {
+          name = "CA_FRONTEND_URL"
+          # TODO: incorrect but temporarily set to not throw exception at runtime
+          value = "http://frontend.chatapp.local:3000"
+        },
+        {
+          name  = "CA_MSSQL_HOST"
+          value = "mssql,1433"
+        }
+      ]
+      portMappings = [
+        {
+          containerPort = 5142
+          hostPort      = 5142
+          protocol      = "tcp"
+          name          = "backend"
+          appProtocol   = "http"
+        }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "${aws_cloudwatch_log_group.chatapp.name}"
+          awslogs-region        = "eu-west-1"
+          awslogs-stream-prefix = "streaming"
+        }
+      }
     }
-
-    routing_policy = "MULTIVALUE"
-  }
-}
-
-resource "aws_service_discovery_service" "mssql" {
-  name = "mssql"
-  dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.chatapp_private.id
-    dns_records {
-      ttl  = 30
-      type = "A"
-    }
-
-    routing_policy = "MULTIVALUE"
-  }
-}
-
-resource "aws_service_discovery_service" "backend" {
-  name = "backend"
-  dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.chatapp_private.id
-    dns_records {
-      ttl  = 30
-      type = "A"
-    }
-
-    routing_policy = "MULTIVALUE"
-  }
+  ])
 }
 
 resource "aws_ecs_task_definition" "chatapp_mssql_task_definition" {
@@ -106,8 +122,9 @@ resource "aws_ecs_task_definition" "chatapp_mssql_task_definition" {
           value = "Developer"
         },
         {
+          # TODO: not ideal, pass secret in a safer way
           name  = "MSSQL_SA_PASSWORD"
-          value = jsondecode(data.aws_secretsmanager_secret_version.chatapp-secrets.secret_string)["CA_MSSQL_SA_PASSWORD"]
+          value = jsondecode(data.aws_secretsmanager_secret_version.chatapp-secrets.secret_string)["CA_MSSQL_PASSWORD"]
         }
       ]
       portMappings = [
@@ -115,6 +132,7 @@ resource "aws_ecs_task_definition" "chatapp_mssql_task_definition" {
           containerPort = 1433
           hostPort      = 1433
           protocol      = "tcp"
+          name          = "mssql"
         }
       ]
 
@@ -145,7 +163,8 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
       essential = true
       environment = [
         {
-          name  = "NEXT_PUBLIC_BACKEND_URL",
+          name = "NEXT_PUBLIC_BACKEND_URL",
+          // TODO: Incrorrect but temporary
           value = "http://backend:5142"
         }
       ]
@@ -154,6 +173,8 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
           containerPort = 3000
           hostPort      = 3000
           protocol      = "tcp"
+          name          = "frontend"
+          appProtocol   = "http"
         }
       ]
 
@@ -178,6 +199,7 @@ resource "local_file" "backend_task_definition" {
     networkMode             = aws_ecs_task_definition.chatapp-backend-task-definition.network_mode
     volumes                 = aws_ecs_task_definition.chatapp-backend-task-definition.volume
     requiresCompatibilities = aws_ecs_task_definition.chatapp-backend-task-definition.requires_compatibilities
+    taskRoleArn             = aws_ecs_task_definition.chatapp-backend-task-definition.task_role_arn
     executionRoleArn        = aws_ecs_task_definition.chatapp-backend-task-definition.execution_role_arn
   })
   filename = "${path.module}/.aws/backend_task_definition.json"
@@ -192,6 +214,7 @@ resource "local_file" "frontend_task_definition" {
     networkMode             = aws_ecs_task_definition.chatapp-frontend-task-definition.network_mode
     volumes                 = aws_ecs_task_definition.chatapp-frontend-task-definition.volume
     requiresCompatibilities = aws_ecs_task_definition.chatapp-frontend-task-definition.requires_compatibilities
+    taskRoleArn             = aws_ecs_task_definition.chatapp-backend-task-definition.task_role_arn
     executionRoleArn        = aws_ecs_task_definition.chatapp-backend-task-definition.execution_role_arn
   })
   filename = "${path.module}/.aws/frontend_task_definition.json"
@@ -200,55 +223,6 @@ resource "local_file" "frontend_task_definition" {
 resource "aws_iam_role_policy_attachment" "secrets-attatchement" {
   role       = aws_iam_role.ecs-task-exec-role.name
   policy_arn = aws_iam_policy.aws_secrets_policy.arn
-}
-
-# task definitions
-resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
-  network_mode             = "awsvpc"
-  family                   = "chatapp-backend"
-  cpu                      = "1024"
-  memory                   = "2048"
-  requires_compatibilities = ["FARGATE"]
-  execution_role_arn       = aws_iam_role.ecs-task-exec-role.arn
-  task_role_arn       = aws_iam_role.ecs-task-exec-role.arn
-
-  container_definitions = jsonencode([
-    {
-      name      = "chatapp-backend"
-      image     = data.aws_ecr_repository.chatapp-backend.repository_url
-      essential = true
-      environment = [
-        {
-          name  = "CA_OIDC_GOOGLE_CLIENT_ID",
-          value = "178336905267-g69rdobhf6ivt0p5nq0lbnmec86r0tgu.apps.googleusercontent.com"
-        },
-        {
-          name  = "CA_OIDC_GOOGLE_AUTHORITY",
-          value = "https://accounts.google.com"
-        },
-        {
-          name  = "CA_MSSQL_HOST"
-          value = "mssql,1433"
-        }
-      ]
-      portMappings = [
-        {
-          containerPort = 5142
-          hostPort      = 5142
-          protocol      = "tcp"
-        }
-      ]
-
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.chatapp.name}"
-          awslogs-region        = "eu-west-1"
-          awslogs-stream-prefix = "streaming"
-        }
-      }
-    }
-  ])
 }
 
 # services
@@ -262,10 +236,6 @@ resource "aws_ecs_service" "frontend" {
     subnets          = [aws_subnet.chatapp-public.id]
     security_groups  = [aws_security_group.allow-all.id]
     assign_public_ip = true
-  }
-
-  service_registries {
-    registry_arn = aws_service_discovery_service.frontend.arn
   }
 
   launch_type = "FARGATE"
@@ -283,8 +253,17 @@ resource "aws_ecs_service" "mssql" {
     assign_public_ip = true
   }
 
-  service_registries {
-    registry_arn = aws_service_discovery_service.mssql.arn
+  service_connect_configuration {
+    enabled   = true
+    namespace = aws_service_discovery_http_namespace.chatapp-private.arn
+    service {
+      discovery_name = "mssql"
+      port_name      = "mssql"
+      client_alias {
+        dns_name = "mssql"
+        port     = 1433
+      }
+    }
   }
 
   launch_type = "FARGATE"
@@ -303,9 +282,20 @@ resource "aws_ecs_service" "backend" {
     assign_public_ip = true
   }
 
-  service_registries {
-    registry_arn = aws_service_discovery_service.backend.arn
+  service_connect_configuration {
+    enabled   = true
+    namespace = aws_service_discovery_http_namespace.chatapp-private.arn
+    service {
+      discovery_name = "backend"
+      port_name      = "backend"
+      client_alias {
+        dns_name = "backend"
+        port     = 5142
+      }
+    }
   }
+
+  enable_execute_command = "true"
 
   launch_type = "FARGATE"
 }

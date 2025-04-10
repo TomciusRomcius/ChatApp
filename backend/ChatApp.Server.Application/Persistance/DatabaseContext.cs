@@ -1,3 +1,4 @@
+using ChatApp.Server.Application.Utils;
 using ChatApp.Server.Domain.Entities;
 using ChatApp.Server.Domain.Entities.ChatRoom;
 using ChatApp.Server.Domain.Entities.UserFriend;
@@ -8,14 +9,10 @@ namespace ChatApp.Server.Application.Persistance
 {
     public class DatabaseContext : IdentityDbContext
     {
-        public DatabaseContext() : base()
-        {
-
-        }
+        readonly MsSqlOptions _msSSqlOptions;
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
