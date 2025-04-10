@@ -1,7 +1,7 @@
 name: Upload backend and frontend to ECR(and optionally deploy to ECS)
 on:
   push:
-    branches: ["main", "fixing-db-connection"]
+    branches: ["main"]
 env:
   AWS_REGION: eu-west-1
   FRONTEND_ECR_REPOSITORY: chatapp-frontend
