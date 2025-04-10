@@ -210,6 +210,7 @@ resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
   memory                   = "2048"
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.ecs-task-exec-role.arn
+  task_role_arn       = aws_iam_role.ecs-task-exec-role.arn
 
   container_definitions = jsonencode([
     {
