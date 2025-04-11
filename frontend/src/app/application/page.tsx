@@ -15,6 +15,7 @@ import CreateChatroom from "./_components/_popupElements/createChatRoom";
 import TextMessage, { ChatRoom } from "@/types";
 import ChatRoomService from "@/services/chatRoomService";
 import User, { CurrentUser } from "./_utils/user";
+import { redirect } from "next/navigation";
 
 export default function ApplicationPage() {
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -49,10 +50,12 @@ export default function ApplicationPage() {
     useEffect(() => {
         UserService.WhoAmI().then((retrievedUser) => {
             setCurrentUser(retrievedUser);
-
+            if (!retrievedUser) {
+                redirect("/auth/sign-in");
+            }
             webSocket.current = new WebSocket(`https://localhost:5112/ws`);
             webSocketSetup(webSocket.current);
-        });
+        }).catch(() => redirect("/auth/sign-in")); 
 
         UserFriendsService.GetAllFriends().then((friends) =>
             setFriends(friends),
