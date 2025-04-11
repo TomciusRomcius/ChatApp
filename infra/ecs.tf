@@ -166,6 +166,10 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
           name = "NEXT_PUBLIC_BACKEND_URL",
           // TODO: Incrorrect but temporary
           value = "http://backend:5142"
+        },
+        {
+          name = "HOSTNAME"
+          value = "0.0.0.0"
         }
       ]
       portMappings = [
