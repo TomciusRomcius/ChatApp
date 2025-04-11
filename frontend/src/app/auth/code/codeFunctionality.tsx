@@ -3,9 +3,11 @@
 import OidcProviders from "@/services/oidc/oidcProviders";
 import OidcProviderService from "@/services/oidc/oidcProviderService";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function PageFunctionality() {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const authorizationCode = searchParams.get("code");
     const state = searchParams.get("state");
@@ -26,10 +28,10 @@ export function PageFunctionality() {
                 securityToken,
             )
             .then(() => {
-                window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}`;
+                router.replace("/application");
             })
             .catch(() => {
-                window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/sign-in`;
+                router.replace("/auth/sign-in");
             });
     });
 
