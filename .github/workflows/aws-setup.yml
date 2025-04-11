@@ -1,7 +1,7 @@
 name: Upload backend and frontend to ECR(and optionally deploy to ECS)
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "terraform-address-bug"]
 env:
   AWS_REGION: eu-west-1
   FRONTEND_ECR_REPOSITORY: chatapp-frontend
@@ -41,7 +41,7 @@ jobs:
       - name: Create local task definition json file
         run: |
           cd ./infra
-          terraform init
+          terraform init -input=false -backend=false
           terraform apply -target=local_file.frontend_task_definition -auto-approve
 
       - name: Build image and push to ECR
@@ -92,7 +92,7 @@ jobs:
       - name: Create local task definition json file
         run: |
           cd ./infra
-          terraform init
+          terraform init -input=false -backend=false
           terraform apply -target=local_file.backend_task_definition -auto-approve
 
       - name: Build image and push to ECR
