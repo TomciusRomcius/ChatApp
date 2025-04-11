@@ -41,7 +41,7 @@ jobs:
       - name: Create local task definition json file
         run: |
           cd ./infra
-          terraform init -input=false -backend=false
+          terraform init
           terraform apply -target=local_file.frontend_task_definition -auto-approve
 
       - name: Build image and push to ECR
@@ -92,7 +92,7 @@ jobs:
       - name: Create local task definition json file
         run: |
           cd ./infra
-          terraform init -input=false -backend=false
+          terraform init
           terraform apply -target=local_file.backend_task_definition -auto-approve
 
       - name: Build image and push to ECR
