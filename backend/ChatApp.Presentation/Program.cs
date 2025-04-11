@@ -1,14 +1,15 @@
-using ChatApp.Infrastructure.Services;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
 using ChatApp.Application.Utils;
+using ChatApp.Infrastructure.Services;
 using ChatApp.Presentation.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add AWS secrets manager configuration source if running in production
 if (builder.Environment.IsProduction())
 {
     var awsConfiguration = new SecretManagerConfiguration("chatapp-secrets", "eu-west-1");
@@ -26,12 +27,7 @@ builder.Logging.AddConsole();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-string? mssqlHost = builder.Configuration["CA_MSSQL_HOST"];
-string? mssqlSaPassword = builder.Configuration["CA_MSSQL_PASSWORD"];
-
-ArgumentNullException.ThrowIfNull(mssqlHost, "CA_MSSQL_HOST");
-ArgumentNullException.ThrowIfNull(mssqlSaPassword, "CA_MSSQL_SA_PASSWORD");
-
+// Database setup
 builder.Services.AddSingleton<MsSqlOptions>();
 builder.Services.AddDbContext<DatabaseContext>((serviceProvider, options) =>
 {
@@ -39,7 +35,7 @@ builder.Services.AddDbContext<DatabaseContext>((serviceProvider, options) =>
     options.UseSqlServer(sqlOptions.GetConnectionString());
 });
 
-builder.Services.AddAntiforgery();
+// Identity
 builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService());
@@ -64,9 +60,11 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
 });
 
+// Background tasks
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 builder.Services.AddHostedService<BackgroundTaskRunner>();
 
+// OIDC
 builder.Services.AddSingleton<OidcProviderConfigMapService>();
 
 // Websockets
