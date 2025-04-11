@@ -87,7 +87,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetService<DatabaseContext>()!.Database.EnsureCreated();
+    scope.ServiceProvider.GetService<DatabaseContext>()!.Database.Migrate();
 }
 
 app.UseDefaultFiles();
