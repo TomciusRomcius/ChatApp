@@ -3,7 +3,6 @@ import { createContext } from "react";
 
 interface CurrentUserWrapper {
     currentUser: CurrentUser;
-    setCurrentUser: (currentUser: CurrentUser) => void;
 }
 
 const CurrentUserContext = createContext<CurrentUserWrapper>(
