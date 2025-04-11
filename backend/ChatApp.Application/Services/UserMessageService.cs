@@ -59,13 +59,6 @@ namespace ChatApp.Application.Services
         /// <returns>Message id</returns>
         public async Task<Result<string>> SendMessage(string senderId, string receiverId, string messageContent)
         {
-            if (senderId == receiverId)
-            {
-                return new Result<string>([
-                    new ResultError(ResultErrorType.VALIDATION_ERROR, "Sender and receiver id cannot be the same")
-                ]);
-            }
-
             var msg = new TextMessageEntity
             {
                 TextMessageId = Guid.NewGuid().ToString(),

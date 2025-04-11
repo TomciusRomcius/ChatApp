@@ -42,28 +42,6 @@ namespace ChatApp.Application.Services
         /// <returns>Message id</returns>
         public async Task<Result<string>> SendChatRoomMessageAsync(string userId, string chatRoomId, string content)
         {
-            if (content.Length < 0)
-            {
-                // TODO: move validation to domain
-
-                return new Result<string>([
-                    new ResultError(
-                        ResultErrorType.VALIDATION_ERROR,
-                        "Message is empty"
-                    )
-                ]);
-            }
-
-            if (!IsInChatRoom(userId, chatRoomId))
-            {
-                return new Result<string>([
-                    new ResultError(
-                        ResultErrorType.FORBIDDEN_ERROR,
-                        "Trying to send a message in a chat room in which you are not in"
-                    )
-                ]);
-            }
-
             var textMessage = new TextMessageEntity
             {
                 TextMessageId = Guid.NewGuid().ToString(),
@@ -88,7 +66,6 @@ namespace ChatApp.Application.Services
 
             List<string> memberIds = [.. membersQuery];
 
-            // Very simple, temporary
             var socketMessageObj = new
             {
                 Type = "chatroom-message",
