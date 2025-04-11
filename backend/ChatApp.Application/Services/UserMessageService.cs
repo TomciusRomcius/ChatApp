@@ -1,8 +1,8 @@
+using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
-using ChatApp.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
@@ -75,6 +75,13 @@ namespace ChatApp.Application.Services
                 ReceiverUserId = receiverId,
                 CreatedAt = DateTime.UtcNow
             };
+
+            var errors = msg.Validate();
+            if (errors.Count > 0)
+            {
+                return new Result<string>(errors);
+            }
+
             await _databaseContext.TextMessages.AddAsync(msg);
             await _databaseContext.SaveChangesAsync();
 

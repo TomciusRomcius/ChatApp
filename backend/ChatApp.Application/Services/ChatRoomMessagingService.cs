@@ -1,8 +1,8 @@
-using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
+using System.Text.Json;
 
 namespace ChatApp.Application.Services
 {
@@ -72,6 +72,13 @@ namespace ChatApp.Application.Services
                 ChatRoomId = chatRoomId,
                 CreatedAt = DateTime.UtcNow,
             };
+
+            var errors = textMessage.Validate();
+            if (errors.Count > 0)
+            {
+                return new Result<string>(errors);
+            }
+
             await _databaseContext.TextMessages.AddAsync(textMessage);
             await _databaseContext.SaveChangesAsync();
 
