@@ -1,12 +1,10 @@
-import { redirect } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Popup from "../../components/popup";
 import { AppState, AppStateContext } from "../../context/appStateContext";
 import { CurrentChat, CurrentChatContext } from "../../context/currentChatContext";
 import CurrentUserContext from "../../context/currentUserContext";
 import ChatRoomService from "../../services/chatRoomService";
 import UserFriendsService from "../../services/userFriendsService";
-import UserService from "../../services/userService";
 import TextMessage, { ChatRoom } from "../../types";
 import ChatWindow from "./_components/_chat/chatWindow";
 import AddFriend from "./_components/_popupElements/addFriend";
@@ -28,7 +26,6 @@ export default function ClientSideApplication(props: ClientSideApplicationProps)
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
     const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
     const [newMessages, setNewMessages] = useState<TextMessage[]>([]);
-    const webSocket = useRef<WebSocket | null>(null);
 
     const handleWsMessage = (ev: MessageEvent) => {
         const msg = JSON.parse(ev.data);
