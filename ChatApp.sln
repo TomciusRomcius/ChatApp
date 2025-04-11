@@ -17,6 +17,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Infrastructure.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Presentation", "backend\ChatApp.Presentation\ChatApp.Presentation.csproj", "{9CC6C60A-EEEC-4E45-BE87-81C86DE884E6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{81BD2195-5909-4362-8C9C-0DF6BFC9EF51}"
+	ProjectSection(SolutionItems) = preProject
+		infra\ecr.tf = infra\ecr.tf
+		infra\ecs.tf = infra\ecs.tf
+		infra\iam.tf = infra\iam.tf
+		infra\logs.tf = infra\logs.tf
+		infra\main.tf = infra\main.tf
+		infra\security.tf = infra\security.tf
+		infra\vpc.tf = infra\vpc.tf
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
