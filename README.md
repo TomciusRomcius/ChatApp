@@ -3,8 +3,10 @@
 ## Technical
 
 ### Start the app
-* The easiest way to start the application is to run docker compose up at the root project directory
-  
+* Currently, it's a bit tough :D
+  * Start the database: ```cd backend && docker compose up -d```
+  * Start the backend: from root run ```dotnet watch --project ChatApp.Presentation```
+  * Start the frontend: from root run ```cd frontend && npm i && npm run dev:https```
   ```
   docker compose up
   ```
