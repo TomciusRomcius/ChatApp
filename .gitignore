@@ -14,3 +14,4 @@ credentials.txt
 *.tfstate
 *.tfstate.backup
 /infra/.aws
+/frontend/frontend.njsproj.user
