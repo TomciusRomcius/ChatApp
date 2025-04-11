@@ -1,12 +1,8 @@
-FROM node:21-alpine AS build
+FROM node:21-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 RUN npm i
 COPY . .
-# temporary no lint
-RUN npm run build --no-lint
-
-FROM node:21-alpine AS final
-WORKDIR /app
-COPY --from=build /app/.next .
-ENTRYPOINT [ "node", "./standalone/server.js"]
+EXPOSE 3000
+# Must build in AWS because NEXT_PUBLIC environment variables are injected at build-time
+ENTRYPOINT ["sh", "-c", "npm run build && npm run start"]
