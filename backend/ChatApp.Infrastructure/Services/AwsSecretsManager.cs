@@ -1,7 +1,7 @@
 ﻿using Amazon;
 using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
-using ChatApp.Server.Domain.Interfaces;
+using ChatApp.Domain.Interfaces;
 using System.Text.Json;
 
 namespace ChatApp.Infrastructure.Services

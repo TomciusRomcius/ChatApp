@@ -1,5 +1,5 @@
 using ChatApp.Infrastructure.Services;
-using ChatApp.Server.Domain.Interfaces;
+using ChatApp.Domain.Interfaces;
 using Xunit;
 
 // You must be logged in to aws to run this test
