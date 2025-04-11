@@ -8,7 +8,7 @@ class AuthService {
     ): Promise<Response> {
         console.log(username, email, password);
 
-        const res = await fetch(publicConfiguration.BACKEND_URL, {
+        const res = await fetch(`${publicConfiguration.BACKEND_URL}/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

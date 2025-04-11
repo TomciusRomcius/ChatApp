@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent } from "react";
 import { authService } from "../authService";
@@ -18,19 +18,19 @@ export default function SignUpPage() {
     };
 
     return (
-        <div className="w-screen min-h-screen flex items-center justify-center">
+        <div className="flex min-h-screen w-screen items-center justify-center">
             <form onSubmit={handleSignIn} method="POST">
-                <div className="p-4 flex flex-col gap-4 border-red-700 border-2">
+                <div className="p-4 gap-4 border-red-700 flex flex-col border-2">
                     <input name="username" placeholder="Username" />
                     <input name="email" placeholder="Email" />
                     <input name="password" placeholder="Password" />
                     <input
                         type="submit"
-                        value="Sign in"
+                        value="Sign up"
                         className="text-white p-2 bg-stone-700 border-red-700 cursor-pointer"
                     />
                     <button className="p-2 bg-stone-700">
-                        Sign in with google
+                        Sign up with google
                     </button>
                 </div>
             </form>
