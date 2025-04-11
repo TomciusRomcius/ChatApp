@@ -32,9 +32,11 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".dockerignore" />
     <Content Include=".env">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Dockerfile" />
     <Content Include="libman.json" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
