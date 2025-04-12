@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using ChatApp.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
 
@@ -12,10 +13,15 @@ namespace ChatApp.Domain.Entities.UserFriend
 
     public class UserFriendEntity
     {
+        [Required]
+        [MaxLength(36)]
         public required string InitiatorId { get; set; }
+        [Required]
+        [MaxLength(36)]
         public required string ReceiverId { get; set; }
         public IdentityUser? Initiator { get; set; }
         public IdentityUser? Receiver { get; set; }
+        [Required]
         public byte Status { get; set; }
 
         public static ResultError? Validate(UserFriendEntity entity)

@@ -12,9 +12,8 @@ namespace ChatApp.Domain.Entities.ChatRoom
         [Required]
         [MaxLength(255)]
         public required string Name { get; init; }
-        [MaxLength(36)]
+        [Required]
         public required string AdminUserId { get; init; }
-        [MaxLength(255)]
         public IdentityUser? AdminUser { get; init; }
 
         public List<ResultError> Validate()
