@@ -3,7 +3,7 @@
 namespace ChatApp.Application.Interfaces;
 public interface IWebSocketList
 {
-    void AddConnection(string userId, WebSocketConnection socket);
-    Task CloseConnection(string userId, string connectionId);
-    List<WebSocketConnection> GetUserSockets(string userId);
+    public void AddConnection(string userId, IWebSocketConnection socket);
+    public Task CloseConnection(string userId, IWebSocketConnection socket);
+    public List<IWebSocketConnection> GetUserSockets(string userId);
 }

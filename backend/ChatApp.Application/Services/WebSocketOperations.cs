@@ -33,10 +33,10 @@ namespace ChatApp.Application.Services
         private async Task _SendMessage(List<string> userIds, string message)
         {
             // Add all websockets from userIds. Note: The user can have multiple sockets
-            List<WebSocketConnection> socks = new List<WebSocketConnection>();
+            List<IWebSocketConnection> socks = new List<IWebSocketConnection>();
             foreach (string userId in userIds)
             {
-                List<WebSocketConnection> receivedSocks = _webSocketList.GetUserSockets(userId);
+                List<IWebSocketConnection> receivedSocks = _webSocketList.GetUserSockets(userId);
                 socks.AddRange([.. receivedSocks]);
             }
 
@@ -47,9 +47,9 @@ namespace ChatApp.Application.Services
             await Task.WhenAll(tasks);
         }
         
-        private async Task SendMessageFuncToSocket(WebSocketConnection socketConnection, string message)
+        private async Task SendMessageFuncToSocket(IWebSocketConnection socketConnection, string message)
         {
-            WebSocket sock = socketConnection.Socket;
+            WebSocket sock = socketConnection.GetWebSocket();
             // TODO: add cancellation token
             if (sock.CloseStatus is not null)
             {

@@ -3,10 +3,12 @@ using Microsoft.Extensions.Logging;
 
 namespace ChatApp.Application.Services
 {
+    // TODO: thread safety
+    
     public class WebSocketList : IWebSocketList
     {
         IBackgroundTaskQueue _backgroundTaskQueue;
-        Dictionary<string, List<WebSocketConnection>> _userToWebSockets { get; set; } = new Dictionary<string, List<WebSocketConnection>>();
+        Dictionary<string, List<IWebSocketConnection>> _userToWebSockets { get; set; } = new Dictionary<string, List<IWebSocketConnection>>();
         readonly ILogger<WebSocketList> _logger;
 
         public WebSocketList(IBackgroundTaskQueue backgroundTaskQueue, ILogger<WebSocketList> logger)
@@ -15,44 +17,56 @@ namespace ChatApp.Application.Services
             _logger = logger;
         }
 
-        public void AddConnection(string userId, WebSocketConnection socket)
+        public void AddConnection(string userId, IWebSocketConnection socket)
         {
             _logger.LogTrace("New WebSocket connection, userId: {UserId}", userId);
-            var pair = _userToWebSockets.FirstOrDefault((item) => item.Key == userId);
-            if (pair.Equals(default(KeyValuePair<string, List<WebSocketConnection>>)))
+            
+            List<IWebSocketConnection>? existingSockets;
+            _userToWebSockets.TryGetValue(userId, out existingSockets);
+            
+            if (existingSockets is null)
             {
-                List<WebSocketConnection> list = [socket];
+                List<IWebSocketConnection> list = [socket];
                 _userToWebSockets.Add(userId, list);
             }
-            
+
             else
             {
-                if (pair.Value.Exists((item) => item.Equals(socket)))
+                // TODO: implement a better comparison with a connection id
+                if (existingSockets.Contains(socket))
                 {
                     throw new InvalidOperationException("Trying to add a socket connection that already exists!");
                 }
-
-                pair.Value.Add(socket);
+                
+                existingSockets.Add(socket);
             }
         }
 
-        public async Task CloseConnection(string userId, string connectionId)
+        public async Task CloseConnection(string userId, IWebSocketConnection socket)
         {
-            List<WebSocketConnection>? sockets;
+            List<IWebSocketConnection>? sockets;
             _userToWebSockets.TryGetValue(userId, out sockets);
-            if (sockets != null)
+
+            if (sockets is null)
             {
-                foreach (var socket in sockets)
-                {
-                    await socket.CloseConnection();
-                    sockets.Remove(socket);
-                }
+                _logger.LogError("Trying to close a connection that does not exist!");
+                return;
             }
+
+            IWebSocketConnection? foundSock = sockets.Find(sock => sock == socket);
+            if (foundSock is null)
+            {
+                _logger.LogError("Trying to close a connection that does not exist!");
+            }
+            
+            else await foundSock.CloseConnection();
+            
+            sockets.Remove(foundSock);
         }
 
-        public List<WebSocketConnection> GetUserSockets(string userId)
+        public List<IWebSocketConnection> GetUserSockets(string userId)
         {
-            List<WebSocketConnection>? result = null;
+            List<IWebSocketConnection>? result = null;
             _userToWebSockets.TryGetValue(userId, out result);
 
             return result ?? [];
