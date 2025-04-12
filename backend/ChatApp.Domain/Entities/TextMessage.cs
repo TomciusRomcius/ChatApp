@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
@@ -10,10 +11,18 @@ namespace ChatApp.Domain.Entities
     */
     public class TextMessageEntity
     {
+        [Required]
+        [MaxLength(36)]
         public required string TextMessageId { get; set; }
+        [Required]
+        [MaxLength(255)]
         public required string Content { get; set; }
+        [Required]
+        [MaxLength(36)]
         public required string SenderId { get; set; }
+        [MaxLength(36)]
         public string? ChatRoomId { get; set; }
+        [MaxLength(36)]
         public string? ReceiverUserId { get; set; }
         public ChatRoomEntity? ChatRoom { get; set; }
         public IdentityUser? Sender { get; set; }

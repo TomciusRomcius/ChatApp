@@ -26,7 +26,7 @@ namespace ChatApp.Application.Persistance
             .IsRequired()
             .HasForeignKey(uf => uf.InitiatorId)
             .OnDelete(DeleteBehavior.Restrict);
-
+            
             modelBuilder.Entity<UserFriendEntity>()
             .HasOne(uf => uf.Receiver)
             .WithMany()

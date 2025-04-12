@@ -25,15 +25,18 @@ namespace ChatApp.Application.Migrations
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomEntity", b =>
                 {
                     b.Property<string>("ChatRoomId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("AdminUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("ChatRoomId");
 
@@ -45,7 +48,7 @@ namespace ChatApp.Application.Migrations
             modelBuilder.Entity("ChatApp.Domain.Entities.ChatRoom.ChatRoomMemberEntity", b =>
                 {
                     b.Property<string>("ChatRoomId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("MemberId")
                         .HasColumnType("nvarchar(450)");
@@ -63,7 +66,7 @@ namespace ChatApp.Application.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ChatRoomId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("Content")
                         .IsRequired()
