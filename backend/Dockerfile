@@ -20,7 +20,7 @@ CMD ["dotnet", "test", "--no-build", "--no-restore"]
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS development
 WORKDIR /app
 COPY --from=build /app .
-CMD [ "dotnet", "watch", "--project", "ChatApp.Server" ]
+CMD [ "dotnet", "watch", "--project", "ChatApp.Presentation" ]
 
 FROM build AS publish
 WORKDIR /app
@@ -29,4 +29,4 @@ RUN dotnet publish -o ./publish
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ChatApp.Server.dll"]
+ENTRYPOINT ["dotnet", "ChatApp.Presentation.dll"]
