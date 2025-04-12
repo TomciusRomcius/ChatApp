@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +20,12 @@ namespace ChatApp.Presentation.User
         [HttpGet("whoami")]
         public async Task<IActionResult> WhoAmIAsync()
         {
-            string userId = HttpContext.User.Claims.First((claim) => claim.Type == ClaimTypes.NameIdentifier).Value;
+            string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
 
             var user = await _userManager.FindByIdAsync(userId);
             // If user is invalid, then expire the cookie
