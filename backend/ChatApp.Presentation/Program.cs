@@ -34,6 +34,8 @@ builder.Services.AddScoped<IChatRoomMessagingService, ChatRoomMessagingService>(
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddAntiforgery();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
