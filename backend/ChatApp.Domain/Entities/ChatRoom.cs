@@ -1,13 +1,21 @@
+using System.ComponentModel.DataAnnotations;
+using ChatApp.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Domain.Entities.ChatRoom
 {
     public class ChatRoomEntity
     {
-        public required string ChatRoomId { get; set; }
-        public required string Name { get; set; }
-        public required string AdminUserId { get; set; }
-        public IdentityUser? AdminUser { get; set; }
+        [Required]
+        [MaxLength(36)]
+        public required string ChatRoomId { get; init; }
+        [Required]
+        [MaxLength(255)]
+        public required string Name { get; init; }
+        [MaxLength(36)]
+        public required string AdminUserId { get; init; }
+        [MaxLength(255)]
+        public IdentityUser? AdminUser { get; init; }
 
         public List<ResultError> Validate()
         {
