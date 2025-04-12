@@ -16,9 +16,7 @@ namespace ChatApp.Application.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            // TODO: probably dont have to spawn a separate thread, cant find any info
             Task.Run(ProcessQueueAsync);
-
             return Task.CompletedTask;
         }
 
@@ -29,20 +27,30 @@ namespace ChatApp.Application.Services
 
         private async Task ProcessQueueAsync()
         {
+            // TODO: Cancellation token support
             while (true)
             {
-                try
+                Func<Task>? task = _backgroundTaskQueue.Dequeue();
+                if (task is not null)
                 {
-                    Func<Task>? task = _backgroundTaskQueue.Dequeue();
-                    if (task is not null)
+                    _logger.LogDebug("Executing a background task");
+                    Task.Run(async () =>
                     {
-                        _logger.LogDebug("Executing a background task");
-                        await task();
-                    }
+                        try
+                        {
+                            await task();
+                            _logger.LogDebug("Background task executed");
+                        }
+                        
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex.ToString());
+                        }
+                    });
                 }
-                catch (Exception ex)
+                else
                 {
-                    _logger.LogError(ex.ToString());
+                    await Task.Delay(TimeSpan.FromMilliseconds(500));
                 }
             }
         }
