@@ -18,7 +18,6 @@ namespace ChatApp.Presentation.Controllers.ChatRoomMessaging
             _chatRoomMessagingService = chatRoomMessagingService;
         }
 
-        // TODO: may be susceptible to CSRF attacks
         [HttpGet()]
         public IActionResult GetChatRoomMessages([FromQuery] GetChatRoomMessageDto dto)
         {
