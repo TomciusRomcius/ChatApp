@@ -1,25 +1,12 @@
 using ChatApp.Application.Interfaces;
-using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
-using ChatApp.Application.Utils;
-using ChatApp.Infrastructure.Services;
-using ChatApp.Presentation.Services;
+using ChatApp.Presentation.Initialization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add AWS secrets manager configuration source if running in production
-if (builder.Environment.IsProduction())
-{
-    var awsConfiguration = new SecretManagerConfiguration("chatapp-secrets", "eu-west-1");
-    var secretsManager = new AwsSecretsManager(awsConfiguration);
-
-    builder.Configuration.Add<SecretManagerConfigurationSource>(source =>
-    {
-        source.SecretsManager = secretsManager;
-    });
-}
+SecretManagerInitializer.Initialize(builder);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -27,45 +14,13 @@ builder.Logging.AddConsole();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-// Database setup
-builder.Services.AddSingleton<MsSqlOptions>();
-builder.Services.AddDbContext<DatabaseContext>((serviceProvider, options) =>
-{
-    var sqlOptions = serviceProvider.GetRequiredService<MsSqlOptions>();
-    options.UseSqlServer(sqlOptions.GetConnectionString());
-});
+DatabaseInitializer.Initialize(builder);
 
-// Identity
-builder.Services.AddAuthorization();
-
-builder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService());
-
-builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
-{
-    options.SignIn.RequireConfirmedEmail = false;
-    options.User.RequireUniqueEmail = true;
-    options.Password.RequiredLength = 8;
-    options.Password.RequireDigit = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(2);
-}).AddEntityFrameworkStores<DatabaseContext>();
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.HttpOnly = true;
-});
+IdentityInitializer.Initialize(builder);
 
 // Background tasks
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 builder.Services.AddHostedService<BackgroundTaskRunner>();
-
-// OIDC
-builder.Services.AddSingleton<OidcProviderConfigMapService>();
 
 // Websockets
 builder.Services.AddSingleton<IWebSocketList, WebSocketList>();
