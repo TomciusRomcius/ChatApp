@@ -4,6 +4,7 @@ using ChatApp.Domain.Utils;
 using ChatApp.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using ChatApp.Domain.Entities.UserFriend;
+using ChatApp.Presentation.Utils;
 
 namespace ChatApp.Presentation.UserFriend
 {
@@ -28,21 +29,10 @@ namespace ChatApp.Presentation.UserFriend
                 return Unauthorized();
             }
 
-            ArrayList friends = new ArrayList();
-
             Result<ArrayList> result = _userFriendService.GetUserFriends(dto.UserId ?? userId, dto.Status ?? UserFriendStatus.FRIEND);
 
-            if (result.IsError())
-            {
-                // TODO: better error description
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
-            else
-            {
-                friends = result.GetValue();
-                return Ok(friends);
-            }
+            if (!result.IsError()) return Ok(result.GetValue());
+            return ControllerUtils.OutputErrorResult(result.Errors.First());
         }
 
         [HttpPost("request")]
@@ -57,9 +47,9 @@ namespace ChatApp.Presentation.UserFriend
                 return Unauthorized();
             }
 
-            await _userFriendService.SendFriendRequest(userId, addFriendDto.UserId);
-
-            return Created();
+            ResultError? error = await _userFriendService.SendFriendRequest(userId, addFriendDto.UserId);
+            if (error is null) return Created();
+            return ControllerUtils.OutputErrorResult(error);
         }
 
         [HttpPost("accept")]
@@ -72,9 +62,9 @@ namespace ChatApp.Presentation.UserFriend
                 return Unauthorized();
             }
 
-            await _userFriendService.AcceptFriendRequest(dto.UserId, userId);
-
-            return Ok();
+            ResultError? error = await _userFriendService.AcceptFriendRequest(dto.UserId, userId);
+            if (error is null) return Created();
+            return ControllerUtils.OutputErrorResult(error);
         }
 
         [HttpDelete("remove")]
@@ -87,9 +77,9 @@ namespace ChatApp.Presentation.UserFriend
                 return Unauthorized();
             }
 
-            await _userFriendService.RemoveFromFriends(userId, dto.UserId);
-
-            return Created();
+            ResultError? error = await _userFriendService.RemoveFromFriends(userId, dto.UserId);
+            if (error is null) return Ok();
+            return ControllerUtils.OutputErrorResult(error);
         }
     }
 }

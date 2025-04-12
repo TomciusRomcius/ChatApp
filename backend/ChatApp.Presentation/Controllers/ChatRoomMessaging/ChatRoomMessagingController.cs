@@ -1,10 +1,11 @@
 using System.Security.Claims;
 using ChatApp.Application.Interfaces;
-using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
+using ChatApp.Presentation.ChatRoomMessaging;
+using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ChatApp.Presentation.ChatRoomMessaging
+namespace ChatApp.Presentation.Controllers.ChatRoomMessaging
 {
     [ApiController]
     [Route("[controller]")]
@@ -17,7 +18,7 @@ namespace ChatApp.Presentation.ChatRoomMessaging
             _chatRoomMessagingService = chatRoomMessagingService;
         }
 
-        // TODO: may be susceptable to CSRF attacks
+        // TODO: may be susceptible to CSRF attacks
         [HttpGet()]
         public IActionResult GetChatRoomMessages([FromQuery] GetChatRoomMessageDto dto)
         {
@@ -28,27 +29,11 @@ namespace ChatApp.Presentation.ChatRoomMessaging
                 return Unauthorized();
             }
 
-            Result<List<TextMessageEntity>> result = _chatRoomMessagingService.GetChatRoomMessages(userId, dto.ChatRoomId, dto.Offset, dto.NumberOfMessages);
-            if (result.IsError())
-            {
-                var error = result.Errors.First();
-                if (error.Type == ResultErrorType.VALIDATION_ERROR)
-                {
-                    return BadRequest(error.Message);
-                }
-
-                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
-                {
-                    return Forbid(error.Message);
-                }
-
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-
-            return Ok(result.GetValue());
+            var result = _chatRoomMessagingService.GetChatRoomMessages(userId, dto.ChatRoomId, dto.Offset, dto.NumberOfMessages);
+            if (!result.IsError()) return Ok(result.GetValue());
+            
+            var error = result.Errors.First();
+            return ControllerUtils.OutputErrorResult(error);
         }
 
         [HttpPost()]
@@ -62,27 +47,10 @@ namespace ChatApp.Presentation.ChatRoomMessaging
             }
 
             Result<string> result = await _chatRoomMessagingService.SendChatRoomMessageAsync(userId, dto.ChatRoomId, dto.Content);
-
-            if (result.IsError())
-            {
-                var error = result.Errors.First();
-                if (error.Type == ResultErrorType.VALIDATION_ERROR)
-                {
-                    return BadRequest(error.Message);
-                }
-
-                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
-                {
-                    return Forbid(error.Message);
-                }
-
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-
-            return Created("", new { TextMessageId = result.GetValue() });
+            if (!result.IsError()) return Created("", new { TextMessageId = result.GetValue() });
+            
+            var error = result.Errors.First();
+            return ControllerUtils.OutputErrorResult(error);
         }
     }
 }

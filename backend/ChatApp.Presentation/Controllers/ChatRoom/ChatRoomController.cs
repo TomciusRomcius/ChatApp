@@ -2,6 +2,7 @@ using System.Security.Claims;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
 using ChatApp.Application.Interfaces;
+using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Presentation.ChatRoom
@@ -29,26 +30,8 @@ namespace ChatApp.Presentation.ChatRoom
 
             Result<List<ChatRoomEntity>> result = _chatRoomService.GetChatRooms(userId);
 
-            if (result.IsError())
-            {
-                var error = result.Errors.First();
-                if (error.Type == ResultErrorType.VALIDATION_ERROR)
-                {
-                    return BadRequest(error.Message);
-                }
-
-                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
-                {
-                    return BadRequest(error.Message);
-                }
-
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-
-            return Ok(result.GetValue());
+            if (!result.IsError()) return Ok(result.GetValue());
+            return ControllerUtils.OutputErrorResult(result.Errors.First());
         }
 
         [HttpPost]
@@ -63,26 +46,8 @@ namespace ChatApp.Presentation.ChatRoom
 
             Result<string> result = await _chatRoomService.CreateChatRoomAsync(userId, dto.Name, dto.Members ?? []);
 
-            if (result.IsError())
-            {
-                var error = result.Errors.First();
-                if (error.Type == ResultErrorType.VALIDATION_ERROR)
-                {
-                    return BadRequest(error.Message);
-                }
-
-                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
-                {
-                    return Forbid(error.Message);
-                }
-
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-
-            return Created("", new { ChatRoomId = result.GetValue() });
+            if (!result.IsError()) return Created("", new {ChatRoomId = result.GetValue()});
+            return ControllerUtils.OutputErrorResult(result.Errors.First());
         }
 
         [HttpDelete]
@@ -97,25 +62,8 @@ namespace ChatApp.Presentation.ChatRoom
 
             ResultError? error = await _chatRoomService.DeleteChatRoomAsync(userId, dto.ChatRoomId);
 
-            if (error is not null)
-            {
-                if (error.Type == ResultErrorType.VALIDATION_ERROR)
-                {
-                    return BadRequest(error.Message);
-                }
-
-                else if (error.Type == ResultErrorType.FORBIDDEN_ERROR)
-                {
-                    return Forbid(error.Message);
-                }
-
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-
-            return Created();
+            if (error is null) return Created();
+            return ControllerUtils.OutputErrorResult(error);
         }
     }
 }

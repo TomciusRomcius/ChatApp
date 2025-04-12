@@ -2,6 +2,7 @@ using System.Security.Claims;
 using ChatApp.Domain.Utils;
 using ChatApp.Application.Interfaces;
 using ChatApp.Presentation.UserFriend;
+using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Presentation.UserMessage
@@ -28,8 +29,8 @@ namespace ChatApp.Presentation.UserMessage
             }
 
             var result = _userMessageService.GetMessages(userId, dto.UserId);
-
-            return Ok(result.GetValue());
+            if (!result.IsError()) return Ok(result.GetValue());
+            return ControllerUtils.OutputErrorResult(result.Errors.First());
         }
 
         [HttpPost]
@@ -43,23 +44,9 @@ namespace ChatApp.Presentation.UserMessage
             }
 
             var result = await _userMessageService.SendMessage(userId, dto.ReceiverId, dto.Content);
-
-            if (result.IsError())
-            {
-                var error = result.Errors.First();
-
-                if (error.Type == ResultErrorType.VALIDATION_ERROR)
-                {
-                    return BadRequest(error.Message);
-                }
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
-            else
-            {
-                return Created("", new { TextMessageId = result.GetValue() });
-            }
+            
+            if (!result.IsError()) return Ok(result.GetValue());
+            return ControllerUtils.OutputErrorResult(result.Errors.First());
         }
 
         [HttpDelete]
@@ -73,16 +60,9 @@ namespace ChatApp.Presentation.UserMessage
             }
 
             ResultError? error = _userMessageService.DeleteMessage(userId, dto.MessageId);
-
-            if (error is not null)
-            {
-                return Forbid(error.Message);
-            }
-
-            else
-            {
-                return Created();
-            }
+            
+            if (error is null) return Ok();
+            return ControllerUtils.OutputErrorResult(error);
         }
     }
 }
