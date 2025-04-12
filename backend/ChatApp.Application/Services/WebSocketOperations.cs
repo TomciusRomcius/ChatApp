@@ -1,6 +1,9 @@
 using System.Net.WebSockets;
 using System.Text;
+using ChatApp.Application.Interfaces;
 using Microsoft.Extensions.Logging;
+
+// TODO: Terminate connections after some time to avoid memory leaks
 
 namespace ChatApp.Application.Services
 {
@@ -29,8 +32,8 @@ namespace ChatApp.Application.Services
 
         private async Task _SendMessage(List<string> userIds, string message)
         {
+            // Add all websockets from userIds. Note: The user can have multiple sockets
             List<WebSocketConnection> socks = new List<WebSocketConnection>();
-            // TODO: make more efficient
             foreach (string userId in userIds)
             {
                 List<WebSocketConnection> receivedSocks = _webSocketList.GetUserSockets(userId);
@@ -38,18 +41,23 @@ namespace ChatApp.Application.Services
             }
 
             _logger.LogDebug("Sending a WebSocket message to {Number} of sockets", socks.Count());
-
-            foreach (var socketConnection in socks)
+            
+            // Send message in parallel to all sockets
+            var tasks = socks.Select(socketConnection => SendMessageFuncToSocket(socketConnection, message)).ToList();
+            await Task.WhenAll(tasks);
+        }
+        
+        private async Task SendMessageFuncToSocket(WebSocketConnection socketConnection, string message)
+        {
+            WebSocket sock = socketConnection.Socket;
+            // TODO: add cancellation token
+            if (sock.CloseStatus is not null)
             {
-                WebSocket sock = socketConnection.Socket;
-                // TODO: add cancellation token
-                if (sock.CloseStatus is not null)
-                {
-                    await socketConnection.CloseConnection();
-                }
-                ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
-                await sock.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+                await socketConnection.CloseConnection();
             }
+
+            ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
+            await sock.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
 }

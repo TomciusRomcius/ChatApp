@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Buffers;
 using System.Security.Claims;
 using System.Text;
+using ChatApp.Application.Interfaces;
 
 namespace ChatApp.Presentation.Websocket
 {
