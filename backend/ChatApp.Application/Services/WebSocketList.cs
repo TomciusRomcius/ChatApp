@@ -5,11 +5,13 @@ namespace ChatApp.Application.Services
 {
     public class WebSocketList : IWebSocketList
     {
+        IBackgroundTaskQueue _backgroundTaskQueue;
         Dictionary<string, List<WebSocketConnection>> _userToWebSockets { get; set; } = new Dictionary<string, List<WebSocketConnection>>();
         readonly ILogger<WebSocketList> _logger;
 
-        public WebSocketList(ILogger<WebSocketList> logger)
+        public WebSocketList(IBackgroundTaskQueue backgroundTaskQueue, ILogger<WebSocketList> logger)
         {
+            _backgroundTaskQueue = backgroundTaskQueue;
             _logger = logger;
         }
 
@@ -36,7 +38,16 @@ namespace ChatApp.Application.Services
 
         public async Task CloseConnection(string userId, string connectionId)
         {
-            throw new NotImplementedException();
+            List<WebSocketConnection>? sockets;
+            _userToWebSockets.TryGetValue(userId, out sockets);
+            if (sockets != null)
+            {
+                foreach (var socket in sockets)
+                {
+                    await socket.CloseConnection();
+                    sockets.Remove(socket);
+                }
+            }
         }
 
         public List<WebSocketConnection> GetUserSockets(string userId)
