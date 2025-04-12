@@ -30,8 +30,7 @@ namespace ChatApp.Application.Migrations
 
                     b.Property<string>("AdminUserId")
                         .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -70,7 +69,8 @@ namespace ChatApp.Application.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -96,10 +96,12 @@ namespace ChatApp.Application.Migrations
             modelBuilder.Entity("ChatApp.Domain.Entities.UserFriend.UserFriendEntity", b =>
                 {
                     b.Property<string>("InitiatorId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("ReceiverId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
