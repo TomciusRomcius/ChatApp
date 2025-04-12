@@ -42,6 +42,12 @@ namespace ChatApp.Application.Services
                 AdminUserId = adminUserId,
                 Name = chatRoomName,
             };
+            
+            var errors = chatroom.Validate();
+            if (errors.Any())
+            {
+                return new Result<string>(errors);
+            }
 
             await _databaseContext.ChatRooms.AddAsync(chatroom);
 
