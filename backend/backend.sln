@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Application", "ChatApp.Application\ChatApp.Application.csproj", "{978DB1BD-8F8B-454D-A3D7-DEAE2C612FB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Application.Tests", "ChatApp.Application.Tests\ChatApp.Application.Tests.csproj", "{C4952B8F-33DA-4ACF-BB84-07B18D052098}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Domain", "ChatApp.Domain\ChatApp.Domain.csproj", "{CA28DB28-60C8-4FA1-8471-4B194752F44D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Infrastructure", "ChatApp.Infrastructure\ChatApp.Infrastructure.csproj", "{7734B0FC-8717-478E-9597-D4ED0E1DFBD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Infrastructure.Tests", "ChatApp.Infrastructure.Tests\ChatApp.Infrastructure.Tests.csproj", "{D3202ABF-3F6F-4687-99FD-97280E2969D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Presentation", "ChatApp.Presentation\ChatApp.Presentation.csproj", "{84DB64EA-E1BD-45AB-A2B3-2166674B35FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution files", "Solution files", "{AD3EBA32-C87E-4692-A0E6-D4D3F0D2D02B}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{978DB1BD-8F8B-454D-A3D7-DEAE2C612FB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{978DB1BD-8F8B-454D-A3D7-DEAE2C612FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{978DB1BD-8F8B-454D-A3D7-DEAE2C612FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{978DB1BD-8F8B-454D-A3D7-DEAE2C612FB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4952B8F-33DA-4ACF-BB84-07B18D052098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4952B8F-33DA-4ACF-BB84-07B18D052098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4952B8F-33DA-4ACF-BB84-07B18D052098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4952B8F-33DA-4ACF-BB84-07B18D052098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA28DB28-60C8-4FA1-8471-4B194752F44D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA28DB28-60C8-4FA1-8471-4B194752F44D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA28DB28-60C8-4FA1-8471-4B194752F44D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA28DB28-60C8-4FA1-8471-4B194752F44D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7734B0FC-8717-478E-9597-D4ED0E1DFBD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7734B0FC-8717-478E-9597-D4ED0E1DFBD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7734B0FC-8717-478E-9597-D4ED0E1DFBD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7734B0FC-8717-478E-9597-D4ED0E1DFBD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3202ABF-3F6F-4687-99FD-97280E2969D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3202ABF-3F6F-4687-99FD-97280E2969D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3202ABF-3F6F-4687-99FD-97280E2969D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3202ABF-3F6F-4687-99FD-97280E2969D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84DB64EA-E1BD-45AB-A2B3-2166674B35FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84DB64EA-E1BD-45AB-A2B3-2166674B35FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84DB64EA-E1BD-45AB-A2B3-2166674B35FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84DB64EA-E1BD-45AB-A2B3-2166674B35FB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

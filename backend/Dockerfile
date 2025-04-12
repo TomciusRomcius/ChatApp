@@ -1,12 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 EXPOSE 5112
-COPY ./ChatApp.sln .
-COPY ./ChatApp.Server/ChatApp.Server.csproj ./ChatApp.Server/
-COPY ./ChatApp.Server.Application/ChatApp.Server.Application.csproj ./ChatApp.Server.Application/
-COPY ./ChatApp.Server.Domain/ChatApp.Server.Domain.csproj ./ChatApp.Server.Domain/
-COPY ./ChatApp.Server.Application.Tests/ChatApp.Server.Application.Tests.csproj ./ChatApp.Server.Application.Tests/
-COPY ./ChatApp.Infrastructure/ChatApp.Server.Infrastructure.csproj ./ChatApp.Infrastructure/
+COPY ./backend.sln .
+COPY ./ChatApp.Presentation/ChatApp.Presentation.csproj ./ChatApp.Presentation/
+COPY ./ChatApp.Application/ChatApp.Application.csproj ./ChatApp.Application/
+COPY ./ChatApp.Domain/ChatApp.Domain.csproj ./ChatApp.Domain/
+COPY ./ChatApp.Application.Tests/ChatApp.Application.Tests.csproj ./ChatApp.Application.Tests/
+COPY ./ChatApp.Infrastructure/ChatApp.Infrastructure.csproj ./ChatApp.Infrastructure/
 COPY ./ChatApp.Infrastructure.Tests/ChatApp.Infrastructure.Tests.csproj ./ChatApp.Infrastructure.Tests/
 RUN dotnet restore
 COPY . .
