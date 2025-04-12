@@ -18,6 +18,8 @@ namespace ChatApp.Presentation.Websocket
         }
 
         [Route("ws")]
+        // TODO: temporary disable
+        [ApiExplorerSettings(IgnoreApi=true)]
         public async Task Get()
         {
             string? userId = HttpContext.User.Claims.FirstOrDefault((claim) => claim.Type == ClaimTypes.NameIdentifier)?.Value;
