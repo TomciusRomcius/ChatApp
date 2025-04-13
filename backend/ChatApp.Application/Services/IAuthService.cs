@@ -1,8 +1,7 @@
-namespace ChatApp.Application.Services
+namespace ChatApp.Application.Services;
+
+public interface IAuthService
 {
-    public interface IAuthService
-    {
-        public Task SignUpWithPassword();
-        public Task SignInWithPassword();
-    }
+    public Task SignUpWithPassword();
+    public Task SignInWithPassword();
 }

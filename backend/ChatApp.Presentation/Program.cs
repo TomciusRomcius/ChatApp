@@ -5,7 +5,7 @@ using ChatApp.Application.Services.WebSockets;
 using ChatApp.Presentation.Initialization;
 using Microsoft.AspNetCore.Identity;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
 // Add AWS secrets manager configuration source if running in production
 SecretManagerInitializer.Initialize(builder);
@@ -41,7 +41,7 @@ builder.Services.AddAntiforgery();
 
 builder.Services.AddHttpClient();
 
-var app = builder.Build();
+WebApplication? app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

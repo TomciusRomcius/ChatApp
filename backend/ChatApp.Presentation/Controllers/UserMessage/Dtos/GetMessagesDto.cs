@@ -1,7 +1,6 @@
-namespace ChatApp.Presentation.UserMessage
+namespace ChatApp.Presentation.UserMessage;
+
+public class GetMesssagesDto
 {
-    public class GetMesssagesDto
-    {
-        public string? UserId { get; set; }
-    }
+    public string? UserId { get; set; }
 }

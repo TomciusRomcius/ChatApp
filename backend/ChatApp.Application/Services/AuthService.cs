@@ -1,7 +1,5 @@
-namespace ChatApp.Application.Services
-{
-    public class AuthService
-    {
+namespace ChatApp.Application.Services;
 
-    }
+public class AuthService
+{
 }

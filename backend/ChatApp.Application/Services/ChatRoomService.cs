@@ -1,110 +1,96 @@
+using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
-using ChatApp.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Application.Services;
+
+public class ChatRoomService : IChatRoomService
 {
-    public class ChatRoomService : IChatRoomService
+    private readonly DatabaseContext _databaseContext;
+
+    public ChatRoomService(DatabaseContext databaseContext)
     {
-        readonly DatabaseContext _databaseContext;
+        _databaseContext = databaseContext;
+    }
 
-        public ChatRoomService(DatabaseContext databaseContext)
-        {
-            _databaseContext = databaseContext;
-        }
+    public Result<List<ChatRoomEntity>> GetChatRooms(string userId)
+    {
+        if (userId.Length == 0)
+            return new Result<List<ChatRoomEntity>>([
+                new ResultError(ResultErrorType.VALIDATION_ERROR, "User id is empty")
+            ]);
 
-        public Result<List<ChatRoomEntity>> GetChatRooms(string userId)
+        IQueryable<ChatRoomEntity> query = from chatroomMember in _databaseContext.ChatRoomMembers
+            where chatroomMember.MemberId == userId
+            join chatroom in _databaseContext.ChatRooms
+                on chatroomMember.ChatRoomId equals chatroom.ChatRoomId
+            select chatroom;
+
+        List<ChatRoomEntity> result = [.. query];
+
+        return new Result<List<ChatRoomEntity>>(result);
+    }
+
+    public async Task<Result<string>> CreateChatRoomAsync(string adminUserId, string chatRoomName, List<string> members)
+    {
+        var chatroom = new ChatRoomEntity
         {
-            if (userId.Length == 0)
+            ChatRoomId = Guid.NewGuid().ToString(),
+            AdminUserId = adminUserId,
+            Name = chatRoomName
+        };
+
+        List<ResultError> errors = chatroom.Validate();
+        if (errors.Any()) return new Result<string>(errors);
+
+        await _databaseContext.ChatRooms.AddAsync(chatroom);
+
+        // If user provides initial chat room members, add them 
+        // TODO: check if all members are friends
+        if (members.Any())
+        {
+            var adminMember = new ChatRoomMemberEntity
             {
-                return new Result<List<ChatRoomEntity>>([new ResultError(ResultErrorType.VALIDATION_ERROR, "User id is empty")]);
-            }
-
-            var query = from chatroomMember in _databaseContext.ChatRoomMembers
-                        where chatroomMember.MemberId == userId
-                        join chatroom in _databaseContext.ChatRooms
-                        on chatroomMember.ChatRoomId equals chatroom.ChatRoomId
-                        select chatroom;
-
-            List<ChatRoomEntity> result = [.. query];
-
-            return new Result<List<ChatRoomEntity>>(result);
-        }
-
-        public async Task<Result<string>> CreateChatRoomAsync(string adminUserId, string chatRoomName, List<string> members)
-        {
-
-            var chatroom = new ChatRoomEntity
-            {
-                ChatRoomId = Guid.NewGuid().ToString(),
-                AdminUserId = adminUserId,
-                Name = chatRoomName,
+                ChatRoomId = chatroom.ChatRoomId,
+                MemberId = adminUserId
             };
-            
-            var errors = chatroom.Validate();
-            if (errors.Any())
-            {
-                return new Result<string>(errors);
-            }
 
-            await _databaseContext.ChatRooms.AddAsync(chatroom);
-
-            // If user provides initial chat room members, add them 
-            // TODO: check if all members are friends
-            if (members.Any())
-            {
-                ChatRoomMemberEntity adminMember = new ChatRoomMemberEntity
-                {
-                    ChatRoomId = chatroom.ChatRoomId,
-                    MemberId = adminUserId,
-                };
-
-                await _databaseContext.ChatRoomMembers.AddRangeAsync(
-                    [..members.Select(uid => new ChatRoomMemberEntity
+            await _databaseContext.ChatRoomMembers.AddRangeAsync(
+                [
+                    ..members.Select(uid => new ChatRoomMemberEntity
                     {
                         ChatRoomId = chatroom.ChatRoomId,
                         MemberId = uid
                     }),
                     adminMember
-                    ]
-                );
+                ]
+            );
 
-                await _databaseContext.SaveChangesAsync();
-            }
-
-            return new Result<string>(chatroom.ChatRoomId);
+            await _databaseContext.SaveChangesAsync();
         }
 
-        public async Task<ResultError?> DeleteChatRoomAsync(string userId, string chatRoomId)
-        {
-            if (userId.Length == 0)
-            {
-                return new ResultError(ResultErrorType.VALIDATION_ERROR, "User id is empty");
-            }
+        return new Result<string>(chatroom.ChatRoomId);
+    }
 
-            if (chatRoomId.Length == 0)
-            {
-                return new ResultError(ResultErrorType.VALIDATION_ERROR, "Chat room id is empty");
-            }
+    public async Task<ResultError?> DeleteChatRoomAsync(string userId, string chatRoomId)
+    {
+        if (userId.Length == 0) return new ResultError(ResultErrorType.VALIDATION_ERROR, "User id is empty");
 
-            var query = _databaseContext.ChatRooms.Where(cr => cr.ChatRoomId == chatRoomId);
-            ChatRoomEntity? chatRoom = query.FirstOrDefault();
+        if (chatRoomId.Length == 0) return new ResultError(ResultErrorType.VALIDATION_ERROR, "Chat room id is empty");
 
-            if (chatRoom is null)
-            {
-                return new ResultError(ResultErrorType.VALIDATION_ERROR, "Chat room does not exist");
-            }
+        IQueryable<ChatRoomEntity> query = _databaseContext.ChatRooms.Where(cr => cr.ChatRoomId == chatRoomId);
+        ChatRoomEntity? chatRoom = query.FirstOrDefault();
 
-            if (userId != chatRoom.AdminUserId)
-            {
-                return new ResultError(ResultErrorType.FORBIDDEN_ERROR, "Trying to delete a chat room while not being an admin");
-            }
+        if (chatRoom is null) return new ResultError(ResultErrorType.VALIDATION_ERROR, "Chat room does not exist");
 
-            await query.ExecuteDeleteAsync();
+        if (userId != chatRoom.AdminUserId)
+            return new ResultError(ResultErrorType.FORBIDDEN_ERROR,
+                "Trying to delete a chat room while not being an admin");
 
-            return null;
-        }
+        await query.ExecuteDeleteAsync();
+
+        return null;
     }
 }

@@ -11,7 +11,8 @@ public static class IdentityInitializer
     {
         webApplicationBuilder.Services.AddAuthorization();
 
-        webApplicationBuilder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ => new CsrfTokenStoreService());
+        webApplicationBuilder.Services.AddSingleton<ICsrfTokenStoreService, CsrfTokenStoreService>(_ =>
+            new CsrfTokenStoreService());
 
         webApplicationBuilder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
         {
@@ -32,7 +33,7 @@ public static class IdentityInitializer
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.HttpOnly = true;
         });
-        
+
         webApplicationBuilder.Services.AddSingleton<OidcProviderConfigMapService>();
     }
 }

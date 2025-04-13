@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChatApp.Presentation.ChatRoom
+namespace ChatApp.Presentation.ChatRoom;
+
+public class DeleteChatRoomDto
 {
-    public class DeleteChatRoomDto
-    {
-        [Required]
-        public string ChatRoomId { get; set; }
-    }
+    [Required] public string ChatRoomId { get; set; }
 }

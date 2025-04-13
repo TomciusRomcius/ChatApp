@@ -16,5 +16,4 @@ public static class SecretManagerInitializer
             source.SecretsManager = secretsManager;
         });
     }
-
 }

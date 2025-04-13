@@ -11,7 +11,7 @@ public static class ControllerUtils
         {
             ResultErrorType.VALIDATION_ERROR => new BadRequestObjectResult(error.Message),
             ResultErrorType.FORBIDDEN_ERROR => new ForbidResult(),
-            _ => new StatusCodeResult(StatusCodes.Status500InternalServerError),
+            _ => new StatusCodeResult(StatusCodes.Status500InternalServerError)
         };
     }
 }

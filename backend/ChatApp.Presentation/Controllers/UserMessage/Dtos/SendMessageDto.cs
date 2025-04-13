@@ -1,8 +1,7 @@
-namespace ChatApp.Presentation.UserFriend
+namespace ChatApp.Presentation.UserFriend;
+
+public class SendMessageDto
 {
-    public class SendMessageDto
-    {
-        public required string ReceiverId { get; set; }
-        public required string Content { get; set; }
-    }
+    public required string ReceiverId { get; set; }
+    public required string Content { get; set; }
 }

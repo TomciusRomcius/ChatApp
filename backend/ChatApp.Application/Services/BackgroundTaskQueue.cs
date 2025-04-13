@@ -1,29 +1,27 @@
 using System.Collections.Concurrent;
-using System.Data;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Application.Services;
+
+public interface IBackgroundTaskQueue
 {
-    public interface IBackgroundTaskQueue
+    Func<Task>? Dequeue();
+    void Enqueue(Func<Task> task);
+}
+
+public class BackgroundTaskQueue : IBackgroundTaskQueue
+{
+    private readonly ConcurrentQueue<Func<Task>> _queue = new();
+
+    public void Enqueue(Func<Task> task)
     {
-        Func<Task>? Dequeue();
-        void Enqueue(Func<Task> task);
+        _queue.Enqueue(task);
     }
 
-    public class BackgroundTaskQueue : IBackgroundTaskQueue
+    public Func<Task>? Dequeue()
     {
-        readonly ConcurrentQueue<Func<Task>> _queue = new ConcurrentQueue<Func<Task>>();
+        Func<Task>? result;
+        _queue.TryDequeue(out result);
 
-        public void Enqueue(Func<Task> task)
-        {
-            _queue.Enqueue(task);
-        }
-
-        public Func<Task>? Dequeue()
-        {
-            Func<Task>? result;
-            _queue.TryDequeue(out result);
-
-            return result;
-        }
+        return result;
     }
 }

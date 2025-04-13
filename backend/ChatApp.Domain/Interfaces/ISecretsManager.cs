@@ -1,8 +1,7 @@
-﻿namespace ChatApp.Domain.Interfaces
+﻿namespace ChatApp.Domain.Interfaces;
+
+public interface ISecretsManager
 {
-    public interface ISecretsManager
-    {
-        public Task Load();
-        public string GetSecret(string secretName);
-    }
+    public Task Load();
+    public string GetSecret(string secretName);
 }

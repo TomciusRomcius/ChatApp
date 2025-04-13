@@ -1,7 +1,5 @@
-﻿namespace ChatApp.Infrastructure
-{
-    public class Class1
-    {
+﻿namespace ChatApp.Infrastructure;
 
-    }
+public class Class1
+{
 }

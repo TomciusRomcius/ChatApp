@@ -1,20 +1,19 @@
-namespace ChatApp.Domain.Utils
+namespace ChatApp.Domain.Utils;
+
+public enum ResultErrorType
 {
-    public enum ResultErrorType
+    VALIDATION_ERROR,
+    FORBIDDEN_ERROR
+}
+
+public class ResultError
+{
+    public ResultError(ResultErrorType type, string message)
     {
-        VALIDATION_ERROR,
-        FORBIDDEN_ERROR,
+        Type = type;
+        Message = message;
     }
 
-    public class ResultError
-    {
-        public ResultErrorType Type { get; init; }
-        public string Message { get; init; }
-
-        public ResultError(ResultErrorType type, string message)
-        {
-            Type = type;
-            Message = message;
-        }
-    }
+    public ResultErrorType Type { get; init; }
+    public string Message { get; init; }
 }

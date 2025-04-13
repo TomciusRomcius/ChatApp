@@ -1,4 +1,5 @@
 ﻿namespace ChatApp.Application.Interfaces.WebSockets;
+
 public interface IWebSocketList
 {
     public void AddConnection(string userId, IWebSocketConnection socket);

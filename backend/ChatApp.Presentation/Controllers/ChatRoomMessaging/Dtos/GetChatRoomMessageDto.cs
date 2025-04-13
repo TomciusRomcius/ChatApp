@@ -1,15 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChatApp.Presentation.ChatRoomMessaging
+namespace ChatApp.Presentation.ChatRoomMessaging;
+
+public class GetChatRoomMessageDto
 {
-    public class GetChatRoomMessageDto
-    {
-        [Required]
-        public required string ChatRoomId { get; set; }
-        [Required]
-        [Range(1, 20)]
-        public int NumberOfMessages { get; set; }
-        [Range(0, int.MaxValue)]
-        public int Offset { get; set; }
-    }
+    [Required] public required string ChatRoomId { get; set; }
+
+    [Required] [Range(1, 20)] public int NumberOfMessages { get; set; }
+
+    [Range(0, int.MaxValue)] public int Offset { get; set; }
 }

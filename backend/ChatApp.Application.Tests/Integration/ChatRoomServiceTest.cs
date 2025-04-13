@@ -1,93 +1,94 @@
+using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
+using ChatApp.Application.Services;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Utils;
-using ChatApp.Application.Interfaces;
-using ChatApp.Application.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.MsSql;
 
-namespace ChatApp.Application.Tests.Integration
+namespace ChatApp.Application.Tests.Integration;
+
+public class ChatRoomServiceTest : IAsyncLifetime
 {
-    public class ChatRoomServiceTest : IAsyncLifetime
+    private IChatRoomService? _chatRoomService;
+    private MsSqlContainer? _container;
+    private DatabaseContext? _databaseContext;
+
+    public async Task InitializeAsync()
     {
-        DatabaseContext? _databaseContext;
-        IChatRoomService? _chatRoomService;
-        MsSqlContainer? _container;
+        _container = new MsSqlBuilder().Build();
+        await _container.StartAsync();
+        string connectionString = _container.GetConnectionString();
 
-        public async Task InitializeAsync()
+        _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
+        await _databaseContext.Database.EnsureCreatedAsync();
+
+        _chatRoomService = new ChatRoomService(_databaseContext);
+    }
+
+    public async Task DisposeAsync()
+    {
+        await _container!.StopAsync();
+    }
+
+    [Fact]
+    public async Task UserShouldBeAbleToCreateAChatRoom()
+    {
+        var chatRoomName = "New chat room name";
+
+        var adminUser = new IdentityUser("adminUser");
+        var user2 = new IdentityUser("User2");
+
+        await _databaseContext!.Users.AddAsync(adminUser);
+        await _databaseContext.Users.AddAsync(user2);
+        await _databaseContext.UserFriends.AddAsync(new UserFriendEntity
         {
-            _container = new MsSqlBuilder().Build();
-            await _container.StartAsync();
-            string connectionString = _container.GetConnectionString();
+            InitiatorId = adminUser.Id,
+            ReceiverId = user2.Id,
+            Status = UserFriendStatus.FRIEND
+        });
+        await _databaseContext.SaveChangesAsync();
 
-            _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
-            await _databaseContext.Database.EnsureCreatedAsync();
+        Result<string> result = await _chatRoomService.CreateChatRoomAsync(adminUser.Id, chatRoomName, [user2.Id]);
 
-            _chatRoomService = new ChatRoomService(_databaseContext);
-        }
+        Assert.False(result.IsError());
+        IQueryable<ChatRoomEntity> query = _databaseContext.ChatRooms.Where(cr => cr.ChatRoomId == result.GetValue());
+        ChatRoomEntity? retrievedChatRoom = query.FirstOrDefault();
+        IQueryable<ChatRoomMemberEntity> membersQuery =
+            _databaseContext.ChatRoomMembers.Where(crm => crm.ChatRoomId == result.GetValue());
+        List<ChatRoomMemberEntity> retrievedMembers = membersQuery.ToList();
 
-        public async Task DisposeAsync()
+        Assert.NotNull(retrievedChatRoom);
+        Assert.Equal(2, retrievedMembers.Count());
+
+        Assert.Equal(chatRoomName, retrievedChatRoom.Name);
+        Assert.Equal(adminUser.Id, retrievedChatRoom.AdminUserId);
+    }
+
+    [Fact]
+    public async Task AdminUserShouldBeAbleToDeleteOwnedChatRoom()
+    {
+        var adminUser = new IdentityUser("adminUser");
+
+        await _databaseContext!.Users.AddAsync(adminUser);
+
+        var chatRoom = new ChatRoomEntity
         {
-            await _container!.StopAsync();
-        }
+            ChatRoomId = Guid.NewGuid().ToString(),
+            AdminUserId = adminUser.Id,
+            Name = "Name"
+        };
+        await _databaseContext!.ChatRooms.AddAsync(chatRoom);
+        await _databaseContext.SaveChangesAsync();
 
-        [Fact]
-        public async Task UserShouldBeAbleToCreateAChatRoom()
-        {
-            string chatRoomName = "New chat room name";
+        ResultError? error = await _chatRoomService.DeleteChatRoomAsync(adminUser.Id, chatRoom.ChatRoomId);
 
-            var adminUser = new IdentityUser("adminUser");
-            var user2 = new IdentityUser("User2");
+        List<ChatRoomEntity> retrievedChatRooms =
+            _databaseContext.ChatRooms.Where(cr => cr.ChatRoomId == chatRoom.ChatRoomId).ToList();
 
-            await _databaseContext!.Users.AddAsync(adminUser);
-            await _databaseContext.Users.AddAsync(user2);
-            await _databaseContext.UserFriends.AddAsync(new UserFriendEntity
-            {
-                InitiatorId = adminUser.Id,
-                ReceiverId = user2.Id,
-                Status = UserFriendStatus.FRIEND
-            });
-            await _databaseContext.SaveChangesAsync();
-
-            Result<string> result = await _chatRoomService.CreateChatRoomAsync(adminUser.Id, chatRoomName, [user2.Id]);
-
-            Assert.False(result.IsError());
-            var query = _databaseContext.ChatRooms.Where(cr => cr.ChatRoomId == result.GetValue());
-            var retrievedChatRoom = query.FirstOrDefault();
-            var membersQuery = _databaseContext.ChatRoomMembers.Where(crm => crm.ChatRoomId == result.GetValue());
-            var retrievedMembers = membersQuery.ToList();
-
-            Assert.NotNull(retrievedChatRoom);
-            Assert.Equal(2, retrievedMembers.Count());
-
-            Assert.Equal(chatRoomName, retrievedChatRoom.Name);
-            Assert.Equal(adminUser.Id, retrievedChatRoom.AdminUserId);
-        }
-
-        [Fact]
-        public async Task AdminUserShouldBeAbleToDeleteOwnedChatRoom()
-        {
-            var adminUser = new IdentityUser("adminUser");
-
-            await _databaseContext!.Users.AddAsync(adminUser);
-
-            var chatRoom = new ChatRoomEntity
-            {
-                ChatRoomId = Guid.NewGuid().ToString(),
-                AdminUserId = adminUser.Id,
-                Name = "Name"
-            };
-            await _databaseContext!.ChatRooms.AddAsync(chatRoom);
-            await _databaseContext.SaveChangesAsync();
-
-            ResultError? error = await _chatRoomService.DeleteChatRoomAsync(adminUser.Id, chatRoom.ChatRoomId);
-
-            var retrievedChatRooms = _databaseContext.ChatRooms.Where(cr => cr.ChatRoomId == chatRoom.ChatRoomId).ToList();
-
-            Assert.Null(error);
-            Assert.Empty(retrievedChatRooms);
-        }
+        Assert.Null(error);
+        Assert.Empty(retrievedChatRooms);
     }
 }

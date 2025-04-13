@@ -1,91 +1,86 @@
+using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
+using ChatApp.Application.Services.WebSockets;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
-using System.Text.Json;
-using ChatApp.Application.Services.WebSockets;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Application.Services;
+
+public class ChatRoomMessagingService : IChatRoomMessagingService
 {
-    public class ChatRoomMessagingService : IChatRoomMessagingService
+    private readonly DatabaseContext _databaseContext;
+    private readonly IWebSocketOperationsManager _webSocketOperationsManager;
+
+    public ChatRoomMessagingService(DatabaseContext databaseContext,
+        IWebSocketOperationsManager webSocketOperationsManager)
     {
-        readonly DatabaseContext _databaseContext;
-        readonly IWebSocketOperationsManager _webSocketOperationsManager;
+        _databaseContext = databaseContext;
+        _webSocketOperationsManager = webSocketOperationsManager;
+    }
 
-        public ChatRoomMessagingService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
+    public Result<List<TextMessageEntity>> GetChatRoomMessages(string userId, string chatRoomId, int offset, int count)
+    {
+        if (!IsInChatRoom(userId, chatRoomId))
+            return new Result<List<TextMessageEntity>>([
+                new ResultError(
+                    ResultErrorType.FORBIDDEN_ERROR,
+                    "Trying to send a message in a chat room in which you are not in"
+                )
+            ]);
+
+        IQueryable<TextMessageEntity> query = (from message in _databaseContext.TextMessages
+            where message.ChatRoomId == chatRoomId
+            orderby message.CreatedAt
+            select message).Skip(offset).Take(count);
+
+        List<TextMessageEntity> results = query.ToList();
+
+        return new Result<List<TextMessageEntity>>(results);
+    }
+
+    /// <returns>Message id</returns>
+    public async Task<Result<string>> SendChatRoomMessageAsync(string userId, string chatRoomId, string content)
+    {
+        var textMessage = new TextMessageEntity
         {
-            _databaseContext = databaseContext;
-            _webSocketOperationsManager = webSocketOperationsManager;
-        }
+            TextMessageId = Guid.NewGuid().ToString(),
+            Content = content,
+            SenderId = userId,
+            ChatRoomId = chatRoomId,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        public Result<List<TextMessageEntity>> GetChatRoomMessages(string userId, string chatRoomId, int offset, int count)
+        List<ResultError> errors = textMessage.Validate();
+        if (errors.Count > 0) return new Result<string>(errors);
+
+        await _databaseContext.TextMessages.AddAsync(textMessage);
+        await _databaseContext.SaveChangesAsync();
+
+        IQueryable<string> membersQuery = from member in _databaseContext.ChatRoomMembers
+            where member.ChatRoomId == chatRoomId
+            select member.MemberId;
+
+        List<string> memberIds = [.. membersQuery];
+
+        var socketMessageObj = new
         {
-            if (!IsInChatRoom(userId, chatRoomId))
-            {
-                return new Result<List<TextMessageEntity>>([
-                    new ResultError(
-                        ResultErrorType.FORBIDDEN_ERROR,
-                        "Trying to send a message in a chat room in which you are not in"
-                    )
-                ]);
-            }
+            Type = "chatroom-message",
+            Body = textMessage
+        };
 
-            var query = (from message in _databaseContext.TextMessages
-                         where message.ChatRoomId == chatRoomId
-                         orderby message.CreatedAt
-                         select message).Skip(offset).Take(count);
+        string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
+        _webSocketOperationsManager.EnqueueSendMessage(memberIds, socketMessageObjStr);
 
-            var results = query.ToList();
+        return new Result<string>(textMessage.TextMessageId);
+    }
 
-            return new Result<List<TextMessageEntity>>(results);
-        }
+    private bool IsInChatRoom(string userId, string chatRoomId)
+    {
+        IQueryable<int>? query = from chatRoomMember in _databaseContext.ChatRoomMembers
+            where chatRoomMember.ChatRoomId == chatRoomId && chatRoomMember.MemberId == userId
+            select 1;
 
-        /// <returns>Message id</returns>
-        public async Task<Result<string>> SendChatRoomMessageAsync(string userId, string chatRoomId, string content)
-        {
-            var textMessage = new TextMessageEntity
-            {
-                TextMessageId = Guid.NewGuid().ToString(),
-                Content = content,
-                SenderId = userId,
-                ChatRoomId = chatRoomId,
-                CreatedAt = DateTime.UtcNow,
-            };
-
-            var errors = textMessage.Validate();
-            if (errors.Count > 0)
-            {
-                return new Result<string>(errors);
-            }
-
-            await _databaseContext.TextMessages.AddAsync(textMessage);
-            await _databaseContext.SaveChangesAsync();
-
-            var membersQuery = from member in _databaseContext.ChatRoomMembers
-                               where member.ChatRoomId == chatRoomId
-                               select member.MemberId;
-
-            List<string> memberIds = [.. membersQuery];
-
-            var socketMessageObj = new
-            {
-                Type = "chatroom-message",
-                Body = textMessage
-            };
-
-            string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
-            _webSocketOperationsManager.EnqueueSendMessage(memberIds, socketMessageObjStr);
-
-            return new Result<string>(textMessage.TextMessageId);
-        }
-
-        private bool IsInChatRoom(string userId, string chatRoomId)
-        {
-            var query = from chatRoomMember in _databaseContext.ChatRoomMembers
-                        where chatRoomMember.ChatRoomId == chatRoomId && chatRoomMember.MemberId == userId
-                        select 1;
-
-            return query.Any();
-        }
+        return query.Any();
     }
 }

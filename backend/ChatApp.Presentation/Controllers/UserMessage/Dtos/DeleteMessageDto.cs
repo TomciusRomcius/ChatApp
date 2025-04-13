@@ -1,7 +1,6 @@
-namespace ChatApp.Presentation.UserFriend
+namespace ChatApp.Presentation.UserFriend;
+
+public class DeleteMessageDto
 {
-    public class DeleteMessageDto
-    {
-        public required string MessageId { get; set; }
-    }
+    public required string MessageId { get; set; }
 }

@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChatApp.Presentation.UserFriend
+namespace ChatApp.Presentation.UserFriend;
+
+public class AddFriendDto
 {
-    public class AddFriendDto
-    {
-        [Required]
-        public required string UserId { get; set; }
-    }
+    [Required] public required string UserId { get; set; }
 }

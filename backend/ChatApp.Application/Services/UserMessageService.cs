@@ -1,114 +1,103 @@
+using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
+using ChatApp.Application.Services.WebSockets;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text.Json;
-using ChatApp.Application.Services.WebSockets;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Application.Services;
+
+public class UserMessageService : IUserMessageService
 {
-    public class UserMessageService : IUserMessageService
+    private readonly DatabaseContext _databaseContext;
+    private readonly IWebSocketOperationsManager _webSocketOperationsManager;
+
+    public UserMessageService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
     {
-        readonly DatabaseContext _databaseContext;
-        readonly IWebSocketOperationsManager _webSocketOperationsManager;
+        _databaseContext = databaseContext;
+        _webSocketOperationsManager = webSocketOperationsManager;
+    }
 
-        public UserMessageService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
+    public Result<List<UserTextMessageModel>> GetMessages(string userId, string? friendId = null)
+    {
+        // If sender id is null, set the condition func to get all messages from all users
+        // else, get messages from a specific user with senderId 
+
+        IQueryable<UserTextMessageModel> query;
+        if (friendId is null)
+            query = from textMessage in _databaseContext.TextMessages
+                where textMessage.SenderId == userId || textMessage.ReceiverUserId == userId
+                select new UserTextMessageModel(
+                    textMessage.TextMessageId,
+                    textMessage.SenderId,
+                    textMessage.Content,
+                    textMessage.CreatedAt
+                );
+
+        else
+            query = from textMessage in _databaseContext.TextMessages
+                where
+                    (textMessage.SenderId == userId && textMessage.ReceiverUserId == friendId) ||
+                    (textMessage.SenderId == friendId && textMessage.ReceiverUserId == userId)
+                select new UserTextMessageModel(
+                    textMessage.TextMessageId,
+                    textMessage.SenderId,
+                    textMessage.Content,
+                    textMessage.CreatedAt
+                );
+        List<UserTextMessageModel> result = [.. query];
+        return new Result<List<UserTextMessageModel>>(result);
+    }
+
+    /// <returns>Message id</returns>
+    public async Task<Result<string>> SendMessage(string senderId, string receiverId, string messageContent)
+    {
+        var msg = new TextMessageEntity
         {
-            _databaseContext = databaseContext;
-            _webSocketOperationsManager = webSocketOperationsManager;
-        }
+            TextMessageId = Guid.NewGuid().ToString(),
+            Content = messageContent,
+            SenderId = senderId,
+            ChatRoomId = null,
+            ReceiverUserId = receiverId,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        public Result<List<UserTextMessageModel>> GetMessages(string userId, string? friendId = null)
+        List<ResultError>? errors = msg.Validate();
+        if (errors.Count > 0) return new Result<string>(errors);
+
+        await _databaseContext.TextMessages.AddAsync(msg);
+        await _databaseContext.SaveChangesAsync();
+
+        var socketMessageObj = new
         {
-            // If sender id is null, set the condition func to get all messages from all users
-            // else, get messages from a specific user with senderId 
+            Type = "user-message",
+            Body = msg
+        };
 
-            IQueryable<UserTextMessageModel> query;
-            if (friendId is null)
-            {
-                query = from textMessage in _databaseContext.TextMessages
-                        where textMessage.SenderId == userId || textMessage.ReceiverUserId == userId
-                        select new UserTextMessageModel(
-                            textMessage.TextMessageId,
-                            textMessage.SenderId,
-                            textMessage.Content,
-                            textMessage.CreatedAt
-                        );
-            }
+        string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
+        _webSocketOperationsManager.EnqueueSendMessage([receiverId], socketMessageObjStr);
 
-            else
-            {
-                query = from textMessage in _databaseContext.TextMessages
-                        where
-                        (textMessage.SenderId == userId && textMessage.ReceiverUserId == friendId) ||
-                        (textMessage.SenderId == friendId && textMessage.ReceiverUserId == userId)
+        return new Result<string>(msg.TextMessageId);
+    }
 
-                        select new UserTextMessageModel(
-                            textMessage.TextMessageId,
-                            textMessage.SenderId,
-                            textMessage.Content,
-                            textMessage.CreatedAt
-                        );
-            }
-            List<UserTextMessageModel> result = [.. query];
-            return new Result<List<UserTextMessageModel>>(result);
-        }
+    public ResultError? DeleteMessage(string userId, string messageId)
+    {
+        IQueryable<TextMessageEntity>? messageQuery =
+            _databaseContext.TextMessages.Where(tm => tm.TextMessageId == messageId);
 
-        /// <returns>Message id</returns>
-        public async Task<Result<string>> SendMessage(string senderId, string receiverId, string messageContent)
-        {
-            var msg = new TextMessageEntity
-            {
-                TextMessageId = Guid.NewGuid().ToString(),
-                Content = messageContent,
-                SenderId = senderId,
-                ChatRoomId = null,
-                ReceiverUserId = receiverId,
-                CreatedAt = DateTime.UtcNow
-            };
+        if (messageQuery.IsNullOrEmpty())
+            return new ResultError(ResultErrorType.VALIDATION_ERROR, "Message does not exist");
 
-            var errors = msg.Validate();
-            if (errors.Count > 0)
-            {
-                return new Result<string>(errors);
-            }
+        TextMessageEntity message = messageQuery.First();
 
-            await _databaseContext.TextMessages.AddAsync(msg);
-            await _databaseContext.SaveChangesAsync();
+        if (message.SenderId != userId)
+            return new ResultError(ResultErrorType.FORBIDDEN_ERROR,
+                "Trying to delete a message where user is not a sender");
 
-            var socketMessageObj = new
-            {
-                Type = "user-message",
-                Body = msg
-            };
-
-            string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
-            _webSocketOperationsManager.EnqueueSendMessage([receiverId], socketMessageObjStr);
-
-            return new Result<string>(msg.TextMessageId);
-        }
-
-        public ResultError? DeleteMessage(string userId, string messageId)
-        {
-            var messageQuery = _databaseContext.TextMessages.Where(tm => tm.TextMessageId == messageId);
-
-            if (messageQuery.IsNullOrEmpty())
-            {
-                return new ResultError(ResultErrorType.VALIDATION_ERROR, "Message does not exist");
-            }
-
-            var message = messageQuery.First();
-
-            if (message.SenderId != userId)
-            {
-                return new ResultError(ResultErrorType.FORBIDDEN_ERROR, "Trying to delete a message where user is not a sender");
-            }
-
-            messageQuery.ExecuteDelete();
-            return null;
-        }
+        messageQuery.ExecuteDelete();
+        return null;
     }
 }

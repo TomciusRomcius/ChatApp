@@ -1,38 +1,38 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace ChatApp.Application.Utils
+namespace ChatApp.Application.Utils;
+
+public class MsSqlOptions
 {
-    public class MsSqlOptions
+    private bool CreatedFromConnectionString = false;
+
+    public MsSqlOptions(IConfiguration configuration, ILogger<MsSqlOptions> logger)
     {
-        public string Host { get; init; }
-        public string UserId { get; init; }
-        public string Password { get; init; }
-        public string Db { get; init; } = "db";
-        private bool CreatedFromConnectionString = false;
+        string? host = configuration["CA_MSSQL_HOST"];
+        UserId = configuration["CA_MSSQL_USERID"] ?? "sa";
+        string? password = configuration["CA_MSSQL_PASSWORD"];
 
-        public MsSqlOptions(IConfiguration configuration, ILogger<MsSqlOptions> logger)
-        {
-            string? host = configuration["CA_MSSQL_HOST"];
-            UserId = configuration["CA_MSSQL_USERID"] ?? "sa";
-            string? password = configuration["CA_MSSQL_PASSWORD"];
+        ArgumentNullException.ThrowIfNull(host);
+        ArgumentNullException.ThrowIfNull(password);
 
-            ArgumentNullException.ThrowIfNull(host);
-            ArgumentNullException.ThrowIfNull(password);
+        // TODO: temporarily logging, remove later
 
-            // TODO: temporarily logging, remove later
+        logger.LogInformation("INFO for mssql options");
+        logger.LogInformation(host);
+        logger.LogInformation(password);
 
-            logger.LogInformation("INFO for mssql options");
-            logger.LogInformation(host);
-            logger.LogInformation(password);
+        Host = host;
+        Password = password;
+    }
 
-            Host = host;
-            Password = password;
-        }
+    public string Host { get; init; }
+    public string UserId { get; init; }
+    public string Password { get; init; }
+    public string Db { get; init; } = "db";
 
-        public string GetConnectionString()
-        {
-            return $"Server={Host};Database={Db};User Id={UserId};Password={Password};TrustServerCertificate=True";
-        }
+    public string GetConnectionString()
+    {
+        return $"Server={Host};Database={Db};User Id={UserId};Password={Password};TrustServerCertificate=True";
     }
 }
