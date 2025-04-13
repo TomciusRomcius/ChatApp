@@ -4,6 +4,8 @@ using System.Buffers;
 using System.Security.Claims;
 using System.Text;
 using ChatApp.Application.Interfaces;
+using ChatApp.Application.Interfaces.WebSockets;
+using ChatApp.Application.Services.WebSockets;
 
 namespace ChatApp.Presentation.Websocket
 {
@@ -38,7 +40,7 @@ namespace ChatApp.Presentation.Websocket
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 var socketFinishedTcs = new TaskCompletionSource<object>();
-                _webSocketList.AddConnection(userId, new WebSocketConnection(webSocket, socketFinishedTcs));
+                _webSocketList.AddConnection(userId, new WebSocketConnection(userId, webSocket, socketFinishedTcs));
                 await socketFinishedTcs.Task;
             }
         }

@@ -1,7 +1,8 @@
 using ChatApp.Application.Interfaces;
+using ChatApp.Application.Interfaces.WebSockets;
 using Microsoft.Extensions.Logging;
 
-namespace ChatApp.Application.Services
+namespace ChatApp.Application.Services.WebSockets
 {
     // TODO: thread safety
     

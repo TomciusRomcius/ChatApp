@@ -1,6 +1,4 @@
-﻿using ChatApp.Application.Services;
-
-namespace ChatApp.Application.Interfaces;
+﻿namespace ChatApp.Application.Interfaces.WebSockets;
 public interface IWebSocketList
 {
     public void AddConnection(string userId, IWebSocketConnection socket);

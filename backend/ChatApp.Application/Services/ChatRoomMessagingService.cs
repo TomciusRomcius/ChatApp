@@ -3,18 +3,19 @@ using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
 using System.Text.Json;
+using ChatApp.Application.Services.WebSockets;
 
 namespace ChatApp.Application.Services
 {
     public class ChatRoomMessagingService : IChatRoomMessagingService
     {
         readonly DatabaseContext _databaseContext;
-        readonly IWebSocketOperations _webSocketOperations;
+        readonly IWebSocketOperationsManager _webSocketOperationsManager;
 
-        public ChatRoomMessagingService(DatabaseContext databaseContext, IWebSocketOperations webSocketOperations)
+        public ChatRoomMessagingService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
         {
             _databaseContext = databaseContext;
-            _webSocketOperations = webSocketOperations;
+            _webSocketOperationsManager = webSocketOperationsManager;
         }
 
         public Result<List<TextMessageEntity>> GetChatRoomMessages(string userId, string chatRoomId, int offset, int count)
@@ -73,7 +74,7 @@ namespace ChatApp.Application.Services
             };
 
             string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
-            _webSocketOperations.EnqueueSendMessage(memberIds, socketMessageObjStr);
+            _webSocketOperationsManager.EnqueueSendMessage(memberIds, socketMessageObjStr);
 
             return new Result<string>(textMessage.TextMessageId);
         }

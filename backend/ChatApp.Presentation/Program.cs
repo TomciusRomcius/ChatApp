@@ -1,5 +1,7 @@
 using ChatApp.Application.Interfaces;
+using ChatApp.Application.Interfaces.WebSockets;
 using ChatApp.Application.Services;
+using ChatApp.Application.Services.WebSockets;
 using ChatApp.Presentation.Initialization;
 using Microsoft.AspNetCore.Identity;
 
@@ -24,7 +26,8 @@ builder.Services.AddHostedService<BackgroundTaskRunner>();
 
 // Websockets
 builder.Services.AddSingleton<IWebSocketList, WebSocketList>();
-builder.Services.AddSingleton<IWebSocketOperations, WebSocketOperations>();
+builder.Services.AddSingleton<IWebSocketOperationsManager, WebSocketOperationsManager>();
+builder.Services.AddSingleton<IWebSocketMessenger, WebSocketMessenger>();
 
 // Services for controllers:
 builder.Services.AddScoped<IUserFriendService, UserFriendService>();

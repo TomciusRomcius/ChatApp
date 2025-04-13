@@ -6,18 +6,19 @@ using ChatApp.Domain.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
+using ChatApp.Application.Services.WebSockets;
 
 namespace ChatApp.Application.Services
 {
     public class UserMessageService : IUserMessageService
     {
         readonly DatabaseContext _databaseContext;
-        readonly IWebSocketOperations _webSocketOperations;
+        readonly IWebSocketOperationsManager _webSocketOperationsManager;
 
-        public UserMessageService(DatabaseContext databaseContext, IWebSocketOperations webSocketOperations)
+        public UserMessageService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
         {
             _databaseContext = databaseContext;
-            _webSocketOperations = webSocketOperations;
+            _webSocketOperationsManager = webSocketOperationsManager;
         }
 
         public Result<List<UserTextMessageModel>> GetMessages(string userId, string? friendId = null)
@@ -85,7 +86,7 @@ namespace ChatApp.Application.Services
             };
 
             string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
-            _webSocketOperations.EnqueueSendMessage([receiverId], socketMessageObjStr);
+            _webSocketOperationsManager.EnqueueSendMessage([receiverId], socketMessageObjStr);
 
             return new Result<string>(msg.TextMessageId);
         }
