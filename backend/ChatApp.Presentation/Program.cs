@@ -22,7 +22,7 @@ IdentityInitializer.Initialize(builder);
 
 // Background tasks
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-builder.Services.AddHostedService<BackgroundTaskRunner>();
+builder.Services.AddHostedService<IOBackgroundRunner>();
 
 // Websockets
 builder.Services.AddSingleton<IWebSocketList, WebSocketList>();

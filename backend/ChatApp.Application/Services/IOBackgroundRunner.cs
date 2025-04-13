@@ -3,12 +3,12 @@ using Microsoft.Extensions.Logging;
 
 namespace ChatApp.Application.Services;
 
-public class BackgroundTaskRunner : IHostedService
+public class IOBackgroundRunner : IHostedService
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-    private readonly ILogger<BackgroundTaskRunner> _logger;
+    private readonly ILogger<IOBackgroundRunner> _logger;
 
-    public BackgroundTaskRunner(IBackgroundTaskQueue backgroundTaskQueue, ILogger<BackgroundTaskRunner> logger)
+    public IOBackgroundRunner(IBackgroundTaskQueue backgroundTaskQueue, ILogger<IOBackgroundRunner> logger)
     {
         _backgroundTaskQueue = backgroundTaskQueue;
         _logger = logger;
@@ -16,7 +16,7 @@ public class BackgroundTaskRunner : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        Task.Run(ProcessQueueAsync);
+        Task.Run(ProcessQueueAsync, CancellationToken.None).ConfigureAwait(false);
         return Task.CompletedTask;
     }
 
@@ -30,23 +30,12 @@ public class BackgroundTaskRunner : IHostedService
         // TODO: Cancellation token support
         while (true)
         {
-            Func<Task>? task = _backgroundTaskQueue.Dequeue();
-            if (task is not null)
+            Func<Task>? func = _backgroundTaskQueue.Dequeue();
+            if (func is not null)
             {
+                // TODO: store tasks and log errors
                 _logger.LogDebug("Executing a background task");
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        await task();
-                        _logger.LogDebug("Background task executed");
-                    }
-
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex.ToString());
-                    }
-                });
+                var task = func();
             }
             else
             {

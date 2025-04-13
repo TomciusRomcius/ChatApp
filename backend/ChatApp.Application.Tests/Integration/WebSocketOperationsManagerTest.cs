@@ -8,7 +8,7 @@ namespace ChatApp.Application.Tests.Integration;
 
 public class WebSocketOperationsManagerTest
 {
-    private readonly BackgroundTaskRunner _backgroundTaskRunner;
+    private readonly IOBackgroundRunner _ioBackgroundRunner;
     private readonly Mock<IWebSocketList> _webSocketList;
     private readonly Mock<IWebSocketMessenger> _webSocketMessenger;
     private readonly WebSocketOperationsManager _webSocketOperationsManager;
@@ -18,9 +18,9 @@ public class WebSocketOperationsManagerTest
         _webSocketList = new Mock<IWebSocketList>();
         _webSocketMessenger = new Mock<IWebSocketMessenger>();
         var backgroundTaskQueue = new BackgroundTaskQueue();
-        _backgroundTaskRunner = new BackgroundTaskRunner(
+        _ioBackgroundRunner = new IOBackgroundRunner(
             backgroundTaskQueue,
-            new Mock<ILogger<BackgroundTaskRunner>>().Object
+            new Mock<ILogger<IOBackgroundRunner>>().Object
         );
 
         _webSocketOperationsManager = new WebSocketOperationsManager(
@@ -62,7 +62,7 @@ public class WebSocketOperationsManagerTest
         // Start background task runner which will process send message task
         // and stop the runner after 1 second
         var cts = new CancellationTokenSource();
-        Task startAsyncTask = _backgroundTaskRunner.StartAsync(cts.Token);
+        Task startAsyncTask = _ioBackgroundRunner.StartAsync(cts.Token);
         await Task.Delay(TimeSpan.FromSeconds(1));
         await cts.CancelAsync();
 
