@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --color-background-0: #101011;
+    --color-background-100: #1c1c21;
+    --color-background-200: #31313d;
+    --color-background-popup: #0c0c0e;
+    --color-text: #f2f2f8;
+    --color-text-lighter: #bbbbbe;
+    --color-accent: #2020e8;
+}
+
 h1,
 h2,
 h3,
@@ -10,14 +20,10 @@ h5,
 h6,
 p,
 input,
+label,
+input:focus,
 button {
     color: var(--color-text);
     background: none;
-}
-
-:root {
-    --color-background-0: #f4f4f9;
-    --color-background-100: #eeeef4;
-    --color-text: #050528;
-    --color-text-lighter: #050528;
+    outline: none;
 }

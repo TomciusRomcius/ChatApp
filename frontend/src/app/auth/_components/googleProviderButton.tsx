@@ -20,5 +20,5 @@ export default function GoogleProviderButton({ text }: { text: string }) {
         );
     };
 
-    return <button onClick={handleClick}>{text}</button>;
+    return <button className="bg-white text-background-0 p-2 rounded-md" onClick={handleClick}>{text}</button>;
 }

@@ -3,6 +3,9 @@
 import { FormEvent } from "react";
 import { authService } from "../authService";
 import GoogleProviderButton from "../_components/googleProviderButton";
+import AuthFlowLayout from "../_components/authFlowLayout";
+import Input from "@/components/Input";
+import ButtonWithPassword from "@/app/auth/_components/buttonWithPassword";
 
 export default function SignInPage() {
     const handleSignIn = (ev: FormEvent) => {
@@ -19,20 +22,20 @@ export default function SignInPage() {
     };
 
     return (
-        <div className="w-screen min-h-screen flex items-center justify-center">
+        <AuthFlowLayout>
             <form onSubmit={handleSignIn} method="POST">
-                <div className="p-4 flex flex-col gap-4 border-red-700 border-2">
-                    <input name="username" placeholder="Username" />
-                    <input name="email" placeholder="Email" />
-                    <input name="password" placeholder="Password" />
-                    <input
+                <div className="p-8 rounded-md flex flex-col gap-4 bg-background-100">
+                    <Input className="text-textLighter" name="username" placeholder="Username" />
+                    <Input className="text-textLighter" name="email" placeholder="Email" />
+                    <Input className="text-textLighter" name="password" placeholder="Password" />
+                    <ButtonWithPassword
                         type="submit"
                         value="Sign in"
-                        className="bg-stone-700 border-red-700 cursor-pointer"
+                        className="p-2 rounded-md bg-accent cursor-pointer"
                     />
                     <GoogleProviderButton text="Sign in with google!" />
                 </div>
             </form>
-        </div>
+        </AuthFlowLayout>
     );
 }

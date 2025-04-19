@@ -30,14 +30,16 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
                         ></Message>
                     ))}
                 </div>
-
-                <div className="w-full px-4 py-2 flex items-center justify-between bg-gray-200">
-                    <input
-                        ref={sendMessageRef}
-                        className="h-full"
-                        placeholder="Send message"
-                    />
-                    <button onClick={onSendMessage}>Send</button>
+                
+                <div className="flex justify-center items-center">
+                    <div className="w-full p-4 flex items-center justify-between bg-background-100 rounded-md">
+                        <input
+                            ref={sendMessageRef}
+                            className="h-auto"
+                            placeholder="Send message"
+                        />
+                        <button onClick={onSendMessage}>Send</button>
+                    </div>
                 </div>
             </div>
         </div>

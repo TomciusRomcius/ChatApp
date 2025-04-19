@@ -24,7 +24,7 @@ export default function Popup(props: PopupProps) {
 
     return (
         <div className="fixed w-screen h-screen flex items-center justify-center">
-            <div className="absolute top-0 left-0 w-full h-full bg-text opacity-50"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-background-popup opacity-75"></div>
             <div
                 className={`z-10 p-4 bg-background-0 rounded-sm ${props.className}`}
             >

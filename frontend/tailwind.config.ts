@@ -12,9 +12,12 @@ export default {
                 background: {
                     0: "var(--color-background-0)",
                     100: "var(--color-background-100)",
+                    200: "var(--color-background-200)",
+                    popup: "var(--color-background-popup)",
                 },
                 text: "var(--color-text)",
                 textLighter: "var(--color-text-lighter)",
+                accent: "var(--color-accent)",
             },
         },
     },

@@ -59,6 +59,7 @@ export default function Sidebar(props: SidebarProps) {
                         <SidebarUser
                             key={friend.userId}
                             username={friend.userName}
+                            chatId={friend.userId}
                         ></SidebarUser>
                     </button>
                 ))}
@@ -71,6 +72,7 @@ export default function Sidebar(props: SidebarProps) {
                         <SidebarUser
                             key={chatRoom.chatRoomId}
                             username={chatRoom.name}
+                            chatId={chatRoom.chatRoomId}
                         ></SidebarUser>
                     </button>
                 ))}

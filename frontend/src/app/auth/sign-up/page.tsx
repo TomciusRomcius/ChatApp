@@ -2,6 +2,7 @@
 
 import { FormEvent } from "react";
 import { authService } from "../authService";
+import Input from "@/components/Input";
 
 export default function SignUpPage() {
     const handleSignIn = (ev: FormEvent) => {
@@ -21,10 +22,10 @@ export default function SignUpPage() {
         <div className="flex min-h-screen w-screen items-center justify-center">
             <form onSubmit={handleSignIn} method="POST">
                 <div className="p-4 gap-4 border-red-700 flex flex-col border-2">
-                    <input name="username" placeholder="Username" />
-                    <input name="email" placeholder="Email" />
-                    <input name="password" placeholder="Password" />
-                    <input
+                    <Input name="username" placeholder="Username" />
+                    <Input name="email" placeholder="Email" />
+                    <Input name="password" placeholder="Password" />
+                    <Input
                         type="submit"
                         value="Sign up"
                         className="text-white p-2 bg-stone-700 border-red-700 cursor-pointer"
