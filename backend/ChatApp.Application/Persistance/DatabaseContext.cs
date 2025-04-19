@@ -19,6 +19,7 @@ public class DatabaseContext : IdentityDbContext
     public DbSet<ChatRoomEntity> ChatRooms { get; set; }
     public DbSet<ChatRoomMemberEntity> ChatRoomMembers { get; set; }
     public DbSet<TextMessageEntity> TextMessages { get; set; }
+    public DbSet<PublicUserInfoEntity> PublicUserInfos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,6 +81,12 @@ public class DatabaseContext : IdentityDbContext
             .HasOne(tm => tm.ReceiverUser)
             .WithMany()
             .HasForeignKey(tm => tm.ReceiverUserId);
+        
+        modelBuilder.Entity<PublicUserInfoEntity>().HasKey(pui => pui.UserId);
+        modelBuilder.Entity<PublicUserInfoEntity>()
+            .HasOne(pui => pui.User)
+            .WithOne()
+            .HasForeignKey<PublicUserInfoEntity>(pui => pui.UserId);
 
         base.OnModelCreating(modelBuilder);
     }

@@ -4,6 +4,7 @@ using ChatApp.Application.Services;
 using ChatApp.Application.Services.WebSockets;
 using ChatApp.Presentation.Initialization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,7 @@ builder.Services.AddScoped<IUserFriendService, UserFriendService>();
 builder.Services.AddScoped<IUserMessageService, UserMessageService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddScoped<IChatRoomMessagingService, ChatRoomMessagingService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

@@ -1,4 +1,9 @@
 using System.Security.Claims;
+using ChatApp.Application.Interfaces;
+using ChatApp.Domain.Entities;
+using ChatApp.Domain.Utils;
+using ChatApp.Presentation.User.Dtos;
+using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +15,13 @@ public class UserController : ControllerBase
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly IUserService _userService;
 
-    public UserController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+    public UserController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUserService userService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _userService = userService;
     }
 
     [HttpGet("whoami")]
@@ -36,5 +43,38 @@ public class UserController : ControllerBase
             user.Email,
             user.Id
         });
+    }
+
+    [HttpGet("user-info")]
+    public async Task<IActionResult> GetUserInfo([FromBody] GetUserInfoDto dto)
+    {
+        string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null) return Unauthorized();
+        
+        Result<List<PublicUserInfoEntity>> result = await _userService.GetPublicUserInfos(dto.UserId ?? [userId]);
+        if (result.IsError())
+            return ControllerUtils.OutputErrorResult(result.Errors.First());
+        
+        return Ok(result.GetValue().FirstOrDefault());
+    }
+
+    [HttpPost("user-info")]
+    public async Task<IActionResult> SetUserInfo([FromBody] SetUserInfoDto dto)
+    {
+        string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
+            ?.Value;
+
+        if (userId is null) return Unauthorized();
+        
+        List<ResultError> errors = await _userService.SetUserInfo(new PublicUserInfoEntity
+        {
+            UserId = userId,
+            Username = dto.Username
+        });
+
+        if (errors.Any())
+            ControllerUtils.OutputErrorResult(errors.First());
+
+        return Created();
     }
 }
