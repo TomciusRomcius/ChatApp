@@ -27,10 +27,9 @@ public class UserController : ControllerBase
     [HttpGet("whoami")]
     public async Task<IActionResult> WhoAmIAsync()
     {
-        string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
-            ?.Value;
-
-        if (userId is null) return Unauthorized();
+        string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
+        if (userId is null) 
+            return Unauthorized();
 
         IdentityUser? user = await _userManager.FindByIdAsync(userId);
         // If user is invalid, then expire the cookie
@@ -48,8 +47,9 @@ public class UserController : ControllerBase
     [HttpGet("user-info")]
     public async Task<IActionResult> GetUserInfo([FromBody] GetUserInfoDto dto)
     {
-        string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId is null) return Unauthorized();
+        string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
+        if (userId is null) 
+            return Unauthorized();
         
         Result<List<PublicUserInfoEntity>> result = await _userService.GetPublicUserInfos(dto.UserId ?? [userId]);
         if (result.IsError())
@@ -61,8 +61,7 @@ public class UserController : ControllerBase
     [HttpPost("user-info")]
     public async Task<IActionResult> SetUserInfo([FromBody] SetUserInfoDto dto)
     {
-        string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
-            ?.Value;
+        string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
 
         if (userId is null) return Unauthorized();
         
