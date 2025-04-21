@@ -2,6 +2,7 @@ using System.Collections;
 using System.Security.Claims;
 using ChatApp.Application.Interfaces;
 using ChatApp.Domain.Entities.UserFriend;
+using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
 using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ public class UserFriendController : ControllerBase
 
         if (userId is null) return Unauthorized();
 
-        Result<ArrayList> result =
+        Result<List<UserModel>> result =
             _userFriendService.GetUserFriends(dto.UserId ?? userId, dto.Status ?? UserFriendStatus.FRIEND);
 
         if (!result.IsError()) return Ok(result.GetValue());

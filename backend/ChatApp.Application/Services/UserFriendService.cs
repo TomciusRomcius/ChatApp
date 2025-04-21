@@ -2,6 +2,7 @@ using System.Collections;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities.UserFriend;
+using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,38 +17,32 @@ public class UserFriendService : IUserFriendService
         _databaseContext = databaseContext;
     }
 
-    public Result<ArrayList> GetUserFriends(string userId, byte status = UserFriendStatus.FRIEND)
+    public Result<List<UserModel>> GetUserFriends(string userId, byte status = UserFriendStatus.FRIEND)
     {
-        // Where the given user is the initiator and a friend is a receiver
+        // Where the caller is the initiator and a friend is a receiver
         IQueryable? query1 = null;
+        
+        query1 = from friend in _databaseContext.UserFriends
+            join receiver in _databaseContext.Users
+                on friend.ReceiverId equals receiver.Id
+            join info in _databaseContext.PublicUserInfos
+                on receiver.Id equals info.UserId
+            where friend.InitiatorId == userId && friend.Status == status
+            select new UserModel(receiver.Id, info.Username);
 
-        if (status == UserFriendStatus.FRIEND)
-            query1 = from friend in _databaseContext.UserFriends
-                join receiver in _databaseContext.Users
-                    on friend.ReceiverId equals receiver.Id
-                where friend.InitiatorId == userId && friend.Status == status
-                select new
-                {
-                    UserId = receiver.Id, receiver.UserName
-                };
-
-        // Where the given user is the receiver and a friend is an initiator
+        // Where the caller is the receiver and a friend is an initiator
         var query2 = from friend in _databaseContext.UserFriends
             join initiator in _databaseContext.Users
-                on friend.InitiatorId equals initiator.Id
+            on friend.InitiatorId equals initiator.Id
+            join info in _databaseContext.PublicUserInfos
+            on initiator.Id equals info.UserId
             where friend.ReceiverId == userId && friend.Status == status
-            select new
-            {
-                UserId = initiator.Id, initiator.UserName
-            };
+            select new UserModel(initiator.Id, info.Username);
 
-        ArrayList result = [];
-        if (query1 is not null)
-            result = [.. query1, .. query2];
-        else
-            result = [.. query2];
-
-        return new Result<ArrayList>(result);
+        List <UserModel> results1 = [..query1.OfType<UserModel>()];
+        List <UserModel> results2 = [..query2.OfType<UserModel>()];
+        
+        return new Result<List<UserModel>>([..results1, ..results2]);
     }
 
     public async Task<ResultError?> SendFriendRequest(string initiatorUserId, string receiverUserId)
@@ -65,15 +60,13 @@ public class UserFriendService : IUserFriendService
 
         ResultError? error = UserFriendEntity.Validate(entity);
 
-        if (error is null)
-        {
-            await _databaseContext.UserFriends.AddAsync(entity);
-            await _databaseContext.SaveChangesAsync();
+        if (error is not null) return error;
+        
+        await _databaseContext.UserFriends.AddAsync(entity);
+        await _databaseContext.SaveChangesAsync();
 
-            return null;
-        }
+        return null;
 
-        return error;
     }
 
     public async Task<ResultError?> AcceptFriendRequest(string initiatorUserId, string receiverUserId)

@@ -28,7 +28,7 @@ export function PageFunctionality() {
                 securityToken,
             )
             .then(() => {
-                router.replace("/application");
+                router.replace("/auth/account-setup");
             })
             .catch(() => {
                 router.replace("/auth/sign-in");

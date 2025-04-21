@@ -105,19 +105,20 @@
     <Folder Include="src\app\application\_components\_popupElements\" />
     <Folder Include="src\app\application\_components\_sidebar\" />
     <Folder Include="src\app\application\_utils\" />
-    <Folder Include="src\app\auth\" />
     <Folder Include="src\app\auth\code\" />
     <Folder Include="src\app\auth\sign-in\" />
     <Folder Include="src\app\auth\sign-up\" />
     <Folder Include="src\context\" />
     <Folder Include="src\services\" />
     <Folder Include="src\services\oidc\" />
-    <Folder Include="src\utils\" />
   </ItemGroup>
   <ItemGroup>
+    <Script Include="src\app\auth\account-setup\page.tsx" />
     <Script Include="src\app\auth\_components\authFlowLayout.tsx" />
     <Script Include="src\app\auth\_components\buttonWithPassword.tsx" />
     <Script Include="src\components\Input.tsx" />
+    <Script Include="src\utils\httpErrorResponse.ts" />
+    <Script Include="src\utils\Result.ts" />
     <Script Include="tailwind.config.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />

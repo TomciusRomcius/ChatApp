@@ -7,4 +7,5 @@ public interface IUserService
 {
     Task<Result<List<PublicUserInfoEntity>>> GetPublicUserInfos(List<string> userIds);
     Task<List<ResultError>> SetUserInfo(PublicUserInfoEntity entity);
+    public Task<bool> IsPublicInfoSetup(string userId);
 }

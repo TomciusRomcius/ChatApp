@@ -2,6 +2,7 @@
 using ChatApp.Application.Persistance;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.Services;
 
@@ -12,6 +13,14 @@ public class UserService : IUserService
     public UserService(DatabaseContext databaseContext)
     {
         _databaseContext = databaseContext;
+    }
+
+    public async Task<bool> IsPublicInfoSetup(string userId)
+    {
+        var query = _databaseContext.PublicUserInfos.Where(pui => pui.UserId == userId).Select(_ => 1);
+        
+        List<int> resultList = await query.ToListAsync();
+        return resultList.Count == 1;
     }
 
     public async Task<Result<List<PublicUserInfoEntity>>> GetPublicUserInfos(List<string> userIds)

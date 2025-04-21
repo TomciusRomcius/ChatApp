@@ -36,6 +36,12 @@ public class UserController : ControllerBase
         if (user is null)
             // await _signInManager.SignOutAsync();
             return Unauthorized("Expired");
+
+        if (!await _userService.IsPublicInfoSetup(userId))
+        {
+            return Unauthorized("Account setup required!");
+        }
+        
         return Ok(new
         {
             user.UserName,
