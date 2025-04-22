@@ -2,12 +2,16 @@ import { useContext, useRef, useState } from "react";
 import User from "../../_utils/user";
 import { AppState, AppStateContext } from "@/context/appStateContext";
 import ChatRoomService from "@/services/chatRoomService";
+import { ChatRoom } from "@/types";
+import CurrentUserContext from "@/context/currentUserContext";
 
 interface CreateChatroomProps {
     friends: User[];
+    onCreateChatRoom: (chatRoom: ChatRoom) => void;
 }
 
 export default function CreateChatroom(props: CreateChatroomProps) {
+    const { currentUser } = useContext(CurrentUserContext);
     const { setAppState } = useContext(AppStateContext);
     const chatRoomNameRef = useRef<HTMLInputElement>(null);
 
@@ -24,7 +28,18 @@ export default function CreateChatroom(props: CreateChatroomProps) {
             ChatRoomService.CreateChatRoom(
                 name,
                 members.map((member) => member.userId),
-            );
+            ).then(result => {
+                if (result.errors.length > 0) {
+                    alert("err");
+                }
+                else {
+                    props.onCreateChatRoom({
+                        name: name,
+                        chatRoomId: result.data!,
+                        adminUserId: currentUser.id,
+                    });   
+                }
+            });
             setAppState(AppState.DEFAULT);
         }
     };

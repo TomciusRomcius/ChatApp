@@ -78,6 +78,10 @@ export default function ClientSideApplication(
         [currentUser],
     );
 
+    const onCreateChatRoom = (chatRoom: ChatRoom) => {
+        setChatRooms([...chatRooms, chatRoom]);
+    }
+    
     useEffect(() => {
         UserFriendsService.GetAllFriends().then((friends) =>
             setFriends(friends),
@@ -144,7 +148,7 @@ export default function ClientSideApplication(
                             onClose={() => setAppState(AppState.DEFAULT)}
                             className="flex flex-col gap-2"
                         >
-                            <CreateChatroom friends={friends} />
+                            <CreateChatroom onCreateChatRoom={onCreateChatRoom} friends={friends} />
                         </Popup>
                     ) : null}
                     <Sidebar friends={friends} chatRooms={chatRooms} />
