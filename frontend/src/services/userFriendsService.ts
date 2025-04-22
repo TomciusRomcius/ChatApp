@@ -7,16 +7,19 @@ class _UserFriendsService {
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend`,
             { withCredentials: true },
         );
-        
+
         let result;
         if (Array.isArray(res.data)) {
-            result = res.data.map((user: any) => ({
-                userName: user.username,
-                userId: user.userId
-            } as User));
+            result = res.data.map(
+                (user: any) =>
+                    ({
+                        userName: user.username,
+                        userId: user.userId,
+                    }) as User,
+            );
         }
 
-        return result ?? [] as User[];
+        return result ?? ([] as User[]);
     }
 
     async GetAllFriendRequests(): Promise<User[]> {
@@ -28,13 +31,16 @@ class _UserFriendsService {
 
         let result;
         if (Array.isArray(res.data)) {
-            result = res.data.map((user: any) => ({
-                userName: user.username,
-                userId: user.userId
-            } as User));
+            result = res.data.map(
+                (user: any) =>
+                    ({
+                        userName: user.username,
+                        userId: user.userId,
+                    }) as User,
+            );
         }
 
-        return result ?? [] as User[];
+        return result ?? ([] as User[]);
     }
 
     async SendFriendRequest(userId: string): Promise<void> {

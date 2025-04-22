@@ -3,48 +3,45 @@ import { publicConfiguration } from "@/utils/configuration";
 import axios from "axios";
 import HttpErrorResponse from "@/utils/httpErrorResponse";
 
-interface UserInfoRequest
-{
+interface UserInfoRequest {
     username: string;
 }
 
 class _UserService {
     async WhoAmI(): Promise<Result<CurrentUser | null, string>> {
         let result: Result<CurrentUser | null, string> | null;
-        
+
         try {
             const res = await axios.get(
                 `${publicConfiguration.BACKEND_URL}/user/whoami`,
                 { withCredentials: true },
             );
-            
+
             result = {
                 data: res.data as CurrentUser | null,
-                errors: []
+                errors: [],
             };
-        }
-        catch (err) {
+        } catch (err) {
             if (axios.isAxiosError(err)) {
                 result = {
                     errors: [err.response?.data?.toString()],
                     data: null,
                 };
-            }
-            else {
+            } else {
                 result = {
                     errors: ["Unexpected error occurred."],
                     data: null,
-                }
+                };
             }
         }
 
         return result;
     }
-    
+
     async SetUserInfo(userInfo: UserInfoRequest): Promise<void> {
         const res = await axios.post(
             `${publicConfiguration.BACKEND_URL}/user/user-info`,
-            {...userInfo},
+            { ...userInfo },
             { withCredentials: true },
         );
     }

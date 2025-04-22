@@ -22,7 +22,9 @@ class _ChatRoomService {
     async GetChatRooms(): Promise<ChatRoom[]> {
         const res = await axios.get(
             `${publicConfiguration.BACKEND_URL}/chatroom`,
-            { withCredentials: true },
+            {
+                withCredentials: true,
+            },
         );
         // TODO: may return error
         return (res.data ?? []) as ChatRoom[];

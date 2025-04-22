@@ -1,5 +1,5 @@
 {
-  "version": "3.0",
-  "defaultProvider": "cdnjs",
-  "libraries": []
+    "version": "3.0",
+    "defaultProvider": "cdnjs",
+    "libraries": []
 }

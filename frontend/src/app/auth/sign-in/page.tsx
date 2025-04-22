@@ -24,14 +24,26 @@ export default function SignInPage() {
     return (
         <AuthFlowLayout>
             <form onSubmit={handleSignIn} method="POST">
-                <div className="p-8 rounded-md flex flex-col gap-4 bg-background-100">
-                    <Input className="text-textLighter" name="username" placeholder="Username" />
-                    <Input className="text-textLighter" name="email" placeholder="Email" />
-                    <Input className="text-textLighter" name="password" placeholder="Password" />
+                <div className="flex flex-col gap-4 rounded-md bg-background-100 p-8">
+                    <Input
+                        className="text-textLighter"
+                        name="username"
+                        placeholder="Username"
+                    />
+                    <Input
+                        className="text-textLighter"
+                        name="email"
+                        placeholder="Email"
+                    />
+                    <Input
+                        className="text-textLighter"
+                        name="password"
+                        placeholder="Password"
+                    />
                     <ButtonWithPassword
                         type="submit"
                         value="Sign in"
-                        className="p-2 rounded-md bg-accent cursor-pointer"
+                        className="cursor-pointer rounded-md bg-accent p-2"
                     />
                     <GoogleProviderButton text="Sign in with google!" />
                 </div>

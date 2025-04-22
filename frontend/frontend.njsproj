@@ -36,6 +36,7 @@
     <Content Include=".env">
       <SubType>Code</SubType>
     </Content>
+    <Content Include=".prettierrc" />
     <Content Include="Dockerfile" />
     <Content Include="libman.json" />
     <Content Include="tsconfig.json" />

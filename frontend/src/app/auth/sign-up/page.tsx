@@ -21,16 +21,16 @@ export default function SignUpPage() {
     return (
         <div className="flex min-h-screen w-screen items-center justify-center">
             <form onSubmit={handleSignIn} method="POST">
-                <div className="p-4 gap-4 border-red-700 flex flex-col border-2">
+                <div className="flex flex-col gap-4 border-2 border-red-700 p-4">
                     <Input name="username" placeholder="Username" />
                     <Input name="email" placeholder="Email" />
                     <Input name="password" placeholder="Password" />
                     <Input
                         type="submit"
                         value="Sign up"
-                        className="text-white p-2 bg-stone-700 border-red-700 cursor-pointer"
+                        className="cursor-pointer border-red-700 bg-stone-700 p-2 text-white"
                     />
-                    <button className="p-2 bg-stone-700">
+                    <button className="bg-stone-700 p-2">
                         Sign up with google
                     </button>
                 </div>

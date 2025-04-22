@@ -5,8 +5,9 @@ interface AuthFlowLayoutProps {
 }
 
 export default function AuthFlowLayout(props: AuthFlowLayoutProps) {
-    return <div className="w-screen min-h-screen flex items-center justify-center">
-        {props.children}
-    </div>  
-        
+    return (
+        <div className="flex min-h-screen w-screen items-center justify-center">
+            {props.children}
+        </div>
+    );
 }

@@ -13,7 +13,7 @@ export default function Message(props: MessageProps) {
 
     return (
         <div
-            className={`${isSender ? "self-end bg-background-100" : "self-start bg-background-100"} p-4 rounded-md flex flex-col gap-4`}
+            className={`${isSender ? "self-end bg-background-100" : "self-start bg-background-100"} flex flex-col gap-4 rounded-md p-4`}
         >
             <div
                 className={`flex flex-col gap-2 ${isSender ? "items-end" : "items-start"}`}

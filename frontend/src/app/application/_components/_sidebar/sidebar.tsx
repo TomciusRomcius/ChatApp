@@ -43,14 +43,14 @@ export default function Sidebar(props: SidebarProps) {
     console.log(props.chatRooms);
 
     return (
-        <div className="p-8 flex flex-col items-start gap-12 bg-background-100">
-            <div className="w-full flex flex-col gap-4 items-start">
+        <div className="col-span-2 flex flex-col items-start gap-12 bg-background-100 p-8 lg:col-span-1">
+            <div className="flex w-full flex-col items-start gap-4">
                 <button onClick={onClickAddFriend}>Add friend</button>
                 <button onClick={onClickFriendRequests}>Friend requests</button>
                 <button onClick={onClickCreateChatRoom}>Create a group</button>
             </div>
             {/* Friends and group list */}
-            <div className="w-full flex flex-col gap-4 items-start">
+            <div className="flex w-full flex-col items-start gap-4">
                 {props.friends.map((friend) => (
                     <button
                         key={friend.userId}

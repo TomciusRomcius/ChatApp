@@ -23,10 +23,10 @@ export default function Popup(props: PopupProps) {
     }, [props]);
 
     return (
-        <div className="fixed w-screen h-screen flex items-center justify-center">
-            <div className="absolute top-0 left-0 w-full h-full bg-background-popup opacity-75"></div>
+        <div className="fixed flex h-screen w-screen items-center justify-center">
+            <div className="absolute left-0 top-0 h-full w-full bg-background-popup opacity-75"></div>
             <div
-                className={`z-10 p-4 bg-background-0 rounded-sm ${props.className}`}
+                className={`z-10 rounded-sm bg-background-0 p-4 ${props.className}`}
             >
                 {props.children}
             </div>

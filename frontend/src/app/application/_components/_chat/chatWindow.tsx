@@ -14,7 +14,6 @@ export default function ChatWindow(props: ChatWindowProps) {
     const { currentUser } = useContext(CurrentUserContext);
     const { currentChat } = useContext(CurrentChatContext);
     const [messages, setMessages] = useState<TextMessage[]>([]);
-
     const onSendMessage = (content: string) => {
         if (!currentChat?.id || !content) {
             return;

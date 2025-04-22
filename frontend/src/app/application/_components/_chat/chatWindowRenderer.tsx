@@ -20,9 +20,9 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
     };
 
     return (
-        <div className="w-full h-screen px-64 py-8 col-span-5">
-            <div className="w-full h-full grid rows-10">
-                <div className="flex h-full overflow-y-auto flex-col gap-4 row-span-9">
+        <div className="h-screen w-full md:col-span-4 md:px-8 md:py-32 lg:col-span-5 lg:px-64 lg:py-8">
+            <div className="rows-10 grid h-full w-full">
+                <div className="row-span-9 flex h-full flex-col gap-4 overflow-y-auto">
                     {props.messages.map((textMessage) => (
                         <Message
                             key={Math.random() * 100}
@@ -30,15 +30,17 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
                         ></Message>
                     ))}
                 </div>
-                
-                <div className="flex justify-center items-center">
-                    <div className="w-full flex items-center justify-between bg-background-100 rounded-md">
+
+                <div className="flex items-center justify-center">
+                    <div className="flex w-full items-center justify-between rounded-md bg-background-100">
                         <input
                             ref={sendMessageRef}
                             className="h-auto w-full p-4"
                             placeholder="Send message"
                         />
-                        <button onClick={onSendMessage} className="p-4">Send</button>
+                        <button onClick={onSendMessage} className="p-4">
+                            Send
+                        </button>
                     </div>
                 </div>
             </div>
