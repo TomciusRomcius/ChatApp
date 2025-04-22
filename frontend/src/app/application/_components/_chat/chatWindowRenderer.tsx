@@ -32,13 +32,13 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
                 </div>
                 
                 <div className="flex justify-center items-center">
-                    <div className="w-full p-4 flex items-center justify-between bg-background-100 rounded-md">
+                    <div className="w-full flex items-center justify-between bg-background-100 rounded-md">
                         <input
                             ref={sendMessageRef}
-                            className="h-auto"
+                            className="h-auto w-full p-4"
                             placeholder="Send message"
                         />
-                        <button onClick={onSendMessage}>Send</button>
+                        <button onClick={onSendMessage} className="p-4">Send</button>
                     </div>
                 </div>
             </div>
