@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Popup from "../../components/popup";
 import { AppState, AppStateContext } from "../../context/appStateContext";
 import { CurrentChat, CurrentChatContext } from "../../context/currentChatContext";
@@ -27,7 +27,7 @@ export default function ClientSideApplication(props: ClientSideApplicationProps)
     const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
     const [newMessages, setNewMessages] = useState<TextMessage[]>([]);
 
-    const handleWsMessage = (ev: MessageEvent) => {
+    const handleWsMessage = useCallback((ev: MessageEvent) => {
         const msg = JSON.parse(ev.data);
 
         if (msg.Type == "user-message" || msg.Type == "chatroom-message") {
@@ -45,7 +45,7 @@ export default function ClientSideApplication(props: ClientSideApplicationProps)
                 setNewMessages([...newMessages, textMessage]);
             }
         }
-    };
+    }, [currentUser]);
 
     useEffect(() => {
         UserFriendsService.GetAllFriends().then((friends) =>
@@ -59,9 +59,15 @@ export default function ClientSideApplication(props: ClientSideApplicationProps)
         ChatRoomService.GetChatRooms().then((result) => {
             setChatRooms(result);
         });
-
-        props.webSocket.addEventListener("message", handleWsMessage);
     }, []);
+
+    useEffect(() => {
+        props.webSocket.addEventListener("message", handleWsMessage);
+
+        return () => {
+            props.webSocket.removeEventListener("message", handleWsMessage);
+        }
+    }, [handleWsMessage]);
 
     console.log(`Current chat: ${currentChat?.id}`);
 
