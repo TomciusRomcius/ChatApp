@@ -1,22 +1,49 @@
-import { useState, useEffect, useCallback } from "react";
+import {useCallback, useEffect, useState} from "react";
 import Popup from "../../components/popup";
-import { AppState, AppStateContext } from "../../context/appStateContext";
-import { CurrentChat, CurrentChatContext } from "../../context/currentChatContext";
+import {AppState, AppStateContext} from "../../context/appStateContext";
+import {CurrentChat, CurrentChatContext} from "../../context/currentChatContext";
 import CurrentUserContext from "../../context/currentUserContext";
 import ChatRoomService from "../../services/chatRoomService";
 import UserFriendsService from "../../services/userFriendsService";
-import TextMessage, { ChatRoom } from "../../types";
+import TextMessage, {ChatRoom} from "../../types";
 import ChatWindow from "./_components/_chat/chatWindow";
 import AddFriend from "./_components/_popupElements/addFriend";
 import CreateChatroom from "./_components/_popupElements/createChatRoom";
 import FriendRequests from "./_components/_popupElements/friendRequests";
 import Sidebar from "./_components/_sidebar/sidebar";
-import User, { CurrentUser } from "./_utils/user";
+import User, {CurrentUser} from "./_utils/user";
 
 interface ClientSideApplicationProps {
     currentUser: CurrentUser;
     webSocket: WebSocket;
 }
+
+function filterNewMessages(currentChat: CurrentChat | null, newMessages: TextMessage[]): TextMessage[] {
+    return !currentChat
+        ? []
+        : newMessages.filter((msg) => {
+            if (currentChat.type == "user") {
+                return currentChat.id == msg.senderId;
+            }
+
+            if (currentChat.type == "chatroom") {
+                return currentChat.id == msg.chatRoomId;
+            }
+        });
+}
+
+function getMessageFromWs(msg: any): TextMessage {
+    const ent = msg.Body;
+    
+    return {
+        content: ent.Content,
+        senderId: ent.SenderId,
+        receiverId: ent.ReceiverId,
+        chatRoomId: ent.ChatRoomId,
+        createdAt: ent.CreatedAt,
+    };
+}
+
 export default function ClientSideApplication(props: ClientSideApplicationProps) {
     const currentUser = props.currentUser;
 
@@ -32,14 +59,7 @@ export default function ClientSideApplication(props: ClientSideApplicationProps)
 
         if (msg.Type == "user-message" || msg.Type == "chatroom-message") {
             const ent = msg.Body;
-            const textMessage: TextMessage = {
-                content: ent.Content,
-                senderId: ent.SenderId,
-                receiverId: ent.ReceiverId,
-                chatRoomId: ent.ChatRoomId,
-                createdAt: ent.CreatedAt,
-            };
-            console.log(currentUser.id, textMessage.senderId)
+            const textMessage = getMessageFromWs(msg);
 
             if (textMessage.senderId != currentUser?.id) {
                 setNewMessages([...newMessages, textMessage]);
@@ -68,22 +88,8 @@ export default function ClientSideApplication(props: ClientSideApplicationProps)
             props.webSocket.removeEventListener("message", handleWsMessage);
         }
     }, [handleWsMessage]);
-
-    console.log(`Current chat: ${currentChat?.id}`);
-
-    const filteredChatNewMessages = !currentChat
-        ? []
-        : newMessages.filter((msg) => {
-            if (currentChat.type == "user") {
-                return currentChat.id == msg.senderId;
-            }
-
-            if (currentChat.type == "chatroom") {
-                return currentChat.id == msg.chatRoomId;
-            }
-        });
-
-    console.log(filteredChatNewMessages, newMessages, currentChat);
+    
+    const filteredChatNewMessages = filterNewMessages(currentChat, newMessages);
 
     return (
         <CurrentUserContext.Provider
