@@ -113,6 +113,7 @@
     <Folder Include="src\services\oidc\" />
   </ItemGroup>
   <ItemGroup>
+    <Script Include="next.config.ts" />
     <Script Include="src\app\auth\account-setup\page.tsx" />
     <Script Include="src\app\auth\_components\authFlowLayout.tsx" />
     <Script Include="src\app\auth\_components\buttonWithPassword.tsx" />
