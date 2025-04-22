@@ -41,11 +41,6 @@ public class WebSocketOperationsManager : IWebSocketOperationsManager
 
         _logger.LogDebug("Sending a WebSocket message to {Number} of sockets", webSockets.Count);
 
-        // Send message in parallel to all sockets
-        List<Task>? tasks = webSockets
-            .Select(socketConnection => _webSocketMessenger.SendMessage(socketConnection, message)).ToList();
-        // await Task.WhenAll(tasks);
-
         _backgroundTaskQueue.Enqueue(() => _webSocketMessenger.SendMessage(webSockets, message));
     }
 }
