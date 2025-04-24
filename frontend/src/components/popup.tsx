@@ -34,7 +34,7 @@ export default function Popup(props: PopupProps) {
     }, [props]);
 
     return (
-        <div onClick={onOutsideClick} ref={outsideContainerRef} className="fixed flex h-screen w-screen items-center justify-center">
+        <div onClick={onOutsideClick} ref={outsideContainerRef} className="fixed flex h-screen w-screen items-center justify-center z-10 top-0">
             <div className="absolute left-0 top-0 h-full w-full bg-background-popup opacity-75"></div>
             <div
                 onClick={onContainerMouseDown}
