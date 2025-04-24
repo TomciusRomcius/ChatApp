@@ -4,7 +4,7 @@ import { AppState, AppStateContext } from "../../context/appStateContext";
 import {
     CurrentChat,
     CurrentChatContext,
-} from "../../context/currentChatContext";
+} from "@/context/currentChatContext";
 import CurrentUserContext from "../../context/currentUserContext";
 import ChatRoomService from "../../services/chatRoomService";
 import UserFriendsService from "../../services/userFriendsService";
@@ -12,9 +12,9 @@ import TextMessage, { ChatRoom } from "../../types";
 import ChatWindow from "./_components/_chat/chatWindow";
 import AddFriend from "./_components/_popupElements/addFriend";
 import CreateChatroom from "./_components/_popupElements/createChatRoom";
-import FriendRequests from "./_components/_popupElements/friendRequests";
 import Sidebar from "./_components/_sidebar/sidebar";
 import User, { CurrentUser } from "./_utils/user";
+import { FriendsContext } from "@/context/friendsContext";
 
 interface ClientSideApplicationProps {
     currentUser: CurrentUser;
@@ -58,7 +58,6 @@ export default function ClientSideApplication(
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
     const [currentChat, setCurrentChat] = useState<CurrentChat | null>(null);
     const [friends, setFriends] = useState<User[]>([]);
-    const [friendRequests, setFriendRequests] = useState<User[]>([]);
     const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
     const [newMessages, setNewMessages] = useState<TextMessage[]>([]);
 
@@ -67,7 +66,6 @@ export default function ClientSideApplication(
             const msg = JSON.parse(ev.data);
 
             if (msg.Type == "user-message" || msg.Type == "chatroom-message") {
-                const ent = msg.Body;
                 const textMessage = getMessageFromWs(msg);
 
                 if (textMessage.senderId != currentUser?.id) {
@@ -86,10 +84,6 @@ export default function ClientSideApplication(
         UserFriendsService.GetAllFriends().then((friends) =>
             setFriends(friends),
         );
-
-        UserFriendsService.GetAllFriendRequests().then((requests) => {
-            setFriendRequests(requests);
-        });
 
         ChatRoomService.GetChatRooms().then((result) => {
             setChatRooms(result);
@@ -134,15 +128,6 @@ export default function ClientSideApplication(
                         </Popup>
                     ) : null}
 
-                    {appState == AppState.ACCEPT_FRIEND_REQUEST ? (
-                        <Popup
-                            onClose={() => setAppState(AppState.DEFAULT)}
-                            className="flex flex-col gap-2"
-                        >
-                            <FriendRequests friendRequests={friendRequests} />
-                        </Popup>
-                    ) : null}
-
                     {appState == AppState.CREATE_CHATROOM ? (
                         <Popup
                             onClose={() => setAppState(AppState.DEFAULT)}
@@ -151,7 +136,9 @@ export default function ClientSideApplication(
                             <CreateChatroom onCreateChatRoom={onCreateChatRoom} friends={friends} />
                         </Popup>
                     ) : null}
-                    <Sidebar friends={friends} chatRooms={chatRooms} />
+                    <FriendsContext value={{ friends: friends, setFriends: setFriends }}>
+                        <Sidebar friends={friends} chatRooms={chatRooms} />
+                    </FriendsContext>
                     <ChatWindow newMessages={filteredChatNewMessages} />
                 </CurrentChatContext.Provider>
             </AppStateContext.Provider>
