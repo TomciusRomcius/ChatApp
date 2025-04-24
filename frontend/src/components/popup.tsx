@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 
 interface PopupProps {
     children: ReactNode;
@@ -10,11 +10,11 @@ export default function Popup(props: PopupProps) {
     let outsideContainerRef = useRef<HTMLDivElement | null>(null);
     let containerRef = useRef<HTMLDivElement | null>(null);
 
-    const onOutsideClick = (e: MouseEvent) => {
+    const onOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
         props.onClose();
     }
 
-    const onContainerMouseDown = (e: MouseEvent) => {
+    const onContainerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
     }
 
