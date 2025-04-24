@@ -1,6 +1,9 @@
 using System.Collections;
+using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
+using ChatApp.Application.Services.WebSockets;
+using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
@@ -11,10 +14,14 @@ namespace ChatApp.Application.Services;
 public class UserFriendService : IUserFriendService
 {
     private readonly DatabaseContext _databaseContext;
-
-    public UserFriendService(DatabaseContext databaseContext)
+    private readonly IWebSocketOperationsManager _webSocketOperationsManager;
+    private readonly IUserService _userService;
+    
+    public UserFriendService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager, IUserService userService)
     {
         _databaseContext = databaseContext;
+        _webSocketOperationsManager = webSocketOperationsManager;
+        _userService = userService;
     }
 
     public Result<List<UserModel>> GetUserFriends(string userId, byte status = UserFriendStatus.FRIEND)
@@ -65,8 +72,27 @@ public class UserFriendService : IUserFriendService
         await _databaseContext.UserFriends.AddAsync(entity);
         await _databaseContext.SaveChangesAsync();
 
-        return null;
+        Result<List<PublicUserInfoEntity>> userInfoResult = await _userService.GetPublicUserInfos([initiatorUserId]);
+        if (userInfoResult.IsError())
+        {
+            return userInfoResult.Errors.First();
+        }
 
+        PublicUserInfoEntity? publicUserInfo = userInfoResult.GetValue().FirstOrDefault();
+        if (publicUserInfo is null)
+        {
+            return new ResultError(ResultErrorType.VALIDATION_ERROR, "User account is not set up");
+        }
+
+        string wsMessage = JsonSerializer.Serialize(new
+        {
+            Type = "new-friend-request",
+            Body = publicUserInfo
+        },  new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        
+        _webSocketOperationsManager.EnqueueSendMessage([receiverUserId], wsMessage);
+        
+        return null;
     }
 
     public async Task<ResultError?> AcceptFriendRequest(string initiatorUserId, string receiverUserId)
@@ -84,6 +110,26 @@ public class UserFriendService : IUserFriendService
         {
             return new ResultError(ResultErrorType.VALIDATION_ERROR, "The user is not inviting you to the friends");
         }
+        
+        Result<List<PublicUserInfoEntity>> userInfoResult = await _userService.GetPublicUserInfos([receiverUserId]);
+        if (userInfoResult.IsError())
+        {
+            return userInfoResult.Errors.First();
+        }
+
+        PublicUserInfoEntity? publicUserInfo = userInfoResult.GetValue().FirstOrDefault();
+        if (publicUserInfo is null)
+        {
+            return new ResultError(ResultErrorType.VALIDATION_ERROR, "User account is not set up");
+        }
+        
+        string wsMessage = JsonSerializer.Serialize(new
+        {
+            Type = "accepted-friend-request",
+            Body = publicUserInfo
+        }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+        
+        _webSocketOperationsManager.EnqueueSendMessage([initiatorUserId], wsMessage);
 
         return null;
     }

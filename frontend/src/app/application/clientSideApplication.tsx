@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Popup from "../../components/popup";
 import { AppState, AppStateContext } from "../../context/appStateContext";
-import {
-    CurrentChat,
-    CurrentChatContext,
-} from "@/context/currentChatContext";
+import { CurrentChat, CurrentChatContext } from "@/context/currentChatContext";
 import CurrentUserContext from "../../context/currentUserContext";
 import ChatRoomService from "../../services/chatRoomService";
 import UserFriendsService from "../../services/userFriendsService";
@@ -65,9 +62,8 @@ export default function ClientSideApplication(
         (ev: MessageEvent) => {
             const msg = JSON.parse(ev.data);
 
-            if (msg.Type == "user-message" || msg.Type == "chatroom-message") {
-                const textMessage = getMessageFromWs(msg);
-
+            if (msg.type == "user-message" || msg.Type == "chatroom-message") {
+                const textMessage = msg.body as TextMessage;
                 if (textMessage.senderId != currentUser?.id) {
                     setNewMessages([...newMessages, textMessage]);
                 }
@@ -78,8 +74,8 @@ export default function ClientSideApplication(
 
     const onCreateChatRoom = (chatRoom: ChatRoom) => {
         setChatRooms([...chatRooms, chatRoom]);
-    }
-    
+    };
+
     useEffect(() => {
         UserFriendsService.GetAllFriends().then((friends) =>
             setFriends(friends),
@@ -133,11 +129,20 @@ export default function ClientSideApplication(
                             onClose={() => setAppState(AppState.DEFAULT)}
                             className="flex flex-col gap-2"
                         >
-                            <CreateChatroom onCreateChatRoom={onCreateChatRoom} friends={friends} />
+                            <CreateChatroom
+                                onCreateChatRoom={onCreateChatRoom}
+                                friends={friends}
+                            />
                         </Popup>
                     ) : null}
-                    <FriendsContext value={{ friends: friends, setFriends: setFriends }}>
-                        <Sidebar friends={friends} chatRooms={chatRooms} />
+                    <FriendsContext
+                        value={{ friends: friends, setFriends: setFriends }}
+                    >
+                        <Sidebar
+                            webSocket={props.webSocket}
+                            friends={friends}
+                            chatRooms={chatRooms}
+                        />
                     </FriendsContext>
                     <ChatWindow newMessages={filteredChatNewMessages} />
                 </CurrentChatContext.Provider>

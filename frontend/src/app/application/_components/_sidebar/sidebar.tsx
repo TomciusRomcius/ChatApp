@@ -1,15 +1,17 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import User from "../../_utils/user";
 import SidebarUser from "./sidebarUser";
 import { AppState, AppStateContext } from "@/context/appStateContext";
 import { CurrentChatContext } from "@/context/currentChatContext";
-import { ChatRoom } from "@/types";
+import TextMessage, { ChatRoom } from "@/types";
 import UserFriendsService from "@/services/userFriendsService";
 import Popup from "@/components/popup";
 import FriendRequests from "@/app/application/_components/_popupElements/friendRequests";
 import { createPortal } from "react-dom";
+import { FriendsContext } from "@/context/friendsContext";
 
 interface SidebarProps {
+    webSocket: WebSocket;
     friends: User[];
     chatRooms: ChatRoom[];
 }
@@ -17,6 +19,7 @@ interface SidebarProps {
 export default function Sidebar(props: SidebarProps) {
     const { appState, setAppState } = useContext(AppStateContext);
     const { setCurrentChat } = useContext(CurrentChatContext);
+    const { friends, setFriends } = useContext(FriendsContext);
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
 
     const onClickAddFriend = () => {
@@ -45,28 +48,54 @@ export default function Sidebar(props: SidebarProps) {
         });
     };
 
+    const handleWsMessage = useCallback((ev: MessageEvent) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.type == "new-friend-request") {
+            let user = msg.body as User;
+            setFriendRequests([...friendRequests, user]);
+        } else if (msg.type == "accepted-friend-request") {
+            let user = msg.body as User;
+            setFriends([...friends, user]);
+        }
+    }, []);
+
     useEffect(() => {
         UserFriendsService.GetAllFriendRequests().then((requests) => {
             setFriendRequests(requests);
         });
     }, []);
+
+    useEffect(() => {
+        props.webSocket.addEventListener("message", handleWsMessage);
+
+        return () => {
+            props.webSocket.removeEventListener("message", handleWsMessage);
+        };
+    }, [handleWsMessage]);
     console.log(appState == AppState.ACCEPT_FRIEND_REQUEST);
     return (
         <>
-            {appState == AppState.ACCEPT_FRIEND_REQUEST ? (
-                createPortal((<Popup
-                    onClose={() => setAppState(AppState.DEFAULT)}
-                    className="flex flex-col gap-2"
-                >
-                    <FriendRequests friendRequests={friendRequests} />
-                </Popup>), document.body)
-            ) : null}
+            {appState == AppState.ACCEPT_FRIEND_REQUEST
+                ? createPortal(
+                      <Popup
+                          onClose={() => setAppState(AppState.DEFAULT)}
+                          className="flex flex-col gap-2"
+                      >
+                          <FriendRequests friendRequests={friendRequests} />
+                      </Popup>,
+                      document.body,
+                  )
+                : null}
 
             <div className="col-span-2 flex flex-col items-start gap-12 bg-background-100 p-8 lg:col-span-1">
                 <div className="flex w-full flex-col items-start gap-4">
                     <button onClick={onClickAddFriend}>Add friend</button>
-                    <button onClick={onClickFriendRequests}>Friend requests</button>
-                    <button onClick={onClickCreateChatRoom}>Create a group</button>
+                    <button onClick={onClickFriendRequests}>
+                        Friend requests
+                    </button>
+                    <button onClick={onClickCreateChatRoom}>
+                        Create a group
+                    </button>
                 </div>
                 {/* Friends and group list */}
                 <div className="flex w-full flex-col items-start gap-4">
@@ -77,7 +106,7 @@ export default function Sidebar(props: SidebarProps) {
                         >
                             <SidebarUser
                                 key={friend.userId}
-                                username={friend.userName}
+                                username={friend.username}
                                 chatId={friend.userId}
                             ></SidebarUser>
                         </button>
@@ -86,7 +115,9 @@ export default function Sidebar(props: SidebarProps) {
                     {props.chatRooms.map((chatRoom) => (
                         <button
                             key={chatRoom.chatRoomId}
-                            onClick={() => onSelectChatRoom(chatRoom.chatRoomId)}
+                            onClick={() =>
+                                onSelectChatRoom(chatRoom.chatRoomId)
+                            }
                         >
                             <SidebarUser
                                 key={chatRoom.chatRoomId}
@@ -98,6 +129,5 @@ export default function Sidebar(props: SidebarProps) {
                 </div>
             </div>
         </>
-        
     );
 }

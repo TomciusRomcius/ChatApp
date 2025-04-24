@@ -7,6 +7,5 @@ export interface FriendsContextData {
 }
 
 export const FriendsContext = createContext<FriendsContextData>(
-    {} as FriendsContextData
+    {} as FriendsContextData,
 );
-

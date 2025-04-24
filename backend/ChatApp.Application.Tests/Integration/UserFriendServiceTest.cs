@@ -1,10 +1,12 @@
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
 using ChatApp.Application.Services;
+using ChatApp.Application.Services.WebSockets;
 using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Testcontainers.MsSql;
 
 namespace ChatApp.Application.Tests.Integration;
@@ -24,7 +26,7 @@ public class UserFriendServiceTest : IAsyncLifetime
         _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
         await _databaseContext.Database.EnsureCreatedAsync();
 
-        _friendService = new UserFriendService(_databaseContext);
+        _friendService = new UserFriendService(_databaseContext, new Mock<IWebSocketOperationsManager>().Object, new Mock<IUserService>().Object);
     }
 
     public async Task DisposeAsync()

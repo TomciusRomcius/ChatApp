@@ -77,7 +77,9 @@ public class UserMessageService : IUserMessageService
             Body = msg
         };
 
-        string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
+        string socketMessageObjStr = JsonSerializer.Serialize(
+            socketMessageObj, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        );
         _webSocketOperationsManager.EnqueueSendMessage([receiverId], socketMessageObjStr);
 
         return new Result<string>(msg.TextMessageId);

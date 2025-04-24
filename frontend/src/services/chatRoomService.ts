@@ -12,7 +12,7 @@ class _ChatRoomService {
         memberIds: string[],
     ): Promise<Result<string, string>> {
         let result: Result<string, string> | null = null;
-        
+
         try {
             const res = await axios.post(
                 `${publicConfiguration.BACKEND_URL}/chatroom`,
@@ -21,26 +21,25 @@ class _ChatRoomService {
                     members: memberIds,
                 },
                 { withCredentials: true },
-            );           
-            
+            );
+
             const body = res.data as CreateChatRoomResponse;
             result = {
                 data: body.chatRoomId,
-                errors: []
+                errors: [],
             };
-        }
-        catch (err) {
+        } catch (err) {
             if (isAxiosError(err)) {
                 const msg = err.response?.data.message;
                 result = {
                     data: null,
-                    errors: [msg]
+                    errors: [msg],
                 };
             }
-            
+
             result = {
                 data: null,
-                errors: ["Unexpected error"]
+                errors: ["Unexpected error"],
             };
         }
 

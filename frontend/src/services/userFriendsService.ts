@@ -13,7 +13,7 @@ class _UserFriendsService {
             result = res.data.map(
                 (user: any) =>
                     ({
-                        userName: user.username,
+                        username: user.username,
                         userId: user.userId,
                     }) as User,
             );
@@ -34,7 +34,7 @@ class _UserFriendsService {
             result = res.data.map(
                 (user: any) =>
                     ({
-                        userName: user.username,
+                        username: user.username,
                         userId: user.userId,
                     }) as User,
             );

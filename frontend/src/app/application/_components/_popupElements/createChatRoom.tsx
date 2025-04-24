@@ -28,16 +28,15 @@ export default function CreateChatroom(props: CreateChatroomProps) {
             ChatRoomService.CreateChatRoom(
                 name,
                 members.map((member) => member.userId),
-            ).then(result => {
+            ).then((result) => {
                 if (result.errors.length > 0) {
                     alert("err");
-                }
-                else {
+                } else {
                     props.onCreateChatRoom({
                         name: name,
                         chatRoomId: result.data!,
                         adminUserId: currentUser.id,
-                    });   
+                    });
                 }
             });
             setAppState(AppState.DEFAULT);
@@ -63,7 +62,7 @@ export default function CreateChatroom(props: CreateChatroomProps) {
             <h2>Added members</h2>
             {members.length > 0
                 ? members.map((member) => (
-                      <p key={member.userId}>{member.userName}</p>
+                      <p key={member.userId}>{member.username}</p>
                   ))
                 : null}
             <h2>Invite others</h2>
@@ -74,7 +73,7 @@ export default function CreateChatroom(props: CreateChatroomProps) {
                     key={friend.userId}
                     onClick={() => addToChatroom(friend.userId)}
                 >
-                    {friend.userName}
+                    {friend.username}
                 </button>
             ))}
             <button onClick={onCreateChatRoom}>Create</button>

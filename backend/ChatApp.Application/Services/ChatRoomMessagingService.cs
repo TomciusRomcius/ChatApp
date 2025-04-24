@@ -69,7 +69,7 @@ public class ChatRoomMessagingService : IChatRoomMessagingService
             Body = textMessage
         };
 
-        string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj);
+        string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
         _webSocketOperationsManager.EnqueueSendMessage(memberIds, socketMessageObjStr);
 
         return new Result<string>(textMessage.TextMessageId);

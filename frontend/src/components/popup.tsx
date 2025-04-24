@@ -12,11 +12,11 @@ export default function Popup(props: PopupProps) {
 
     const onOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
         props.onClose();
-    }
+    };
 
     const onContainerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
-    }
+    };
 
     useEffect(() => {
         const onKeyDown = (ev: KeyboardEvent) => {
@@ -25,7 +25,7 @@ export default function Popup(props: PopupProps) {
                 window.removeEventListener("keydown", onKeyDown);
             }
         };
-        
+
         window.addEventListener("keydown", onKeyDown);
 
         return () => {
@@ -34,7 +34,11 @@ export default function Popup(props: PopupProps) {
     }, [props]);
 
     return (
-        <div onClick={onOutsideClick} ref={outsideContainerRef} className="fixed flex h-screen w-screen items-center justify-center z-10 top-0">
+        <div
+            onClick={onOutsideClick}
+            ref={outsideContainerRef}
+            className="fixed top-0 z-10 flex h-screen w-screen items-center justify-center"
+        >
             <div className="absolute left-0 top-0 h-full w-full bg-background-popup opacity-75"></div>
             <div
                 onClick={onContainerMouseDown}
