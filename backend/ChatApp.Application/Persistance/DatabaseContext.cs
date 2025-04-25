@@ -84,6 +84,9 @@ public class DatabaseContext : IdentityDbContext
         
         modelBuilder.Entity<PublicUserInfoEntity>().HasKey(pui => pui.UserId);
         modelBuilder.Entity<PublicUserInfoEntity>()
+            .HasIndex(pui => pui.Username)
+            .IsUnique();
+        modelBuilder.Entity<PublicUserInfoEntity>()
             .HasOne(pui => pui.User)
             .WithOne()
             .HasForeignKey<PublicUserInfoEntity>(pui => pui.UserId);
