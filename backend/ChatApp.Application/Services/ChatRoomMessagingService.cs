@@ -62,14 +62,18 @@ public class ChatRoomMessagingService : IChatRoomMessagingService
             select member.MemberId;
 
         List<string> memberIds = [.. membersQuery];
-
+        memberIds.Remove(userId); // Don't send notification to the sender
+        
         var socketMessageObj = new
         {
-            Type = "chatroom-message",
+            Type = "new-message",
             Body = textMessage
         };
 
-        string socketMessageObjStr = JsonSerializer.Serialize(socketMessageObj, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+        string socketMessageObjStr = JsonSerializer.Serialize(
+            socketMessageObj, 
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase}
+        );
         _webSocketOperationsManager.EnqueueSendMessage(memberIds, socketMessageObjStr);
 
         return new Result<string>(textMessage.TextMessageId);

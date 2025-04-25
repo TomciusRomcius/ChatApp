@@ -59,11 +59,9 @@ export default function ClientSideApplication(
         (ev: MessageEvent) => {
             const msg = JSON.parse(ev.data);
 
-            if (msg.type == "user-message" || msg.Type == "chatroom-message") {
+            if (msg.type == "new-message") {
                 const textMessage = msg.body as TextMessage;
-                if (textMessage.senderId != currentUser?.id) {
-                    setNewMessages([...newMessages, textMessage]);
-                }
+                setNewMessages([...newMessages, textMessage]);
             }
         },
         [currentUser],

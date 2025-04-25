@@ -73,7 +73,7 @@ public class UserMessageService : IUserMessageService
 
         var socketMessageObj = new
         {
-            Type = "user-message",
+            Type = "new-message",
             Body = msg
         };
 
