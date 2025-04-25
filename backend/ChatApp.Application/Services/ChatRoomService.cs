@@ -1,5 +1,7 @@
+using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistance;
+using ChatApp.Application.Services.WebSockets;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +11,12 @@ namespace ChatApp.Application.Services;
 public class ChatRoomService : IChatRoomService
 {
     private readonly DatabaseContext _databaseContext;
+    private readonly IWebSocketOperationsManager _webSocketOperationsManager;
 
-    public ChatRoomService(DatabaseContext databaseContext)
+    public ChatRoomService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
     {
         _databaseContext = databaseContext;
+        _webSocketOperationsManager = webSocketOperationsManager;
     }
 
     public Result<List<ChatRoomEntity>> GetChatRooms(string userId)
@@ -69,6 +73,21 @@ public class ChatRoomService : IChatRoomService
             );
 
             await _databaseContext.SaveChangesAsync();
+
+            var msg = new
+            {
+                Type = "added-to-chat-room",
+                Body = chatroom
+            };
+
+            var jsonMsg = JsonSerializer.Serialize(
+                msg, 
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            );
+            
+            List<string> wsReceivers = [..members];
+            wsReceivers.Remove(adminUserId);
+            _webSocketOperationsManager.EnqueueSendMessage(wsReceivers, jsonMsg);
         }
 
         return new Result<string>(chatroom.ChatRoomId);

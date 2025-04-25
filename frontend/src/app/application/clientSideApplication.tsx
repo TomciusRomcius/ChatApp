@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import Popup from "../../components/popup";
-import { AppState, AppStateContext } from "../../context/appStateContext";
+import { AppState, AppStateContext } from "@/context/appStateContext";
 import { CurrentChat, CurrentChatContext } from "@/context/currentChatContext";
 import CurrentUserContext from "../../context/currentUserContext";
-import ChatRoomService from "../../services/chatRoomService";
 import UserFriendsService from "../../services/userFriendsService";
-import TextMessage, { ChatRoom } from "../../types";
+import TextMessage from "../../types";
 import ChatWindow from "./_components/_chat/chatWindow";
 import AddFriend from "./_components/_popupElements/addFriend";
-import CreateChatroom from "./_components/_popupElements/createChatRoom";
 import Sidebar from "./_components/_sidebar/sidebar";
 import User, { CurrentUser } from "./_utils/user";
 import { FriendsContext } from "@/context/friendsContext";
@@ -55,7 +53,6 @@ export default function ClientSideApplication(
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
     const [currentChat, setCurrentChat] = useState<CurrentChat | null>(null);
     const [friends, setFriends] = useState<User[]>([]);
-    const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
     const [newMessages, setNewMessages] = useState<TextMessage[]>([]);
 
     const handleWsMessage = useCallback(
@@ -72,18 +69,10 @@ export default function ClientSideApplication(
         [currentUser],
     );
 
-    const onCreateChatRoom = (chatRoom: ChatRoom) => {
-        setChatRooms([...chatRooms, chatRoom]);
-    };
-
     useEffect(() => {
         UserFriendsService.GetAllFriends().then((friends) =>
             setFriends(friends),
         );
-
-        ChatRoomService.GetChatRooms().then((result) => {
-            setChatRooms(result);
-        });
     }, []);
 
     useEffect(() => {
@@ -123,25 +112,12 @@ export default function ClientSideApplication(
                             />
                         </Popup>
                     ) : null}
-
-                    {appState == AppState.CREATE_CHATROOM ? (
-                        <Popup
-                            onClose={() => setAppState(AppState.DEFAULT)}
-                            className="flex flex-col gap-2"
-                        >
-                            <CreateChatroom
-                                onCreateChatRoom={onCreateChatRoom}
-                                friends={friends}
-                            />
-                        </Popup>
-                    ) : null}
                     <FriendsContext
                         value={{ friends: friends, setFriends: setFriends }}
                     >
                         <Sidebar
                             webSocket={props.webSocket}
                             friends={friends}
-                            chatRooms={chatRooms}
                         />
                     </FriendsContext>
                     <ChatWindow newMessages={filteredChatNewMessages} />

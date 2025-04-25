@@ -3,17 +3,18 @@ import User from "../../_utils/user";
 import SidebarUser from "./sidebarUser";
 import { AppState, AppStateContext } from "@/context/appStateContext";
 import { CurrentChatContext } from "@/context/currentChatContext";
-import TextMessage, { ChatRoom } from "@/types";
+import { ChatRoom } from "@/types";
 import UserFriendsService from "@/services/userFriendsService";
 import Popup from "@/components/popup";
 import FriendRequests from "@/app/application/_components/_popupElements/friendRequests";
 import { createPortal } from "react-dom";
 import { FriendsContext } from "@/context/friendsContext";
+import ChatRoomService from "@/services/chatRoomService";
+import CreateChatroom from "@/app/application/_components/_popupElements/createChatRoom";
 
 interface SidebarProps {
     webSocket: WebSocket;
     friends: User[];
-    chatRooms: ChatRoom[];
 }
 
 export default function Sidebar(props: SidebarProps) {
@@ -21,6 +22,7 @@ export default function Sidebar(props: SidebarProps) {
     const { setCurrentChat } = useContext(CurrentChatContext);
     const { friends, setFriends } = useContext(FriendsContext);
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
+    const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
     const onClickAddFriend = () => {
         setAppState(AppState.ADD_FRIEND);
@@ -48,6 +50,10 @@ export default function Sidebar(props: SidebarProps) {
         });
     };
 
+    const onCreateChatRoom = (chatRoom: ChatRoom) => {
+        setChatRooms([...chatRooms, chatRoom]);
+    };
+
     const handleWsMessage = useCallback((ev: MessageEvent) => {
         const msg = JSON.parse(ev.data);
         if (msg.type == "new-friend-request") {
@@ -56,12 +62,20 @@ export default function Sidebar(props: SidebarProps) {
         } else if (msg.type == "accepted-friend-request") {
             let user = msg.body as User;
             setFriends([...friends, user]);
+        } else if (msg.type === "added-to-chat-room") {
+            const chatRoom = msg.body as ChatRoom;
+            setChatRooms([...chatRooms, chatRoom]);
         }
-    }, []);
+    }, [chatRooms]);
+    
 
     useEffect(() => {
         UserFriendsService.GetAllFriendRequests().then((requests) => {
             setFriendRequests(requests);
+        });
+
+        ChatRoomService.GetChatRooms().then((result) => {
+            setChatRooms(result);
         });
     }, []);
 
@@ -72,7 +86,7 @@ export default function Sidebar(props: SidebarProps) {
             props.webSocket.removeEventListener("message", handleWsMessage);
         };
     }, [handleWsMessage]);
-    console.log(appState == AppState.ACCEPT_FRIEND_REQUEST);
+    
     return (
         <>
             {appState == AppState.ACCEPT_FRIEND_REQUEST
@@ -82,6 +96,21 @@ export default function Sidebar(props: SidebarProps) {
                           className="flex flex-col gap-2"
                       >
                           <FriendRequests friendRequests={friendRequests} />
+                      </Popup>,
+                      document.body,
+                  )
+                : null}
+
+            {appState == AppState.CREATE_CHATROOM
+                ? createPortal(
+                      <Popup
+                          onClose={() => setAppState(AppState.DEFAULT)}
+                          className="flex flex-col gap-2"
+                      >
+                          <CreateChatroom
+                              onCreateChatRoom={onCreateChatRoom}
+                              friends={friends}
+                          />
                       </Popup>,
                       document.body,
                   )
@@ -99,7 +128,7 @@ export default function Sidebar(props: SidebarProps) {
                 </div>
                 {/* Friends and group list */}
                 <div className="flex w-full flex-col items-start gap-4">
-                    {props.friends.map((friend) => (
+                    {friends.map((friend) => (
                         <button
                             key={friend.userId}
                             onClick={() => onSelectUserChat(friend.userId)}
@@ -112,7 +141,7 @@ export default function Sidebar(props: SidebarProps) {
                         </button>
                     ))}
 
-                    {props.chatRooms.map((chatRoom) => (
+                    {chatRooms.map((chatRoom) => (
                         <button
                             key={chatRoom.chatRoomId}
                             onClick={() =>
