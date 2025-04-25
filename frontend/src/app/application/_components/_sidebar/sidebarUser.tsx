@@ -14,7 +14,7 @@ export default function SidebarUser(props: SidebarUserProps) {
     return (
         <div className="flex w-full gap-4">
             <small
-                className={`${isCurrentChat ? "bg-background-200 text-text" : "text-textLighter"} w-full rounded-md p-2 text-base`}
+                className={`${isCurrentChat ? "bg-background-200 text-text" : "text-textLighter"} w-full rounded-md p-2 text-sm`}
             >
                 {props.username}
             </small>
