@@ -11,11 +11,16 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
     const sendMessageRef = useRef<HTMLInputElement>(null);
 
     const onSendMessage = () => {
-        const content = sendMessageRef.current?.value;
+        if (!sendMessageRef.current) {
+            alert("Something went wrong");
+            return;
+        }
+        const content = sendMessageRef.current.value;
         if (!content) {
             return;
         }
-
+        
+        sendMessageRef.current.value = "";
         props.sendMessage(content);
     };
 
