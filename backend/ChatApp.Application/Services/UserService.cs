@@ -36,7 +36,12 @@ public class UserService : IUserService
             List<ResultError> errors = [new ResultError(ResultErrorType.NOT_FOUND, "User info row does not exist.")];
             result = new Result<List<PublicUserInfoEntity>>(errors);   
         }
-        return new Result<List<PublicUserInfoEntity>>(dbResult);
+        else
+        {
+            result = new Result<List<PublicUserInfoEntity>>(dbResult);
+        }
+        
+        return result;
     }
     
     public async Task<List<ResultError>> SetUserInfo(PublicUserInfoEntity entity)
