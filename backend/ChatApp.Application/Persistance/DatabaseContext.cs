@@ -31,14 +31,14 @@ public class DatabaseContext : IdentityDbContext
             .WithMany()
             .IsRequired()
             .HasForeignKey(uf => uf.InitiatorId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         modelBuilder.Entity<UserFriendEntity>()
             .HasOne(uf => uf.Receiver)
             .WithMany()
             .IsRequired()
             .HasForeignKey(uf => uf.ReceiverId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         modelBuilder.Entity<ChatRoomEntity>()
             .HasKey(cr => cr.ChatRoomId);
@@ -47,7 +47,7 @@ public class DatabaseContext : IdentityDbContext
             .HasOne(cr => cr.AdminUser)
             .WithMany()
             .HasForeignKey(cr => cr.AdminUserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         modelBuilder.Entity<ChatRoomMemberEntity>()
             .HasKey(crm => new { crm.ChatRoomId, crm.MemberId });
@@ -55,12 +55,14 @@ public class DatabaseContext : IdentityDbContext
         modelBuilder.Entity<ChatRoomMemberEntity>()
             .HasOne(crm => crm.ChatRoom)
             .WithMany()
-            .HasForeignKey(crm => crm.ChatRoomId);
+            .HasForeignKey(crm => crm.ChatRoomId)
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         modelBuilder.Entity<ChatRoomMemberEntity>()
             .HasOne(crm => crm.Member)
             .WithMany()
-            .HasForeignKey(crm => crm.MemberId);
+            .HasForeignKey(crm => crm.MemberId)
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         modelBuilder.Entity<TextMessageEntity>().HasKey(tm => tm.TextMessageId);
 
@@ -70,17 +72,20 @@ public class DatabaseContext : IdentityDbContext
         modelBuilder.Entity<TextMessageEntity>()
             .HasOne(tm => tm.ChatRoom)
             .WithMany()
-            .HasForeignKey(tm => tm.ChatRoomId);
+            .HasForeignKey(tm => tm.ChatRoomId)
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         modelBuilder.Entity<TextMessageEntity>()
             .HasOne(tm => tm.Sender)
             .WithMany()
-            .HasForeignKey(tm => tm.SenderId);
+            .HasForeignKey(tm => tm.SenderId)
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         modelBuilder.Entity<TextMessageEntity>()
             .HasOne(tm => tm.ReceiverUser)
             .WithMany()
-            .HasForeignKey(tm => tm.ReceiverUserId);
+            .HasForeignKey(tm => tm.ReceiverUserId)
+            .OnDelete(DeleteBehavior.ClientCascade);
         
         modelBuilder.Entity<PublicUserInfoEntity>().HasKey(pui => pui.UserId);
         modelBuilder.Entity<PublicUserInfoEntity>()
@@ -89,7 +94,8 @@ public class DatabaseContext : IdentityDbContext
         modelBuilder.Entity<PublicUserInfoEntity>()
             .HasOne(pui => pui.User)
             .WithOne()
-            .HasForeignKey<PublicUserInfoEntity>(pui => pui.UserId);
+            .HasForeignKey<PublicUserInfoEntity>(pui => pui.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }
