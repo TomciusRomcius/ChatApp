@@ -4,7 +4,8 @@ public enum ResultErrorType
 {
     VALIDATION_ERROR,
     FORBIDDEN_ERROR,
-    NOT_FOUND
+    NOT_FOUND,
+    UNKNOWN_ERROR
 }
 
 public class ResultError
