@@ -2,6 +2,7 @@
 using ChatApp.Application.Persistence;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.Services;
@@ -49,9 +50,29 @@ public class UserService : IUserService
         List<ResultError> errors = entity.Validate();
         if (errors.Any())
             return errors;
+
+        try
+        {
+            await _databaseContext.PublicUserInfos.AddAsync(entity);
+            await _databaseContext.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            if (ex.InnerException is SqlException sqlException)
+            {
+                if (sqlException.Number == 2627 || sqlException.Number == 2601)
+                {
+                    errors.Add(new ResultError(ResultErrorType.VALIDATION_ERROR, "The username is already taken"));
+                }
+            }
+
+            else
+            {
+                // TODO: log
+                errors.Add(new ResultError(ResultErrorType.UNKNOWN_ERROR, "Unknown error occured"));
+            }   
+        }
         
-        await _databaseContext.PublicUserInfos.AddAsync(entity);
-        await _databaseContext.SaveChangesAsync();
-        return [];
+        return errors;
     }
 }
