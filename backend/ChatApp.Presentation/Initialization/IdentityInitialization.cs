@@ -1,5 +1,5 @@
 ﻿using ChatApp.Application.Interfaces;
-using ChatApp.Application.Persistance;
+using ChatApp.Application.Persistence;
 using ChatApp.Application.Services;
 using Microsoft.AspNetCore.Identity;
 

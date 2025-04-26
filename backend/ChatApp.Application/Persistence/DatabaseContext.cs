@@ -5,7 +5,7 @@ using ChatApp.Domain.Entities.UserFriend;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChatApp.Application.Persistance;
+namespace ChatApp.Application.Persistence;
 
 public class DatabaseContext : IdentityDbContext
 {

@@ -1,4 +1,4 @@
-﻿using ChatApp.Application.Persistance;
+﻿using ChatApp.Application.Persistence;
 using ChatApp.Application.Utils;
 using Microsoft.EntityFrameworkCore;
 

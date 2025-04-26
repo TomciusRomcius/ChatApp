@@ -1,6 +1,6 @@
 using System.Text.Json;
 using ChatApp.Application.Interfaces;
-using ChatApp.Application.Persistance;
+using ChatApp.Application.Persistence;
 using ChatApp.Application.Services.WebSockets;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Models;
