@@ -10,6 +10,8 @@ import AddFriend from "./_components/_popupElements/addFriend";
 import Sidebar from "./_components/_sidebar/sidebar";
 import User, { CurrentUser } from "./_utils/user";
 import { FriendsContext } from "@/context/friendsContext";
+import NotificationsContainer from "@/app/application/_components/_popupElements/notificationsContainer";
+import NotificationService from "@/app/application/_components/_notifications/notificationService";
 
 interface ClientSideApplicationProps {
     currentUser: CurrentUser;
@@ -62,9 +64,12 @@ export default function ClientSideApplication(
             if (msg.type == "new-message") {
                 const textMessage = msg.body as TextMessage;
                 setNewMessages([...newMessages, textMessage]);
+                NotificationService.AddNotification(
+                    `${friends.find((f) => f.userId == textMessage.senderId)?.username} sent you a message!`,
+                );
             }
         },
-        [currentUser],
+        [currentUser, friends],
     );
 
     useEffect(() => {
@@ -119,6 +124,7 @@ export default function ClientSideApplication(
                         />
                     </FriendsContext>
                     <ChatWindow newMessages={filteredChatNewMessages} />
+                    <NotificationsContainer />
                 </CurrentChatContext.Provider>
             </AppStateContext.Provider>
         </CurrentUserContext.Provider>

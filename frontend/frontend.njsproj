@@ -101,9 +101,7 @@
     <Folder Include="src\" />
     <Folder Include="src\app\" />
     <Folder Include="src\app\application\" />
-    <Folder Include="src\app\application\_components\" />
     <Folder Include="src\app\application\_components\_chat\" />
-    <Folder Include="src\app\application\_components\_popupElements\" />
     <Folder Include="src\app\application\_utils\" />
     <Folder Include="src\app\auth\code\" />
     <Folder Include="src\app\auth\sign-in\" />
@@ -113,6 +111,8 @@
   </ItemGroup>
   <ItemGroup>
     <Script Include="next.config.ts" />
+    <Script Include="src\app\application\_components\_notifications\notificationService.ts" />
+    <Script Include="src\app\application\_components\_popupElements\notificationsContainer.tsx" />
     <Script Include="src\app\auth\account-setup\page.tsx" />
     <Script Include="src\app\auth\_components\authFlowLayout.tsx" />
     <Script Include="src\app\auth\_components\buttonWithPassword.tsx" />
