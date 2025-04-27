@@ -1,15 +1,13 @@
 import React, { useRef, useState } from "react";
 import SidebarChatEntry from "@/app/application/_components/_sidebar/sidebarChatEntry";
 import Modal from "@/components/Modal";
-import UserFriendsService from "@/services/userFriendsService";
 
-export interface SidebarUserProps {
-    username: string;
-    userId: string;
-    chatId: string;
+export interface SidebarChatRoomProps {
+    chatRoomName: string;
+    chatRoomId: string;
 }
 
-export default function SidebarUser(props: SidebarUserProps) {
+export default function SidebarChatRoom(props: SidebarChatRoomProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const modalX = useRef<number>(0);
     const modalY = useRef<number>(0);
@@ -21,12 +19,6 @@ export default function SidebarUser(props: SidebarUserProps) {
         setIsModalOpen(true);
     };
 
-    const onRemoveFriend = () => {
-        UserFriendsService.RemoveFriend(props.userId).then(() =>
-            alert("User removed successfully"),
-        );
-    };
-
     return (
         <div className="relative" onContextMenu={handleContextMenu}>
             {isModalOpen && (
@@ -35,13 +27,14 @@ export default function SidebarUser(props: SidebarUserProps) {
                     y={modalY.current}
                     onClose={() => setIsModalOpen(false)}
                 >
-                    <div className="flex flex-col gap-4 rounded-md bg-background-200 p-2">
-                        <button onClick={onRemoveFriend}>Remove friend</button>
-                    </div>
+                    <div className="flex flex-col gap-4 rounded-md bg-background-200 p-2"></div>
                 </Modal>
             )}
 
-            <SidebarChatEntry name={props.username} chatId={props.userId} />
+            <SidebarChatEntry
+                name={props.chatRoomName}
+                chatId={props.chatRoomId}
+            />
         </div>
     );
 }

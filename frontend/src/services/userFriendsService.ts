@@ -62,6 +62,15 @@ class _UserFriendsService {
             },
         );
     }
+
+    async RemoveFriend(userId: string): Promise<void> {
+        await axios.delete(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend?userId=${userId}`,
+            {
+                withCredentials: true,
+            },
+        );
+    }
 }
 
 const UserFriendsService = new _UserFriendsService();

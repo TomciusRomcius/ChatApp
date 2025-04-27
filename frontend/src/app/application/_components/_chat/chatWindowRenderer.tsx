@@ -19,7 +19,7 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
         if (!content) {
             return;
         }
-        
+
         sendMessageRef.current.value = "";
         props.sendMessage(content);
     };

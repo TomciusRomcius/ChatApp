@@ -12,6 +12,7 @@ import { FriendsContext } from "@/context/friendsContext";
 import ChatRoomService from "@/services/chatRoomService";
 import CreateChatroom from "@/app/application/_components/_popupElements/createChatRoom";
 import CurrentUserContext from "@/context/currentUserContext";
+import SidebarChatRoom from "@/app/application/_components/_sidebar/sidebarChatRoom";
 
 interface SidebarProps {
     webSocket: WebSocket;
@@ -56,20 +57,22 @@ export default function Sidebar(props: SidebarProps) {
         setChatRooms([...chatRooms, chatRoom]);
     };
 
-    const handleWsMessage = useCallback((ev: MessageEvent) => {
-        const msg = JSON.parse(ev.data);
-        if (msg.type == "new-friend-request") {
-            let user = msg.body as User;
-            setFriendRequests([...friendRequests, user]);
-        } else if (msg.type == "accepted-friend-request") {
-            let user = msg.body as User;
-            setFriends([...friends, user]);
-        } else if (msg.type === "added-to-chat-room") {
-            const chatRoom = msg.body as ChatRoom;
-            setChatRooms([...chatRooms, chatRoom]);
-        }
-    }, [chatRooms]);
-    
+    const handleWsMessage = useCallback(
+        (ev: MessageEvent) => {
+            const msg = JSON.parse(ev.data);
+            if (msg.type == "new-friend-request") {
+                let user = msg.body as User;
+                setFriendRequests([...friendRequests, user]);
+            } else if (msg.type == "accepted-friend-request") {
+                let user = msg.body as User;
+                setFriends([...friends, user]);
+            } else if (msg.type === "added-to-chat-room") {
+                const chatRoom = msg.body as ChatRoom;
+                setChatRooms([...chatRooms, chatRoom]);
+            }
+        },
+        [chatRooms],
+    );
 
     useEffect(() => {
         UserFriendsService.GetAllFriendRequests().then((requests) => {
@@ -88,7 +91,7 @@ export default function Sidebar(props: SidebarProps) {
             props.webSocket.removeEventListener("message", handleWsMessage);
         };
     }, [handleWsMessage]);
-    
+
     return (
         <>
             {appState == AppState.ACCEPT_FRIEND_REQUEST
@@ -129,7 +132,7 @@ export default function Sidebar(props: SidebarProps) {
                     </button>
                 </div>
                 {/* Friends and group list */}
-                <div className="flex w-full h-full flex-col items-start gap-4">
+                <div className="flex h-full w-full flex-col items-start gap-4">
                     {friends.map((friend) => (
                         <button
                             key={friend.userId}
@@ -138,6 +141,7 @@ export default function Sidebar(props: SidebarProps) {
                             <SidebarUser
                                 key={friend.userId}
                                 username={friend.username}
+                                userId={friend.userId}
                                 chatId={friend.userId}
                             ></SidebarUser>
                         </button>
@@ -150,11 +154,11 @@ export default function Sidebar(props: SidebarProps) {
                                 onSelectChatRoom(chatRoom.chatRoomId)
                             }
                         >
-                            <SidebarUser
+                            <SidebarChatRoom
                                 key={chatRoom.chatRoomId}
-                                username={chatRoom.name}
-                                chatId={chatRoom.chatRoomId}
-                            ></SidebarUser>
+                                chatRoomName={chatRoom.name}
+                                chatRoomId={chatRoom.chatRoomId}
+                            ></SidebarChatRoom>
                         </button>
                     ))}
                 </div>
