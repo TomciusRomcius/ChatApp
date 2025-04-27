@@ -41,13 +41,15 @@ public class UserController : ControllerBase
         {
             return Unauthorized("Account setup required!");
         }
-        
-        return Ok(new
+
+        Result<List<PublicUserInfoEntity>> publicInfoResult = await _userService.GetPublicUserInfos([userId]);
+        if (publicInfoResult.IsError())
         {
-            user.UserName,
-            user.Email,
-            user.Id
-        });
+            // Should never happen
+            return Unauthorized("Account setup required!");
+        }
+
+        return Ok(publicInfoResult.GetValue().First());
     }
 
     [HttpGet("user-info")]
