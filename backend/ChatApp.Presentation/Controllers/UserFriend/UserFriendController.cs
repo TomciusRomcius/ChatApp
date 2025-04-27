@@ -61,8 +61,8 @@ public class UserFriendController : ControllerBase
         return ControllerUtils.OutputErrorResult(error);
     }
 
-    [HttpDelete("remove")]
-    public async Task<IActionResult> RemoveFromFriends([FromBody] RemoveFriendDto dto)
+    [HttpDelete]
+    public async Task<IActionResult> RemoveFromFriends([FromQuery] RemoveFriendDto dto)
     {
         string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
             ?.Value;
