@@ -24,7 +24,7 @@ public class UserFriendServiceTest : IAsyncLifetime
         string connectionString = _container.GetConnectionString();
 
         _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
-        await _databaseContext.Database.EnsureCreatedAsync();
+        await _databaseContext.Database.MigrateAsync();
 
         _friendService = new UserFriendService(_databaseContext, new Mock<IWebSocketOperationsManager>().Object, new Mock<IUserService>().Object);
     }

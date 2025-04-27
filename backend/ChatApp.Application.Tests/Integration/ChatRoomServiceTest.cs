@@ -1,11 +1,13 @@
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistence;
 using ChatApp.Application.Services;
+using ChatApp.Application.Services.WebSockets;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Testcontainers.MsSql;
 
 namespace ChatApp.Application.Tests.Integration;
@@ -23,9 +25,9 @@ public class ChatRoomServiceTest : IAsyncLifetime
         string connectionString = _container.GetConnectionString();
 
         _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
-        await _databaseContext.Database.EnsureCreatedAsync();
+        await _databaseContext.Database.MigrateAsync();
 
-        _chatRoomService = new ChatRoomService(_databaseContext);
+        _chatRoomService = new ChatRoomService(_databaseContext, new Mock<IWebSocketOperationsManager>().Object);
     }
 
     public async Task DisposeAsync()

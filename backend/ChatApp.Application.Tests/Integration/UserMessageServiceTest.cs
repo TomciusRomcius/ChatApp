@@ -21,7 +21,7 @@ public class UserMessageServiceTest : IAsyncLifetime
         await _msSqlContainer.StartAsync();
         string connectionString = _msSqlContainer.GetConnectionString();
         _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
-        await _databaseContext.Database.EnsureCreatedAsync();
+        await _databaseContext.Database.MigrateAsync();
         _userMessageService = new UserMessageService(_databaseContext, new Mock<IWebSocketOperationsManager>().Object);
     }
 
