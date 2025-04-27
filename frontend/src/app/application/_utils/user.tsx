@@ -5,6 +5,6 @@ export default interface User {
 
 export interface CurrentUser {
     email: string;
-    userName: string;
+    username: string;
     id: string;
 }

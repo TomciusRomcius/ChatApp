@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import { FriendsContext } from "@/context/friendsContext";
 import ChatRoomService from "@/services/chatRoomService";
 import CreateChatroom from "@/app/application/_components/_popupElements/createChatRoom";
+import CurrentUserContext from "@/context/currentUserContext";
 
 interface SidebarProps {
     webSocket: WebSocket;
@@ -21,6 +22,7 @@ export default function Sidebar(props: SidebarProps) {
     const { appState, setAppState } = useContext(AppStateContext);
     const { setCurrentChat } = useContext(CurrentChatContext);
     const { friends, setFriends } = useContext(FriendsContext);
+    const { currentUser } = useContext(CurrentUserContext);
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
     const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
@@ -127,7 +129,7 @@ export default function Sidebar(props: SidebarProps) {
                     </button>
                 </div>
                 {/* Friends and group list */}
-                <div className="flex w-full flex-col items-start gap-4">
+                <div className="flex w-full h-full flex-col items-start gap-4">
                     {friends.map((friend) => (
                         <button
                             key={friend.userId}
@@ -155,6 +157,9 @@ export default function Sidebar(props: SidebarProps) {
                             ></SidebarUser>
                         </button>
                     ))}
+                </div>
+                <div className="h-[10%]">
+                    <small>{currentUser.username}</small>
                 </div>
             </div>
         </>
