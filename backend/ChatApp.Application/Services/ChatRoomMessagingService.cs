@@ -54,7 +54,7 @@ public class ChatRoomMessagingService : IChatRoomMessagingService
 
         List<ResultError> errors = textMessage.Validate();
         if (errors.Count > 0) return new Result<string>(errors);
-        
+
         // Check if user is in the chatroom
         bool isInChat = await (from chatRoomMember in _databaseContext.ChatRoomMembers
             where chatRoomId == chatRoomMember.ChatRoomId && userId == chatRoomMember.MemberId
@@ -75,7 +75,7 @@ public class ChatRoomMessagingService : IChatRoomMessagingService
 
         List<string> memberIds = [.. membersQuery];
         memberIds.Remove(userId); // Don't send notification to the sender
-        
+
         var socketMessageObj = new
         {
             Type = "new-message",
@@ -83,8 +83,8 @@ public class ChatRoomMessagingService : IChatRoomMessagingService
         };
 
         string socketMessageObjStr = JsonSerializer.Serialize(
-            socketMessageObj, 
-            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase}
+            socketMessageObj,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
         );
         _webSocketOperationsManager.EnqueueSendMessage(memberIds, socketMessageObjStr);
 

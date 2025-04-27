@@ -18,8 +18,8 @@ public class UserService : IUserService
 
     public async Task<bool> IsPublicInfoSetup(string userId)
     {
-        var query = _databaseContext.PublicUserInfos.Where(pui => pui.UserId == userId).Select(_ => 1);
-        
+        IQueryable<int>? query = _databaseContext.PublicUserInfos.Where(pui => pui.UserId == userId).Select(_ => 1);
+
         List<int> resultList = await query.ToListAsync();
         return resultList.Count == 1;
     }
@@ -27,24 +27,25 @@ public class UserService : IUserService
     public async Task<Result<List<PublicUserInfoEntity>>> GetPublicUserInfos(List<string> userIds)
     {
         Result<List<PublicUserInfoEntity>>? result = null;
-        
+
         // TODO: Should test performance of this as it may be quite slow
-        var query = _databaseContext.PublicUserInfos.Where(pui => userIds.Contains(pui.UserId));
-        
+        IQueryable<PublicUserInfoEntity> query =
+            _databaseContext.PublicUserInfos.Where(pui => userIds.Contains(pui.UserId));
+
         List<PublicUserInfoEntity> dbResult = query.ToList();
         if (!dbResult.Any())
         {
-            List<ResultError> errors = [new ResultError(ResultErrorType.NOT_FOUND, "User info row does not exist.")];
-            result = new Result<List<PublicUserInfoEntity>>(errors);   
+            List<ResultError> errors = [new(ResultErrorType.NOT_FOUND, "User info row does not exist.")];
+            result = new Result<List<PublicUserInfoEntity>>(errors);
         }
         else
         {
             result = new Result<List<PublicUserInfoEntity>>(dbResult);
         }
-        
+
         return result;
     }
-    
+
     public async Task<List<ResultError>> SetUserInfo(PublicUserInfoEntity entity)
     {
         List<ResultError> errors = entity.Validate();
@@ -61,18 +62,16 @@ public class UserService : IUserService
             if (ex.InnerException is SqlException sqlException)
             {
                 if (sqlException.Number == 2627 || sqlException.Number == 2601)
-                {
                     errors.Add(new ResultError(ResultErrorType.VALIDATION_ERROR, "The username is already taken"));
-                }
             }
 
             else
             {
                 // TODO: log
                 errors.Add(new ResultError(ResultErrorType.UNKNOWN_ERROR, "Unknown error occured"));
-            }   
+            }
         }
-        
+
         return errors;
     }
 }

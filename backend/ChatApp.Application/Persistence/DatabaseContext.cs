@@ -86,7 +86,7 @@ public class DatabaseContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(tm => tm.ReceiverUserId)
             .OnDelete(DeleteBehavior.ClientCascade);
-        
+
         modelBuilder.Entity<PublicUserInfoEntity>().HasKey(pui => pui.UserId);
         modelBuilder.Entity<PublicUserInfoEntity>()
             .HasIndex(pui => pui.Username)

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using ChatApp.Application.Interfaces;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
@@ -17,7 +16,8 @@ public class UserController : ControllerBase
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IUserService _userService;
 
-    public UserController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IUserService userService)
+    public UserController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
+        IUserService userService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -28,7 +28,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> WhoAmIAsync()
     {
         string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
-        if (userId is null) 
+        if (userId is null)
             return Unauthorized();
 
         IdentityUser? user = await _userManager.FindByIdAsync(userId);
@@ -37,17 +37,12 @@ public class UserController : ControllerBase
             // await _signInManager.SignOutAsync();
             return Unauthorized("Expired");
 
-        if (!await _userService.IsPublicInfoSetup(userId))
-        {
-            return Unauthorized("Account setup required!");
-        }
+        if (!await _userService.IsPublicInfoSetup(userId)) return Unauthorized("Account setup required!");
 
         Result<List<PublicUserInfoEntity>> publicInfoResult = await _userService.GetPublicUserInfos([userId]);
         if (publicInfoResult.IsError())
-        {
             // Should never happen
             return Unauthorized("Account setup required!");
-        }
 
         return Ok(publicInfoResult.GetValue().First());
     }
@@ -56,13 +51,13 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUserInfo([FromBody] GetUserInfoDto dto)
     {
         string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
-        if (userId is null) 
+        if (userId is null)
             return Unauthorized();
-        
+
         Result<List<PublicUserInfoEntity>> result = await _userService.GetPublicUserInfos(dto.UserId ?? [userId]);
         if (result.IsError())
             return ControllerUtils.OutputErrorResult(result.Errors.First());
-        
+
         return Ok(result.GetValue().FirstOrDefault());
     }
 
@@ -72,7 +67,7 @@ public class UserController : ControllerBase
         string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
 
         if (userId is null) return Unauthorized();
-        
+
         List<ResultError> errors = await _userService.SetUserInfo(new PublicUserInfoEntity
         {
             UserId = userId,

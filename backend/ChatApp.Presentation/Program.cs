@@ -4,7 +4,6 @@ using ChatApp.Application.Services;
 using ChatApp.Application.Services.WebSockets;
 using ChatApp.Presentation.Initialization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 

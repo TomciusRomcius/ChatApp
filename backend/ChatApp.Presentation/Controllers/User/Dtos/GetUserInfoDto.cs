@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ChatApp.Presentation.User.Dtos;
+﻿namespace ChatApp.Presentation.User.Dtos;
 
 public class GetUserInfoDto
 {

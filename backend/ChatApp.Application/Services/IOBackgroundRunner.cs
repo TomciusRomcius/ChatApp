@@ -35,7 +35,7 @@ public class IOBackgroundRunner : IHostedService
             {
                 // TODO: store tasks and log errors
                 _logger.LogDebug("Executing a background task");
-                var task = func();
+                Task? task = func();
             }
             else
             {

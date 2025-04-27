@@ -80,11 +80,11 @@ public class ChatRoomService : IChatRoomService
                 Body = chatroom
             };
 
-            var jsonMsg = JsonSerializer.Serialize(
-                msg, 
+            string jsonMsg = JsonSerializer.Serialize(
+                msg,
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
             );
-            
+
             List<string> wsReceivers = [..members];
             wsReceivers.Remove(adminUserId);
             _webSocketOperationsManager.EnqueueSendMessage(wsReceivers, jsonMsg);

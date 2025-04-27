@@ -4,7 +4,6 @@ using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
 using ChatApp.Presentation.Controllers.UserFriend.Dtos;
-using ChatApp.Presentation.UserFriend;
 using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Mvc;
 
