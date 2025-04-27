@@ -4,6 +4,7 @@ using ChatApp.Application.Persistence;
 using ChatApp.Application.Services.WebSockets;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.Services;
 
@@ -53,6 +54,17 @@ public class ChatRoomMessagingService : IChatRoomMessagingService
 
         List<ResultError> errors = textMessage.Validate();
         if (errors.Count > 0) return new Result<string>(errors);
+        
+        // Check if user is in the chatroom
+        bool isInChat = await (from chatRoomMember in _databaseContext.ChatRoomMembers
+            where chatRoomId == chatRoomMember.ChatRoomId && userId == chatRoomMember.MemberId
+            select 1).AnyAsync();
+
+        if (!isInChat)
+        {
+            errors = [new ResultError(ResultErrorType.FORBIDDEN_ERROR, "User is not a member of the chat room!")];
+            return new Result<string>(errors);
+        }
 
         await _databaseContext.TextMessages.AddAsync(textMessage);
         await _databaseContext.SaveChangesAsync();

@@ -23,7 +23,7 @@ public class ChatRoomMessagingServiceTest : IAsyncLifetime
         await _msSqlContainer.StartAsync();
         string connectionString = _msSqlContainer.GetConnectionString();
         _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
-        await _databaseContext.Database.EnsureCreatedAsync();
+        await _databaseContext.Database.MigrateAsync();
         _chatRoomMessagingService =
             new ChatRoomMessagingService(_databaseContext, new Mock<IWebSocketOperationsManager>().Object);
     }
@@ -53,7 +53,7 @@ public class ChatRoomMessagingServiceTest : IAsyncLifetime
         _databaseContext.Users.Add(user1);
         _databaseContext.ChatRooms.Add(chatRoom);
         _databaseContext.ChatRoomMembers.Add(chatRoomMember);
-        _databaseContext.SaveChanges();
+        await _databaseContext.SaveChangesAsync();
 
         var messageContent = "Hello";
         Result<string> result =
@@ -62,8 +62,8 @@ public class ChatRoomMessagingServiceTest : IAsyncLifetime
         Assert.False(result.IsError());
 
         string textMessageId = result.GetValue();
-        TextMessageEntity? textMessage = _databaseContext.TextMessages.Where(tm => textMessageId == tm.TextMessageId)
-            .FirstOrDefault();
+        TextMessageEntity? textMessage = _databaseContext.TextMessages
+            .FirstOrDefault(tm => textMessageId == tm.TextMessageId);
 
         Assert.NotNull(textMessage);
 
@@ -141,7 +141,7 @@ public class ChatRoomMessagingServiceTest : IAsyncLifetime
         _databaseContext.Users.AddRange(user1, user2);
         _databaseContext.ChatRooms.Add(chatRoom);
         _databaseContext.ChatRoomMembers.Add(user1Member);
-        _databaseContext.SaveChanges();
+        await _databaseContext.SaveChangesAsync();
 
         Result<string> result =
             await _chatRoomMessagingService.SendChatRoomMessageAsync(user2.Id, chatRoom.ChatRoomId, "Message");
