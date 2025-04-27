@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistence;
@@ -27,9 +26,8 @@ public class UserFriendService : IUserFriendService
     public Result<List<UserModel>> GetUserFriends(string userId, byte status = UserFriendStatus.FRIEND)
     {
         // Where the caller is the initiator and a friend is a receiver
-        IQueryable? query1 = null;
-        
-        query1 = from friend in _databaseContext.UserFriends
+
+        IQueryable query1 = from friend in _databaseContext.UserFriends
             join receiver in _databaseContext.Users
                 on friend.ReceiverId equals receiver.Id
             join info in _databaseContext.PublicUserInfos
@@ -56,7 +54,7 @@ public class UserFriendService : IUserFriendService
     {
         // TODO: check if already friends
         if (initiatorUserId == receiverUserId)
-            return new ResultError(ResultErrorType.VALIDATION_ERROR, "You cannot add youself");
+            return new ResultError(ResultErrorType.VALIDATION_ERROR, "You cannot add yourself");
 
         var entity = new UserFriendEntity
         {
@@ -93,6 +91,19 @@ public class UserFriendService : IUserFriendService
         _webSocketOperationsManager.EnqueueSendMessage([receiverUserId], wsMessage);
         
         return null;
+    }
+
+    public async Task<ResultError?> SendFriendRequestWithUsername(string initiatorUserId, string receiverUsername)
+    {
+        // Not ideal as we have two queries per friend request: one for fetching user id and one for adding record
+        string? receiverUserId = (from publicUserInfo in _databaseContext.PublicUserInfos
+            where receiverUsername == publicUserInfo.Username 
+            select publicUserInfo.UserId).FirstOrDefault();
+        
+        if (receiverUserId is null)
+            return new ResultError(ResultErrorType.VALIDATION_ERROR, "User account is not set up");
+        
+        return await SendFriendRequest(initiatorUserId, receiverUserId);
     }
 
     public async Task<ResultError?> AcceptFriendRequest(string initiatorUserId, string receiverUserId)
@@ -137,7 +148,7 @@ public class UserFriendService : IUserFriendService
     public async Task<ResultError?> RemoveFromFriends(string user1Id, string user2Id)
     {
         if (user1Id == user2Id)
-            return new ResultError(ResultErrorType.VALIDATION_ERROR, "You cannot remove youself from friends list");
+            return new ResultError(ResultErrorType.VALIDATION_ERROR, "You cannot remove yourself from friends list");
 
         // TODO: Not very efficient, maybe find a better way
         await _databaseContext.UserFriends.Where(uf => uf.InitiatorId == user1Id && uf.ReceiverId == user2Id)

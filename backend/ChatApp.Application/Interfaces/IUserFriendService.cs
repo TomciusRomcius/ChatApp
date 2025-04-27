@@ -11,4 +11,5 @@ public interface IUserFriendService
     Result<List<UserModel>> GetUserFriends(string userId, byte status = UserFriendStatus.FRIEND);
     Task<ResultError?> RemoveFromFriends(string user1Id, string user2Id);
     Task<ResultError?> SendFriendRequest(string initiatorUserId, string receiverUserId);
+    Task<ResultError?> SendFriendRequestWithUsername(string initiatorUserId, string receiverUsername);
 }

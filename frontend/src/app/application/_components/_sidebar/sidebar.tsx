@@ -159,7 +159,7 @@ export default function Sidebar(props: SidebarProps) {
                     ))}
                 </div>
                 <div className="h-[10%]">
-                    <small>{currentUser.username}</small>
+                    <small className="text-base">{currentUser.username}</small>
                 </div>
             </div>
         </>

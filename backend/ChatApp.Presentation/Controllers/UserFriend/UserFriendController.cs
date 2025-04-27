@@ -1,13 +1,14 @@
-using System.Collections;
 using System.Security.Claims;
 using ChatApp.Application.Interfaces;
 using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
+using ChatApp.Presentation.Controllers.UserFriend.Dtos;
+using ChatApp.Presentation.UserFriend;
 using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ChatApp.Presentation.UserFriend;
+namespace ChatApp.Presentation.Controllers.UserFriend;
 
 [ApiController]
 [Route("[controller]")]
@@ -38,20 +39,18 @@ public class UserFriendController : ControllerBase
     [HttpPost("request")]
     public async Task<IActionResult> SendFriendRequest([FromBody] AddFriendDto addFriendDto)
     {
-        // TODO: check if already friends
-
         string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
             ?.Value;
 
         if (userId is null) return Unauthorized();
 
-        ResultError? error = await _userFriendService.SendFriendRequest(userId, addFriendDto.UserId);
+        ResultError? error = await _userFriendService.SendFriendRequestWithUsername(userId, addFriendDto.Username);
         if (error is null) return Created();
         return ControllerUtils.OutputErrorResult(error);
     }
 
     [HttpPost("accept")]
-    public async Task<IActionResult> AcceptFriendRequest([FromBody] AddFriendDto dto)
+    public async Task<IActionResult> AcceptFriendRequest([FromBody] AcceptFriendRequestDto dto)
     {
         string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
             ?.Value;
@@ -64,7 +63,7 @@ public class UserFriendController : ControllerBase
     }
 
     [HttpDelete("remove")]
-    public async Task<IActionResult> RemoveFromFriends([FromBody] AddFriendDto dto)
+    public async Task<IActionResult> RemoveFromFriends([FromBody] RemoveFriendDto dto)
     {
         string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
             ?.Value;

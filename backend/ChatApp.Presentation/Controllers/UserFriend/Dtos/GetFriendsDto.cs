@@ -1,6 +1,6 @@
 using ChatApp.Domain.Entities.UserFriend;
 
-namespace ChatApp.Presentation.UserFriend;
+namespace ChatApp.Presentation.Controllers.UserFriend.Dtos;
 
 public class GetFriendsDto
 {
