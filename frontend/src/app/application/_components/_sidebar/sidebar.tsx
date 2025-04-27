@@ -13,6 +13,7 @@ import ChatRoomService from "@/services/chatRoomService";
 import CreateChatroom from "@/app/application/_components/_popupElements/createChatRoom";
 import CurrentUserContext from "@/context/currentUserContext";
 import SidebarChatRoom from "@/app/application/_components/_sidebar/sidebarChatRoom";
+import NotificationService from "@/app/application/_components/_notifications/notificationService";
 
 interface SidebarProps {
     webSocket: WebSocket;
@@ -62,12 +63,21 @@ export default function Sidebar(props: SidebarProps) {
             const msg = JSON.parse(ev.data);
             if (msg.type == "new-friend-request") {
                 let user = msg.body as User;
+                NotificationService.AddNotification(
+                  `${user.username} send you a friend request!`  
+                );
                 setFriendRequests([...friendRequests, user]);
             } else if (msg.type == "accepted-friend-request") {
                 let user = msg.body as User;
+                NotificationService.AddNotification(
+                    `${user.username} has accepted your friend request!`
+                );
                 setFriends([...friends, user]);
             } else if (msg.type === "added-to-chat-room") {
                 const chatRoom = msg.body as ChatRoom;
+                NotificationService.AddNotification(
+                    `You have been added to chat room: ${chatRoom.name}!`
+                );
                 setChatRooms([...chatRooms, chatRoom]);
             }
         },

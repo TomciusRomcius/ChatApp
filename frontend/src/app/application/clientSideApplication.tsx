@@ -64,8 +64,16 @@ export default function ClientSideApplication(
             if (msg.type == "new-message") {
                 const textMessage = msg.body as TextMessage;
                 setNewMessages([...newMessages, textMessage]);
+                let notification;
+                if (textMessage.chatRoomId) {
+                    // TODO: add chatroom name
+                    notification = `New message in chatroom.`
+                }
+                else {
+                    notification = `${friends.find((f) => f.userId == textMessage.senderId)?.username} sent you a message!`;
+                }
                 NotificationService.AddNotification(
-                    `${friends.find((f) => f.userId == textMessage.senderId)?.username} sent you a message!`,
+                    notification
                 );
             }
         },
