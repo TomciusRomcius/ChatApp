@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 
 export default function Page() {
     const router = useRouter();
-
     const handleSetup = (ev: FormEvent) => {
         ev.preventDefault();
 
@@ -30,22 +29,18 @@ export default function Page() {
     };
 
     return (
-        <AuthFlowLayout>
-            <form onSubmit={handleSetup} method="POST">
-                <div className="flex flex-col gap-4 rounded-md bg-background-100 p-8">
-                    <h1 className="text-center text-xl">Setup your account</h1>
-                    <Input
-                        className="text-textLighter"
-                        name="username"
-                        placeholder="Username"
-                    />
-                    <ButtonWithPassword
-                        type="submit"
-                        value="Setup"
-                        className="cursor-pointer rounded-md bg-accent p-2"
-                    />
-                </div>
-            </form>
+        <AuthFlowLayout onSubmit={handleSetup}>
+            <h1 className="text-center text-xl">Setup your account</h1>
+            <Input
+                className="text-textLighter"
+                name="username"
+                placeholder="Username"
+            />
+            <ButtonWithPassword
+                type="submit"
+                value="Setup"
+                className="cursor-pointer rounded-md bg-accent p-2"
+            />
         </AuthFlowLayout>
     );
 }

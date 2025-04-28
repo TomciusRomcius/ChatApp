@@ -1,20 +1,17 @@
 import { publicConfiguration } from "@/utils/configuration";
+import axios, { AxiosResponse } from "axios";
 
 class AuthService {
     public static async SignUpWithPassword(
-        username: string,
         email: string,
         password: string,
     ): Promise<Response> {
-        console.log(username, email, password);
-
         const res = await fetch(`${publicConfiguration.BACKEND_URL}/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                username: username,
                 email: email,
                 password: password,
             }),
@@ -24,24 +21,17 @@ class AuthService {
     }
 
     public static async SignInWithPassword(
-        username: string,
         email: string,
         password: string,
-    ): Promise<Response> {
-        console.log(username, email, password);
-
-        const res = await fetch(publicConfiguration.BACKEND_URL, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: username,
+    ): Promise<AxiosResponse> {
+        const res = await axios.post(
+            `${publicConfiguration.BACKEND_URL}/login?useCookies=true`,
+            {
                 email: email,
                 password: password,
-            }),
-        });
+            },
+            { withCredentials: true },
+        );
 
         return res;
     }

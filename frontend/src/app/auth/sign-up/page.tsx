@@ -3,38 +3,49 @@
 import { FormEvent } from "react";
 import { authService } from "../authService";
 import Input from "@/components/Input";
+import GoogleProviderButton from "@/app/auth/_components/googleProviderButton";
+import ButtonWithPassword from "@/app/auth/_components/buttonWithPassword";
+import Link from "next/link";
+import AuthFlowLayout from "@/app/auth/_components/authFlowLayout";
 
 export default function SignUpPage() {
-    const handleSignIn = (ev: FormEvent) => {
+    const handleSignUp = (ev: FormEvent) => {
         // TODO: validate input
 
         ev.preventDefault();
         const form = ev.target as HTMLFormElement;
 
-        const username = form.username.value;
         const email = form.email.value;
         const password = form.password.value;
+        const repeatPassword = form.repeatPassword.value;
 
-        authService.SignUpWithPassword(username, email, password);
+        // TODO: error message
+        if (!email || !password || !repeatPassword) {
+            return;
+        }
+
+        if (password !== repeatPassword) {
+            return;
+        }
+
+        authService.SignUpWithPassword(email, password);
     };
 
     return (
-        <div className="flex min-h-screen w-screen items-center justify-center">
-            <form onSubmit={handleSignIn} method="POST">
-                <div className="flex flex-col gap-4 border-2 border-red-700 p-4">
-                    <Input name="username" placeholder="Username" />
-                    <Input name="email" placeholder="Email" />
-                    <Input name="password" placeholder="Password" />
-                    <Input
-                        type="submit"
-                        value="Sign up"
-                        className="cursor-pointer border-red-700 bg-stone-700 p-2 text-white"
-                    />
-                    <button className="bg-stone-700 p-2">
-                        Sign up with google
-                    </button>
-                </div>
-            </form>
-        </div>
+        <AuthFlowLayout onSubmit={handleSignUp}>
+            <h1 className="text-center text-xl">Register</h1>
+            <Input name="email" placeholder="Email" />
+            <Input name="password" placeholder="Password" />
+            <Input name="repeatPassword" placeholder="Repeat password" />
+            <ButtonWithPassword type="submit" value="Sign up" />
+            <GoogleProviderButton text="Sign up with Google" />
+            <p className="text-textLighter">
+                Have an account?
+                <Link className="text-accent" href="/auth/sign-in">
+                    {" "}
+                    Login.
+                </Link>
+            </p>
+        </AuthFlowLayout>
     );
 }
