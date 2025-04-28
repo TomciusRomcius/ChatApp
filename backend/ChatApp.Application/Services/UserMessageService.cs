@@ -28,20 +28,22 @@ public class UserMessageService : IUserMessageService
 
         IQueryable<UserTextMessageModel> query;
         if (friendId is null)
-            query = from textMessage in _databaseContext.TextMessages
+            query = (from textMessage in _databaseContext.TextMessages
                 where textMessage.SenderId == userId || textMessage.ReceiverUserId == userId
+                orderby textMessage.CreatedAt
                 select new UserTextMessageModel(
                     textMessage.TextMessageId,
                     textMessage.SenderId,
                     textMessage.Content,
                     textMessage.CreatedAt
-                );
+                ));
 
         else
             query = from textMessage in _databaseContext.TextMessages
                 where
                     (textMessage.SenderId == userId && textMessage.ReceiverUserId == friendId) ||
                     (textMessage.SenderId == friendId && textMessage.ReceiverUserId == userId)
+                orderby textMessage.CreatedAt
                 select new UserTextMessageModel(
                     textMessage.TextMessageId,
                     textMessage.SenderId,
@@ -62,7 +64,6 @@ public class UserMessageService : IUserMessageService
             SenderId = senderId,
             ChatRoomId = null,
             ReceiverUserId = receiverId,
-            CreatedAt = DateTime.UtcNow
         };
 
         List<ResultError>? errors = msg.Validate();
