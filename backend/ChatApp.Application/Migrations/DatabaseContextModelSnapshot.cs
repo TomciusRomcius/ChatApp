@@ -90,7 +90,9 @@ namespace ChatApp.Application.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getutcdate()");
 
                     b.Property<string>("ReceiverUserId")
                         .HasColumnType("nvarchar(450)");

@@ -86,6 +86,10 @@ public class DatabaseContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(tm => tm.ReceiverUserId)
             .OnDelete(DeleteBehavior.ClientCascade);
+        
+        modelBuilder.Entity<TextMessageEntity>()
+            .Property(tm => tm.CreatedAt)
+            .HasDefaultValueSql("getutcdate()");
 
         modelBuilder.Entity<PublicUserInfoEntity>().HasKey(pui => pui.UserId);
         modelBuilder.Entity<PublicUserInfoEntity>()

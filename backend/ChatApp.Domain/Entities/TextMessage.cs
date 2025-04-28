@@ -40,8 +40,6 @@ public class TextMessageEntity
         if (!string.IsNullOrEmpty(ReceiverUserId) && !string.IsNullOrEmpty(ChatRoomId))
             errors.Add(new ResultError(ResultErrorType.VALIDATION_ERROR,
                 "You cannot specify both ReceiverUserId and ChatRoomId"));
-        if (CreatedAt == default)
-            errors.Add(new ResultError(ResultErrorType.VALIDATION_ERROR, "CreatedAt must be set"));
 
         return errors;
     }
