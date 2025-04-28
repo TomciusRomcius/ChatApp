@@ -35,7 +35,7 @@ export default function CreateChatroom(props: CreateChatroomProps) {
                     props.onCreateChatRoom({
                         name: name,
                         chatRoomId: result.data!,
-                        adminUserId: currentUser.id,
+                        adminUserId: currentUser.userId,
                     });
                 }
             });

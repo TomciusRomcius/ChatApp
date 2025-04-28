@@ -35,18 +35,6 @@ function filterNewMessages(
           });
 }
 
-function getMessageFromWs(msg: any): TextMessage {
-    const ent = msg.Body;
-
-    return {
-        content: ent.Content,
-        senderId: ent.SenderId,
-        receiverId: ent.ReceiverId,
-        chatRoomId: ent.ChatRoomId,
-        createdAt: ent.CreatedAt,
-    };
-}
-
 export default function ClientSideApplication(
     props: ClientSideApplicationProps,
 ) {

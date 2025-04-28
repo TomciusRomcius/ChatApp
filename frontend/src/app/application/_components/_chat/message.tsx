@@ -9,7 +9,7 @@ interface MessageProps {
 export default function Message(props: MessageProps) {
     const { currentUser } = useContext(CurrentUserContext);
 
-    const isSender = props.message.senderId == currentUser.id;
+    const isSender = props.message.senderId == currentUser.userId;
 
     return (
         <div

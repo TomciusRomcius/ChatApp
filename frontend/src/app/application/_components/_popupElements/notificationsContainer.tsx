@@ -10,7 +10,7 @@ export default function NotificationsContainer() {
             setUpdate([]);
         });
     }, []);
-    
+
     const notifications = NotificationService.notifications;
     let notificationKey = 0;
 

@@ -29,7 +29,7 @@ export default function ChatWindow(props: ChatWindowProps) {
         setMessages([
             ...messages,
             {
-                senderId: currentUser.id,
+                senderId: currentUser.userId,
                 receiverId: currentChat.id,
                 content: content,
                 createdAt: new Date(),
