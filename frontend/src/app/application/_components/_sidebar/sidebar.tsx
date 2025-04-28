@@ -84,6 +84,10 @@ export default function Sidebar(props: SidebarProps) {
         [chatRooms],
     );
 
+    const handleDeletedFriend = (deletedId: string) => {
+        setFriends(friends.filter((f) => f.userId !== deletedId));
+    };
+
     useEffect(() => {
         UserFriendsService.GetAllFriendRequests().then((requests) => {
             setFriendRequests(requests);
@@ -153,6 +157,7 @@ export default function Sidebar(props: SidebarProps) {
                                 username={friend.username}
                                 userId={friend.userId}
                                 chatId={friend.userId}
+                                onDeleteFriend={handleDeletedFriend}
                             ></SidebarUser>
                         </button>
                     ))}

@@ -7,6 +7,7 @@ export interface SidebarUserProps {
     username: string;
     userId: string;
     chatId: string;
+    onDeleteFriend: (deletedId: string) => void;
 }
 
 export default function SidebarUser(props: SidebarUserProps) {
@@ -22,9 +23,9 @@ export default function SidebarUser(props: SidebarUserProps) {
     };
 
     const onRemoveFriend = () => {
-        UserFriendsService.RemoveFriend(props.userId).then(() =>
-            alert("User removed successfully"),
-        );
+        UserFriendsService.RemoveFriend(props.userId).then(() => {
+            props.onDeleteFriend(props.userId);
+        });
     };
 
     return (
