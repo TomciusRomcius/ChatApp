@@ -12,8 +12,8 @@ class _NotificationService {
         // Remove notification after some time
         setTimeout(() => {
             this.notifications.splice(
-                0,
                 this.notifications.indexOf(notification),
+                1,
             );
             this.CallCallbacks();
         }, this.notificationLifetimeMs);

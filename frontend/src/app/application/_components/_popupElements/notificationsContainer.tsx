@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import NotificationService from "@/app/application/_components/_notifications/notificationService";
 
 export default function NotificationsContainer() {
-    const [notifications, setNotifications] = useState<string[]>([]);
+    const [_, setUpdate] = useState([]);
 
     useEffect(() => {
         NotificationService.AddCallback(() => {
-            setNotifications(NotificationService.notifications);
+            // Change reference to trigger update
+            setUpdate([]);
         });
     }, []);
-
+    
+    const notifications = NotificationService.notifications;
     let notificationKey = 0;
 
     return (
@@ -17,6 +19,10 @@ export default function NotificationsContainer() {
             <div className="flex flex-col gap-2">
                 {notifications.map((notification) => (
                     <div
+                        /* TODO: not the most efficient. Attach keys to notifications
+                            because when notification is deleted the order and as a result the
+                            key gets changed.                        
+                        */
                         key={notificationKey++}
                         className="rounded-md bg-background-200 p-2"
                     >
