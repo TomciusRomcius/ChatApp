@@ -64,19 +64,19 @@ export default function Sidebar(props: SidebarProps) {
             if (msg.type == "new-friend-request") {
                 let user = msg.body as User;
                 NotificationService.AddNotification(
-                  `${user.username} send you a friend request!`  
+                    `${user.username} send you a friend request!`,
                 );
                 setFriendRequests([...friendRequests, user]);
             } else if (msg.type == "accepted-friend-request") {
                 let user = msg.body as User;
                 NotificationService.AddNotification(
-                    `${user.username} has accepted your friend request!`
+                    `${user.username} has accepted your friend request!`,
                 );
                 setFriends([...friends, user]);
             } else if (msg.type === "added-to-chat-room") {
                 const chatRoom = msg.body as ChatRoom;
                 NotificationService.AddNotification(
-                    `You have been added to chat room: ${chatRoom.name}!`
+                    `You have been added to chat room: ${chatRoom.name}!`,
                 );
                 setChatRooms([...chatRooms, chatRoom]);
             }

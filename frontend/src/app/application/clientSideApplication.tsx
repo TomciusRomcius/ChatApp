@@ -67,14 +67,11 @@ export default function ClientSideApplication(
                 let notification;
                 if (textMessage.chatRoomId) {
                     // TODO: add chatroom name
-                    notification = `New message in chatroom.`
-                }
-                else {
+                    notification = `New message in chatroom.`;
+                } else {
                     notification = `${friends.find((f) => f.userId == textMessage.senderId)?.username} sent you a message!`;
                 }
-                NotificationService.AddNotification(
-                    notification
-                );
+                NotificationService.AddNotification(notification);
             }
         },
         [currentUser, friends],
