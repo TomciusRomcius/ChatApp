@@ -1,6 +1,7 @@
 import { ChatRoom } from "@/types";
 import { publicConfiguration } from "@/utils/configuration";
 import axios, { isAxiosError } from "axios";
+import User from "@/app/application/_utils/user";
 
 interface CreateChatRoomResponse {
     chatRoomId: string;
@@ -55,6 +56,18 @@ class _ChatRoomService {
         );
         // TODO: may return error
         return (res.data ?? []) as ChatRoom[];
+    }
+
+    async GetChatRoomMembers(chatRoomId: string): Promise<User[]> {
+        const res = await axios.get(
+            `${publicConfiguration.BACKEND_URL}/chatroom/members?chatRoomId=${chatRoomId}`,
+            {
+                withCredentials: true,
+            },
+        );
+
+        return (res.data ?? []) as User[];
+        // TODO: may return error
     }
 }
 

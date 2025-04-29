@@ -173,6 +173,7 @@ export default function Sidebar(props: SidebarProps) {
                                 key={chatRoom.chatRoomId}
                                 chatRoomName={chatRoom.name}
                                 chatRoomId={chatRoom.chatRoomId}
+                                adminUserId={chatRoom.adminUserId}
                             ></SidebarChatRoom>
                         </button>
                     ))}
