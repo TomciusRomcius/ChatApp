@@ -85,42 +85,42 @@ public class ChatRoomService : IChatRoomService
 
         // If user provides initial chat room members, add them 
         // TODO: check if all members are friends
-        if (members.Any())
-        {
-            var adminMember = new ChatRoomMemberEntity
-            {
-                ChatRoomId = chatroom.ChatRoomId,
-                MemberId = adminUserId
-            };
 
+        var adminMember = new ChatRoomMemberEntity
+        {
+            ChatRoomId = chatroom.ChatRoomId,
+            MemberId = adminUserId
+        };
+
+        _databaseContext.ChatRoomMembers.Add(adminMember);
+
+        if (members.Any())
             await _databaseContext.ChatRoomMembers.AddRangeAsync(
                 [
                     ..members.Select(uid => new ChatRoomMemberEntity
                     {
                         ChatRoomId = chatroom.ChatRoomId,
                         MemberId = uid
-                    }),
-                    adminMember
+                    })
                 ]
             );
 
-            await _databaseContext.SaveChangesAsync();
+        await _databaseContext.SaveChangesAsync();
 
-            var msg = new
-            {
-                Type = "added-to-chat-room",
-                Body = chatroom
-            };
+        var msg = new
+        {
+            Type = "added-to-chat-room",
+            Body = chatroom
+        };
 
-            string jsonMsg = JsonSerializer.Serialize(
-                msg,
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
-            );
+        string jsonMsg = JsonSerializer.Serialize(
+            msg,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        );
 
-            List<string> wsReceivers = [..members];
-            wsReceivers.Remove(adminUserId);
-            _webSocketOperationsManager.EnqueueSendMessage(wsReceivers, jsonMsg);
-        }
+        List<string> wsReceivers = [..members];
+        wsReceivers.Remove(adminUserId);
+        _webSocketOperationsManager.EnqueueSendMessage(wsReceivers, jsonMsg);
 
         return new Result<string>(chatroom.ChatRoomId);
     }
