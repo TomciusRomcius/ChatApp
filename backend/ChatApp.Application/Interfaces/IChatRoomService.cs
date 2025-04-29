@@ -9,5 +9,6 @@ public interface IChatRoomService
     Task<Result<string>> CreateChatRoomAsync(string adminUserId, string chatRoomName, List<string> members);
     Task<ResultError?> DeleteChatRoomAsync(string userId, string chatRoomId);
     Result<List<ChatRoomEntity>> GetChatRooms(string userId);
+    Task<ResultError?> AddFriendsToChatRoom(string adderId, string chatRoomId, List<string> friendIds);
     Task<List<PublicUserInfoEntity>> GetUsersInChatRoom(string userId, string chatRoomId);
 }

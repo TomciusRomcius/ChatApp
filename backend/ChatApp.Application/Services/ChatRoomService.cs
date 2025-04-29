@@ -38,6 +38,26 @@ public class ChatRoomService : IChatRoomService
         return new Result<List<ChatRoomEntity>>(result);
     }
 
+    public async Task<ResultError?> AddFriendsToChatRoom(string adderId, string chatRoomId, List<string> friendIds)
+    {
+        List<ChatRoomMemberEntity> chatRoomMembers = [];
+
+        // TODO: check if already friends if not, return error        
+        foreach (string friendId in friendIds)
+            chatRoomMembers.Add(
+                new ChatRoomMemberEntity
+                {
+                    ChatRoomId = chatRoomId,
+                    MemberId = friendId
+                }
+            );
+
+        _databaseContext.ChatRoomMembers.AddRange(chatRoomMembers);
+        await _databaseContext.SaveChangesAsync();
+
+        return null;
+    }
+
     public async Task<List<PublicUserInfoEntity>> GetUsersInChatRoom(string userId, string chatRoomId)
     {
         IQueryable<PublicUserInfoEntity> query = from member in _databaseContext.ChatRoomMembers
