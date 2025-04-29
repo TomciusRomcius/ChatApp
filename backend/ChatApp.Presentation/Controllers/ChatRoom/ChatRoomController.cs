@@ -35,6 +35,19 @@ public class ChatRoomController : ControllerBase
         return ControllerUtils.OutputErrorResult(result.Errors.First());
     }
 
+    [HttpPost("members")]
+    public async Task<IActionResult> AddChatRoomMembers([FromBody] AddChatRoomMembersDto dto)
+    {
+        string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
+
+        if (userId is null)
+            return Unauthorized();
+
+        await _chatRoomService.AddFriendsToChatRoom(userId, dto.ChatRoomId, dto.UserIds);
+
+        return Created();
+    }
+
     [HttpGet("members")]
     public async Task<IActionResult> GetChatRoomMembers([FromQuery] GetChatRoomMembersDto dto)
     {
