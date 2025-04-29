@@ -58,6 +58,22 @@ class _ChatRoomService {
         return (res.data ?? []) as ChatRoom[];
     }
 
+    async AddChatRoomMembers(
+        chatRoomId: string,
+        userIds: string[],
+    ): Promise<void> {
+        await axios.post(
+            `${publicConfiguration.BACKEND_URL}/chatroom/members`,
+            {
+                chatRoomId: chatRoomId,
+                userIds: userIds,
+            },
+            {
+                withCredentials: true,
+            },
+        );
+    }
+
     async GetChatRoomMembers(chatRoomId: string): Promise<User[]> {
         const res = await axios.get(
             `${publicConfiguration.BACKEND_URL}/chatroom/members?chatRoomId=${chatRoomId}`,

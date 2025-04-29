@@ -48,7 +48,10 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
             {isMembersListOpen &&
                 createPortal(
                     <Popup onClose={onToogleMembersList}>
-                        <MembersList chatRoomId={props.chatRoomId} />
+                        <MembersList
+                            chatRoomId={props.chatRoomId}
+                            adminUserId={props.adminUserId}
+                        />
                     </Popup>,
                     document.body,
                 )}
