@@ -1,11 +1,14 @@
 using System.Security.Claims;
 using ChatApp.Application.Interfaces;
+using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
+using ChatApp.Presentation.ChatRoom;
+using ChatApp.Presentation.Controllers.ChatRoom.Dto;
 using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ChatApp.Presentation.ChatRoom;
+namespace ChatApp.Presentation.Controllers.ChatRoom;
 
 [ApiController]
 [Route("[controller]")]
