@@ -2,6 +2,7 @@ using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistence;
 using ChatApp.Application.Services.WebSockets;
+using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,17 @@ public class ChatRoomService : IChatRoomService
         List<ChatRoomEntity> result = [.. query];
 
         return new Result<List<ChatRoomEntity>>(result);
+    }
+
+    public async Task<List<PublicUserInfoEntity>> GetUsersInChatRoom(string userId, string chatRoomId)
+    {
+        IQueryable<PublicUserInfoEntity> query = from member in _databaseContext.ChatRoomMembers
+            where member.ChatRoomId == chatRoomId
+            join publicUserInfo in _databaseContext.PublicUserInfos
+                on member.MemberId equals publicUserInfo.UserId
+            select publicUserInfo;
+        // TODO: check if already in chat room
+        return await query.ToListAsync();
     }
 
     public async Task<Result<string>> CreateChatRoomAsync(string adminUserId, string chatRoomName, List<string> members)

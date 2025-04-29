@@ -1,3 +1,4 @@
+using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
 
@@ -8,4 +9,5 @@ public interface IChatRoomService
     Task<Result<string>> CreateChatRoomAsync(string adminUserId, string chatRoomName, List<string> members);
     Task<ResultError?> DeleteChatRoomAsync(string userId, string chatRoomId);
     Result<List<ChatRoomEntity>> GetChatRooms(string userId);
+    Task<List<PublicUserInfoEntity>> GetUsersInChatRoom(string userId, string chatRoomId);
 }

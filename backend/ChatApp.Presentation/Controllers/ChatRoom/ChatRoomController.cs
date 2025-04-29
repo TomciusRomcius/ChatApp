@@ -32,6 +32,18 @@ public class ChatRoomController : ControllerBase
         return ControllerUtils.OutputErrorResult(result.Errors.First());
     }
 
+    [HttpGet("members")]
+    public async Task<IActionResult> GetChatRoomMembers([FromQuery] GetChatRoomMembersDto dto)
+    {
+        string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
+
+        if (userId is null)
+            return Unauthorized();
+
+        List<PublicUserInfoEntity> result = await _chatRoomService.GetUsersInChatRoom(userId, dto.ChatRoomId);
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateChatRoomAsync([FromBody] CreateChatRoomDto dto)
     {
