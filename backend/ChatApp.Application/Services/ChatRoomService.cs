@@ -77,6 +77,19 @@ public class ChatRoomService : IChatRoomService
         return await query.ToListAsync();
     }
 
+    public async Task<ResultError?> LeaveChatRoom(string userId, string chatRoomId)
+    {
+        int deletedCount = await _databaseContext.ChatRoomMembers
+            .Where(member => member.ChatRoomId == chatRoomId)
+            .ExecuteDeleteAsync();
+
+        if (deletedCount < 1)
+            return new ResultError(
+                ResultErrorType.VALIDATION_ERROR,
+                "Trying to leave a chat room where the user is not a member");
+        return null;
+    }
+
     public async Task<Result<string>> CreateChatRoomAsync(string adminUserId, string chatRoomName, List<string> members)
     {
         var chatroom = new ChatRoomEntity
@@ -154,7 +167,7 @@ public class ChatRoomService : IChatRoomService
         await _databaseContext.ChatRoomMembers
             .Where(crm => crm.ChatRoomId == chatRoomId)
             .ExecuteDeleteAsync();
-        
+
         await query.ExecuteDeleteAsync();
 
         return null;

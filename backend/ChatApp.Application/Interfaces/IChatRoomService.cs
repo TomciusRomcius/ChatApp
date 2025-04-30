@@ -11,4 +11,5 @@ public interface IChatRoomService
     Result<List<ChatRoomEntity>> GetChatRooms(string userId);
     Task<ResultError?> AddFriendsToChatRoom(string adderId, string chatRoomId, List<string> friendIds);
     Task<List<PublicUserInfoEntity>> GetUsersInChatRoom(string userId, string chatRoomId);
+    Task<ResultError?> LeaveChatRoom(string userId, string chatRoomId);
 }

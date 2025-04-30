@@ -35,6 +35,20 @@ public class ChatRoomController : ControllerBase
         return ControllerUtils.OutputErrorResult(result.Errors.First());
     }
 
+    [HttpPost("leave")]
+    public async Task<IActionResult> LeaveChatRoom([FromBody] LeaveChatRoomDto dto)
+    {
+        string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
+
+        if (userId is null)
+            return Unauthorized();
+
+        ResultError? error = await _chatRoomService.LeaveChatRoom(userId, dto.ChatRoomId);
+        if (error is not null)
+            return ControllerUtils.OutputErrorResult(error);
+        return Ok();
+    }
+
     [HttpPost("members")]
     public async Task<IActionResult> AddChatRoomMembers([FromBody] AddChatRoomMembersDto dto)
     {
