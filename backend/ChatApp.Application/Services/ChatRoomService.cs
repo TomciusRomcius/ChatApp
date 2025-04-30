@@ -148,6 +148,13 @@ public class ChatRoomService : IChatRoomService
             return new ResultError(ResultErrorType.FORBIDDEN_ERROR,
                 "Trying to delete a chat room while not being an admin");
 
+        await _databaseContext.TextMessages
+            .Where(mt => mt.ChatRoomId == chatRoomId)
+            .ExecuteDeleteAsync();
+        await _databaseContext.ChatRoomMembers
+            .Where(crm => crm.ChatRoomId == chatRoomId)
+            .ExecuteDeleteAsync();
+        
         await query.ExecuteDeleteAsync();
 
         return null;
