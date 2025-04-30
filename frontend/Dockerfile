@@ -1,3 +1,6 @@
+FROM node:21-alpine AS dev
+CMD [ "npm", "run", "dev:https" ]
+
 FROM node:21-alpine AS base
 WORKDIR /app
 COPY package*.json ./
