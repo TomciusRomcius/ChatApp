@@ -75,7 +75,7 @@ public class ChatRoomController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteChatRoomAsync([FromBody] DeleteChatRoomDto dto)
+    public async Task<IActionResult> DeleteChatRoomAsync([FromQuery] DeleteChatRoomDto dto)
     {
         string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
             ?.Value;
