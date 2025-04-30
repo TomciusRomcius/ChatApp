@@ -1,0 +1,37 @@
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    command: ["npm", "run", "dev:https"]
+    volumes:
+      - .:/app
+    environment:
+      - CA_MSSQL_HOST=127.0.0.1,1433,
+      - CA_MSSQL_PASSWORD=DevelopmentPassword.2025,
+      - CA_FRONTEND_URL=https://localhost:3000,
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - 5112:5112
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-preview-ubuntu-22.04
+    container_name: mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=DevelopmentPassword.2025
+    ports:
+      - 1433:1433
+  # TODO: setup redis authentication
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
