@@ -87,10 +87,10 @@ export default function Sidebar(props: SidebarProps) {
     const handleDeletedFriend = (deletedId: string) => {
         setFriends(friends.filter((f) => f.userId !== deletedId));
     };
-    
+
     const handleDeletedChatRoom = (chatRoomId: string) => {
-        setChatRooms(chatRooms.filter(cr => cr.chatRoomId !== chatRoomId));
-    }
+        setChatRooms(chatRooms.filter((cr) => cr.chatRoomId !== chatRoomId));
+    };
 
     useEffect(() => {
         UserFriendsService.GetAllFriendRequests().then((requests) => {

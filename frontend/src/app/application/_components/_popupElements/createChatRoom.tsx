@@ -4,6 +4,7 @@ import { AppState, AppStateContext } from "@/context/appStateContext";
 import ChatRoomService from "@/services/chatRoomService";
 import { ChatRoom } from "@/types";
 import CurrentUserContext from "@/context/currentUserContext";
+import AccentButton from "@/components/accentButton";
 
 interface CreateChatroomProps {
     friends: User[];
@@ -53,30 +54,52 @@ export default function CreateChatroom(props: CreateChatroomProps) {
         }
     };
 
+    const removeFromChatRoom = (userId: string) => {
+        setMembers(members.filter((m) => m.userId !== userId));
+    };
+
     return (
         <div className="flex flex-col gap-4 px-4">
-            <h1 className="text-xl">Create chatroom</h1>
-            <label>Chatroom name</label>
-            <input ref={chatRoomNameRef} placeholder="Enter chatroom name" />
+            <h1 className="text-center text-2xl">Create chatroom</h1>
+            <div className="flex flex-col gap-1">
+                <label className="text-sm text-textLighter">
+                    Chatroom name
+                </label>
+                <input
+                    ref={chatRoomNameRef}
+                    placeholder="Enter chatroom name"
+                />
+            </div>
+            <h2 className="text-xl">Members</h2>
+            {members.length > 0 ? (
+                members.map((member) => (
+                    <button
+                        className="flex w-full items-center justify-between"
+                        key={member.userId}
+                        onClick={() => removeFromChatRoom(member.userId)}
+                    >
+                        {member.username}
+                        <small className="text-textLighter">Remove</small>
+                    </button>
+                ))
+            ) : (
+                <small className="text-center text-textLighter">
+                    No members, start by adding or create an empty group chat
+                </small>
+            )}
+            <h2 className="text-xl">Add</h2>
 
-            <h2>Added members</h2>
-            {members.length > 0
-                ? members.map((member) => (
-                      <p key={member.userId}>{member.username}</p>
-                  ))
-                : null}
-            <h2>Invite others</h2>
-
-            <input placeholder="Enter friend's username" />
             {potentialMembers.map((friend) => (
                 <button
+                    className="flex w-full items-center justify-between"
                     key={friend.userId}
                     onClick={() => addToChatroom(friend.userId)}
                 >
                     {friend.username}
+                    <small className="text-textLighter">Add</small>
                 </button>
             ))}
-            <button onClick={onCreateChatRoom}>Create</button>
+            <AccentButton onClick={onCreateChatRoom}>Create</AccentButton>
         </div>
     );
 }

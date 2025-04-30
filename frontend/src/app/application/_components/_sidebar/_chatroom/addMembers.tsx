@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { FriendsContext } from "@/context/friendsContext";
 import User from "@/app/application/_utils/user";
 import ChatRoomService from "@/services/chatRoomService";
+import AccentButton from "@/components/accentButton";
 
 interface AddMembersProps {
     chatRoomId: string;
@@ -48,7 +49,6 @@ export default function AddMembers(props: AddMembersProps) {
                     {member.username}
                 </button>
             ))}
-            <h2>Added to list</h2>
             <div>
                 {addedMembers.map((member) => (
                     <button
@@ -59,7 +59,7 @@ export default function AddMembers(props: AddMembersProps) {
                     </button>
                 ))}
             </div>
-            <button onClick={onSubmitAddMembers}>Submit</button>
+            <AccentButton onClick={onSubmitAddMembers}>Submit</AccentButton>
         </>
     );
 }

@@ -28,7 +28,7 @@ export default function FriendRequests(props: FriendRequestsProps) {
 
     return (
         <>
-            <h1 className="text-xl">Friend requests</h1>
+            <h1 className="text-center text-xl">Friend requests</h1>
             {props.friendRequests.map((user) => (
                 <div key={user.userId} className="flex gap-4">
                     <small className="text-base">{user.username}</small>

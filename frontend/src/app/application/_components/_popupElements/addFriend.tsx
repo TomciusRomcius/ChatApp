@@ -1,5 +1,6 @@
 import UserFriendsService from "@/services/userFriendsService";
 import { useRef } from "react";
+import AccentButton from "@/components/accentButton";
 
 interface AddFriendProps {
     onSendFriendRequest: () => void;
@@ -22,10 +23,18 @@ export default function AddFriend(props: AddFriendProps) {
 
     return (
         <>
-            <h1 className="text-xl">Add a friend</h1>
-            <label>Username</label>
-            <input ref={usernameRef} placeholder="Enter username" />
-            <button onClick={onSendFriendRequest}>Send friend request</button>
+            <h1 className="text-center text-xl">Add a friend</h1>
+            <div className="flex flex-col gap-1">
+                <label className="text-sm text-textLighter">Username</label>
+                <input
+                    className="text-base"
+                    ref={usernameRef}
+                    placeholder="Enter username"
+                />
+            </div>
+            <AccentButton onClick={onSendFriendRequest}>
+                Send friend request
+            </AccentButton>
         </>
     );
 }
