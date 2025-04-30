@@ -47,9 +47,7 @@ class _ChatRoomService {
         return result;
     }
 
-    async DeleteChatRoom(
-        chatRoomId: string,
-    ): Promise<Result<void, string>> {
+    async DeleteChatRoom(chatRoomId: string): Promise<Result<void, string>> {
         let result: Result<void, string> | null = null;
 
         try {
@@ -73,7 +71,36 @@ class _ChatRoomService {
                 errors: ["Unexpected error"],
             };
         }
-        
+
+        return result;
+    }
+
+    async LeaveChatRoom(chatRoomId: string): Promise<Result<void, string>> {
+        let result: Result<void, string> | null = null;
+
+        try {
+            await axios.post(
+                `${publicConfiguration.BACKEND_URL}/chatroom/leave`,
+                { chatRoomId: chatRoomId },
+                { withCredentials: true },
+            );
+
+            result = { data: null, errors: [] };
+        } catch (err) {
+            if (isAxiosError(err)) {
+                const msg = err.response?.data.message;
+                result = {
+                    data: null,
+                    errors: [msg],
+                };
+            }
+
+            result = {
+                data: null,
+                errors: ["Unexpected error"],
+            };
+        }
+
         return result;
     }
 
