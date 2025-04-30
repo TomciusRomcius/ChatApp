@@ -5,11 +5,14 @@ import CurrentUserContext from "@/context/currentUserContext";
 import { createPortal } from "react-dom";
 import Popup from "@/components/popup";
 import MembersList from "@/app/application/_components/_sidebar/_chatroom/membersList";
+import ChatRoomService from "@/services/chatRoomService";
+import NotificationService from "@/app/application/_components/_notifications/notificationService";
 
 export interface SidebarChatRoomProps {
     chatRoomName: string;
     chatRoomId: string;
     adminUserId: string;
+    handleDeletedChatRoom: (chatRoomId: string) => void;
 }
 
 export default function SidebarChatRoom(props: SidebarChatRoomProps) {
@@ -18,6 +21,8 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
     const [isMembersListOpen, setIsMembersListOpen] = useState(false);
     const modalX = useRef<number>(0);
     const modalY = useRef<number>(0);
+    
+    const isAdmin = currentUser.userId === props.adminUserId;
 
     const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -29,6 +34,20 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
     const onToogleMembersList = () => {
         setIsMembersListOpen(!isMembersListOpen);
     };
+    
+    const onDeleteChatRoom = () => {
+        ChatRoomService.DeleteChatRoom(props.chatRoomId)
+            .then((result) => {
+                if (result.errors.length > 0) {
+                    NotificationService.AddNotification(`Failed to delete chat room: ${result.errors}`);
+                }
+                
+                else {
+                    props.handleDeletedChatRoom(props.chatRoomId);
+                    NotificationService.AddNotification(`Successfully deleted chatroom: ${props.chatRoomName}`);
+                }
+            });
+    }
 
     return (
         <div className="relative" onContextMenu={handleContextMenu}>
@@ -38,9 +57,11 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
                     y={modalY.current}
                     onClose={() => setIsModalOpen(false)}
                 >
-                    <div className="flex flex-col gap-4 rounded-md bg-background-200 p-2">
+                    <div className="flex flex-col items-start gap-4 rounded-md bg-background-200 p-2">
                         <button onClick={onToogleMembersList}>Members</button>
-                        <button></button>
+                        { isAdmin && (
+                            <button onClick={onDeleteChatRoom}>Delete chat room</button>  
+                        ) }
                     </div>
                 </Modal>
             )}

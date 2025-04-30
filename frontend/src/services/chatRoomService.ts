@@ -47,6 +47,36 @@ class _ChatRoomService {
         return result;
     }
 
+    async DeleteChatRoom(
+        chatRoomId: string,
+    ): Promise<Result<void, string>> {
+        let result: Result<void, string> | null = null;
+
+        try {
+            await axios.delete(
+                `${publicConfiguration.BACKEND_URL}/chatroom?chatRoomId=${chatRoomId}`,
+                { withCredentials: true },
+            );
+
+            result = { data: null, errors: [] };
+        } catch (err) {
+            if (isAxiosError(err)) {
+                const msg = err.response?.data.message;
+                result = {
+                    data: null,
+                    errors: [msg],
+                };
+            }
+
+            result = {
+                data: null,
+                errors: ["Unexpected error"],
+            };
+        }
+        
+        return result;
+    }
+
     async GetChatRooms(): Promise<ChatRoom[]> {
         const res = await axios.get(
             `${publicConfiguration.BACKEND_URL}/chatroom`,
