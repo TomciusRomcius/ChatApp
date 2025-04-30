@@ -12,12 +12,15 @@ namespace ChatApp.Application.Services;
 public class ChatRoomService : IChatRoomService
 {
     private readonly DatabaseContext _databaseContext;
+    private readonly IUserFriendService _userFriendService;
     private readonly IWebSocketOperationsManager _webSocketOperationsManager;
 
-    public ChatRoomService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
+    public ChatRoomService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager,
+        IUserFriendService userFriendService)
     {
         _databaseContext = databaseContext;
         _webSocketOperationsManager = webSocketOperationsManager;
+        _userFriendService = userFriendService;
     }
 
     public Result<List<ChatRoomEntity>> GetChatRooms(string userId)
@@ -51,6 +54,11 @@ public class ChatRoomService : IChatRoomService
                     MemberId = friendId
                 }
             );
+
+        bool areFriends = await _userFriendService.CheckIfFriends(adderId, friendIds);
+        if (!areFriends)
+            return new ResultError(ResultErrorType.FORBIDDEN_ERROR,
+                "Trying to add member that is not in the friend list");
 
         _databaseContext.ChatRoomMembers.AddRange(chatRoomMembers);
         await _databaseContext.SaveChangesAsync();
