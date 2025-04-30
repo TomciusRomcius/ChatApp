@@ -102,6 +102,18 @@ public class UserFriendService : IUserFriendService
         return await SendFriendRequest(initiatorUserId, receiverUserId);
     }
 
+    public async Task<bool> CheckIfFriends(string targetUserId, List<string> userIds)
+    {
+        IQueryable<UserFriendEntity> query1 = _databaseContext.UserFriends
+            .Where(f => f.InitiatorId == targetUserId && userIds.Contains(f.ReceiverId));
+
+        IQueryable<UserFriendEntity> query2 = _databaseContext.UserFriends
+            .Where(f => f.ReceiverId == targetUserId && userIds.Contains(f.InitiatorId));
+
+        int count = await query1.CountAsync() + await query2.CountAsync();
+        return count == userIds.Count;
+    }
+
     public async Task<ResultError?> AcceptFriendRequest(string initiatorUserId, string receiverUserId)
     {
         UserFriendEntity? instance = _databaseContext.UserFriends.FirstOrDefault(item =>

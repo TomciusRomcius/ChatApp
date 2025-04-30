@@ -103,4 +103,72 @@ public class UserFriendServiceTest : IAsyncLifetime
 
         Assert.Empty(friends);
     }
+
+
+    [Fact]
+    public async Task CheckIfFriends_ShouldReturnTrue_WhenAllAreFriends()
+    {
+        var targetUser = new IdentityUser("targetUser");
+        var user1 = new IdentityUser("user1");
+        var user2 = new IdentityUser("user2");
+
+        var friendRelationship1 = new UserFriendEntity
+        {
+            InitiatorId = targetUser.Id,
+            ReceiverId = user1.Id,
+            Status = UserFriendStatus.FRIEND
+        };
+        var friendRelationship2 = new UserFriendEntity
+        {
+            InitiatorId = targetUser.Id,
+            ReceiverId = user2.Id,
+            Status = UserFriendStatus.FRIEND
+        };
+
+        await _databaseContext!.Users.AddRangeAsync(targetUser, user1, user2);
+        await _databaseContext.UserFriends.AddRangeAsync(friendRelationship1, friendRelationship2);
+        await _databaseContext.SaveChangesAsync();
+
+        bool result = await _friendService!.CheckIfFriends(targetUser.Id, [user1.Id, user2.Id]);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task CheckIfFriends_ShouldReturnFalse_WhenOneIsNotFriend()
+    {
+        var targetUser = new IdentityUser("targetUser");
+        var user1 = new IdentityUser("user1");
+        var user2 = new IdentityUser("user2");
+
+        var friendRelationship1 = new UserFriendEntity
+        {
+            InitiatorId = targetUser.Id,
+            ReceiverId = user1.Id,
+            Status = UserFriendStatus.FRIEND
+        };
+
+        await _databaseContext!.Users.AddRangeAsync(targetUser, user1, user2);
+        await _databaseContext.UserFriends.AddAsync(friendRelationship1);
+        await _databaseContext.SaveChangesAsync();
+
+        bool result = await _friendService!.CheckIfFriends(targetUser.Id, [user1.Id, user2.Id]);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task CheckIfFriends_ShouldReturnFalse_WhenAllAreNotFriends()
+    {
+        var targetUser = new IdentityUser("targetUser");
+        var user1 = new IdentityUser("user1");
+        var user2 = new IdentityUser("user2");
+
+        await _databaseContext!.Users.AddRangeAsync(targetUser, user1, user2);
+        await _databaseContext.SaveChangesAsync();
+
+        bool result = await _friendService!.CheckIfFriends(targetUser.Id, [user1.Id, user2.Id]);
+
+        Assert.False(result);
+    }
 }
