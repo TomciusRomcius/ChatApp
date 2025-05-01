@@ -2,6 +2,7 @@ using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistence;
 using ChatApp.Application.Services.WebSockets;
+using ChatApp.Application.Utils;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.ChatRoom;
 using ChatApp.Domain.Utils;
@@ -144,7 +145,7 @@ public class ChatRoomService : IChatRoomService
 
         var msg = new
         {
-            Type = "added-to-chat-room",
+            Type = UserWebSocketMessageType.AddedToChatRoom,
             Body = chatroom
         };
 

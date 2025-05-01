@@ -2,6 +2,7 @@ using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistence;
 using ChatApp.Application.Services.WebSockets;
+using ChatApp.Application.Utils;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Models;
 using ChatApp.Domain.Utils;
@@ -74,7 +75,7 @@ public class UserMessageService : IUserMessageService
 
         var socketMessageObj = new
         {
-            Type = "new-message",
+            Type = UserWebSocketMessageType.NewMessage,
             Body = msg
         };
 

@@ -2,6 +2,7 @@ using System.Text.Json;
 using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistence;
 using ChatApp.Application.Services.WebSockets;
+using ChatApp.Application.Utils;
 using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Models;
@@ -80,7 +81,7 @@ public class UserFriendService : IUserFriendService
 
         string wsMessage = JsonSerializer.Serialize(new
         {
-            Type = "new-friend-request",
+            Type = UserWebSocketMessageType.NewFriendRequest,
             Body = publicUserInfo
         }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
@@ -139,7 +140,7 @@ public class UserFriendService : IUserFriendService
 
         string wsMessage = JsonSerializer.Serialize(new
         {
-            Type = "accepted-friend-request",
+            Type = UserWebSocketMessageType.AcceptedFriendRequest,
             Body = publicUserInfo
         }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
