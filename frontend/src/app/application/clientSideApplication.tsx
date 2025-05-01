@@ -22,17 +22,20 @@ function filterNewMessages(
     currentChat: CurrentChat | null,
     newMessages: TextMessage[],
 ): TextMessage[] {
-    return !currentChat
-        ? []
-        : newMessages.filter((msg) => {
-              if (currentChat.type == "user") {
-                  return currentChat.id == msg.senderId;
-              }
+    if (!currentChat) return [];
 
-              if (currentChat.type == "chatroom") {
-                  return currentChat.id == msg.chatRoomId;
-              }
-          });
+    const filteredMessages: TextMessage[] = [];
+
+    newMessages.forEach((msg) => {
+        if (currentChat.type === "chatroom" && msg.chatRoomId) {
+            filteredMessages.push(msg);
+        }
+        if (currentChat.type === "user" && !msg.chatRoomId) {
+            filteredMessages.push(msg);
+        }
+    });
+
+    return filteredMessages;
 }
 
 export default function ClientSideApplication(
