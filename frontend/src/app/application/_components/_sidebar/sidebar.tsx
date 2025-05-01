@@ -79,6 +79,27 @@ export default function Sidebar(props: SidebarProps) {
                     `You have been added to chat room: ${chatRoom.name}!`,
                 );
                 setChatRooms([...chatRooms, chatRoom]);
+            } else if (msg.type === "removed-from-chat-room") {
+                const chatRoom = chatRooms.find(
+                    (cr) => cr.chatRoomId === msg.body.chatRoomId,
+                );
+
+                if (!chatRoom) {
+                    console.error(
+                        `Something is wrong. Received removed-from-chat-room 
+                        message but chat room does not exist in state`,
+                    );
+                    return;
+                }
+
+                NotificationService.AddNotification(
+                    `You have been removed from chatroom: ${chatRoom.name}`,
+                );
+                setChatRooms(
+                    chatRooms.filter(
+                        (cr) => cr.chatRoomId !== chatRoom.chatRoomId,
+                    ),
+                );
             }
         },
         [chatRooms],
