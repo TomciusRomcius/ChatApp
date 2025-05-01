@@ -69,6 +69,11 @@ public class ChatRoomService : IChatRoomService
 
     public async Task<ResultError?> RemoveFriendsFromChatRoom(string removerId, string chatRoomId, List<string> friendIds)
     {
+        if (friendIds.Contains(removerId))
+        {
+            return new ResultError(ResultErrorType.VALIDATION_ERROR, "You cannot remove yourself from your chat room!");
+        }
+        
         int deletedCount = await _databaseContext.ChatRoomMembers
             .Where(crm => crm.ChatRoomId == chatRoomId && friendIds.Contains(crm.MemberId))
             .ExecuteDeleteAsync();
