@@ -61,7 +61,7 @@ public class ChatRoomController : ControllerBase
 
         return Created();
     }
-    
+
     [HttpPost("members/remove")]
     public async Task<IActionResult> RemoveChatRoomMembers([FromBody] RemoveChatRoomMembersDto dto)
     {
@@ -71,7 +71,7 @@ public class ChatRoomController : ControllerBase
             return Unauthorized();
 
         ResultError? error = await _chatRoomService.RemoveFriendsFromChatRoom(userId, dto.ChatRoomId, dto.UserIds);
-        
+
         if (error is not null)
             return ControllerUtils.OutputErrorResult(error);
         return Ok();

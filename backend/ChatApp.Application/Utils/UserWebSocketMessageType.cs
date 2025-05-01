@@ -7,5 +7,4 @@ public static class UserWebSocketMessageType
     public static string NewMessage { get; } = "new-message";
     public static string NewFriendRequest { get; } = "new-friend-request";
     public static string AcceptedFriendRequest { get; } = "accepted-friend-request";
-
 }
