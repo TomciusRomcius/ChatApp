@@ -44,6 +44,17 @@ public class ChatRoomService : IChatRoomService
 
     public async Task<ResultError?> AddFriendsToChatRoom(string adderId, string chatRoomId, List<string> friendIds)
     {
+        ChatRoomEntity? chatroom = _databaseContext.ChatRooms
+            .SingleOrDefault(chatroom => chatroom.ChatRoomId == chatRoomId);
+
+        if (chatroom == null)
+        {
+            return new ResultError(
+                ResultErrorType.VALIDATION_ERROR,
+                "Trying to add friend to a chat room that does not exist"
+            );
+        }
+        
         List<ChatRoomMemberEntity> chatRoomMembers = [];
 
         // TODO: check if already friends if not, return error        
@@ -63,6 +74,21 @@ public class ChatRoomService : IChatRoomService
 
         _databaseContext.ChatRoomMembers.AddRange(chatRoomMembers);
         await _databaseContext.SaveChangesAsync();
+        
+        
+        var msg = new
+        {
+            Type = UserWebSocketMessageType.AddedToChatRoom,
+            Body = chatroom
+        };
+
+        string jsonMsg = JsonSerializer.Serialize(
+            msg,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        );
+
+        _webSocketOperationsManager.EnqueueSendMessage(friendIds, jsonMsg);
+
 
         return null;
     }
