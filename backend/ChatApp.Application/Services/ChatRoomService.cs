@@ -81,8 +81,25 @@ public class ChatRoomService : IChatRoomService
         if (deletedCount != friendIds.Count)
             return new ResultError(
                 ResultErrorType.VALIDATION_ERROR,
-                "Trying to remove members that are not in the chat room"
+                "Trying to remove members that are not in the chat room!"
             );
+
+        var msg = new
+        {
+            Type = UserWebSocketMessageType.RemovedFromChatRoom,
+            Body = new
+            {
+                ChatRoomId = chatRoomId,
+            }
+        };
+        
+        string jsonMsg = JsonSerializer.Serialize(
+            msg,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        );
+
+        _webSocketOperationsManager.EnqueueSendMessage(friendIds, jsonMsg);
+        
         return null;
     }
 
