@@ -5,6 +5,7 @@ import CurrentUserContext from "@/context/currentUserContext";
 import { FriendsContext } from "@/context/friendsContext";
 import AddMembers from "@/app/application/_components/_sidebar/_chatroom/addMembers";
 import ToggleElement from "@/components/toggleElement";
+import NotificationService from "../../_notifications/notificationService";
 
 interface MembersListProps {
     chatRoomId: string;
@@ -13,8 +14,25 @@ interface MembersListProps {
 
 export default function MembersList(props: MembersListProps) {
     const { currentUser } = useContext(CurrentUserContext);
-    const { friends } = useContext(FriendsContext);
     const [members, setMembers] = useState<User[] | null>(null);
+
+    const isAdmin = currentUser.userId === props.adminUserId;
+
+    const onRemoveFromChatRoom = (userId: string) => {
+        if (!members) return;
+
+        ChatRoomService.RemoveChatRoomMembers(props.chatRoomId, [userId]).then(
+            (result) => {
+                if (result.errors.length > 0) {
+                    NotificationService.AddNotification(
+                        `Failed to remove user: ${result.errors[0]}`,
+                    );
+                } else {
+                    setMembers(members.filter((m) => m.userId !== userId));
+                }
+            },
+        );
+    };
 
     useEffect(() => {
         ChatRoomService.GetChatRoomMembers(props.chatRoomId)
@@ -24,7 +42,7 @@ export default function MembersList(props: MembersListProps) {
                 );
             })
             .catch(() => "err");
-    }, []);
+    }, [currentUser.userId, props.chatRoomId]);
 
     if (members === null) {
         return <h1>Loading...</h1>;
@@ -38,6 +56,14 @@ export default function MembersList(props: MembersListProps) {
                     <small className="w-full text-center">
                         {member.username}
                     </small>
+
+                    {isAdmin && (
+                        <button
+                            onClick={() => onRemoveFromChatRoom(member.userId)}
+                        >
+                            Remove
+                        </button>
+                    )}
                 </div>
             ))}
 
@@ -48,13 +74,12 @@ export default function MembersList(props: MembersListProps) {
                         buttonChildren={
                             <h1 className="text-xl">Add members</h1>
                         }
-                        children={
-                            <AddMembers
-                                chatRoomId={props.chatRoomId}
-                                currentMemberIds={members.map((m) => m.userId)}
-                            />
-                        }
-                    />
+                    >
+                        <AddMembers
+                            chatRoomId={props.chatRoomId}
+                            currentMemberIds={members.map((m) => m.userId)}
+                        />
+                    </ToggleElement>
                 </>
             )}
         </div>

@@ -131,6 +131,43 @@ class _ChatRoomService {
         );
     }
 
+    async RemoveChatRoomMembers(
+        chatRoomId: string,
+        userIds: string[],
+    ): Promise<Result<void, string>> {
+        let result: Result<void, string> | null = null;
+
+        try {
+            await axios.post(
+                `${publicConfiguration.BACKEND_URL}/chatroom/members/remove`,
+                {
+                    chatRoomId: chatRoomId,
+                    userIds: userIds,
+                },
+                {
+                    withCredentials: true,
+                },
+            );
+
+            result = { data: null, errors: [] };
+        } catch (err) {
+            if (isAxiosError(err)) {
+                const msg = err.response?.data.message;
+                result = {
+                    data: null,
+                    errors: [msg],
+                };
+            }
+
+            result = {
+                data: null,
+                errors: ["Unexpected error"],
+            };
+        }
+
+        return result;
+    }
+
     async GetChatRoomMembers(chatRoomId: string): Promise<User[]> {
         const res = await axios.get(
             `${publicConfiguration.BACKEND_URL}/chatroom/members?chatRoomId=${chatRoomId}`,
