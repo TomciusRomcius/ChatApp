@@ -66,6 +66,20 @@ public class ChatRoomService : IChatRoomService
         return null;
     }
 
+    public async Task<ResultError?> RemoveFriendsFromChatRoom(string removerId, string chatRoomId, List<string> friendIds)
+    {
+        int deletedCount = await _databaseContext.ChatRoomMembers
+            .Where(crm => crm.ChatRoomId == chatRoomId && friendIds.Contains(crm.MemberId))
+            .ExecuteDeleteAsync();
+
+        if (deletedCount != friendIds.Count)
+            return new ResultError(
+                ResultErrorType.VALIDATION_ERROR,
+                "Trying to remove members that are not in the chat room"
+            );
+        return null;
+    }
+
     public async Task<List<PublicUserInfoEntity>> GetUsersInChatRoom(string userId, string chatRoomId)
     {
         IQueryable<PublicUserInfoEntity> query = from member in _databaseContext.ChatRoomMembers
