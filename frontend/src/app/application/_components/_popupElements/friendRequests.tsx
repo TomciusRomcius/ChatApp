@@ -9,7 +9,7 @@ interface FriendRequestsProps {
 }
 
 export default function FriendRequests(props: FriendRequestsProps) {
-    const { appState, setAppState } = useContext(AppStateContext);
+    const { setAppState } = useContext(AppStateContext);
     const { friends, setFriends } = useContext(FriendsContext);
 
     const onAcceptRequest = (userId: string) => {

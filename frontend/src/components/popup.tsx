@@ -7,10 +7,10 @@ interface PopupProps {
 }
 
 export default function Popup(props: PopupProps) {
-    let outsideContainerRef = useRef<HTMLDivElement | null>(null);
-    let containerRef = useRef<HTMLDivElement | null>(null);
+    const outsideContainerRef = useRef<HTMLDivElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
-    const onOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const onOutsideClick = () => {
         props.onClose();
     };
 

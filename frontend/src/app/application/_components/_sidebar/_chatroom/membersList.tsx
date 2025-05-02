@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import ChatRoomService from "@/services/chatRoomService";
 import User from "@/app/application/_utils/user";
 import CurrentUserContext from "@/context/currentUserContext";
-import { FriendsContext } from "@/context/friendsContext";
 import AddMembers from "@/app/application/_components/_sidebar/_chatroom/addMembers";
 import ToggleElement from "@/components/toggleElement";
 import NotificationService from "../../_notifications/notificationService";

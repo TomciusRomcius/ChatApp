@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import NotificationService from "@/app/application/_components/_notifications/notificationService";
 
 export default function NotificationsContainer() {
-    const [_, setUpdate] = useState([]);
+    const [, setUpdate] = useState([]);
 
     useEffect(() => {
         NotificationService.AddCallback(() => {

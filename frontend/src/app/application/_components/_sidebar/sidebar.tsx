@@ -62,13 +62,13 @@ export default function Sidebar(props: SidebarProps) {
         (ev: MessageEvent) => {
             const msg = JSON.parse(ev.data);
             if (msg.type == "new-friend-request") {
-                let user = msg.body as User;
+                const user = msg.body as User;
                 NotificationService.AddNotification(
                     `${user.username} send you a friend request!`,
                 );
                 setFriendRequests([...friendRequests, user]);
             } else if (msg.type == "accepted-friend-request") {
-                let user = msg.body as User;
+                const user = msg.body as User;
                 NotificationService.AddNotification(
                     `${user.username} has accepted your friend request!`,
                 );
@@ -102,7 +102,7 @@ export default function Sidebar(props: SidebarProps) {
                 );
             }
         },
-        [chatRooms],
+        [chatRooms, friendRequests, friends, setFriends],
     );
 
     const handleDeletedFriend = (deletedId: string) => {
@@ -129,7 +129,7 @@ export default function Sidebar(props: SidebarProps) {
         return () => {
             props.webSocket.removeEventListener("message", handleWsMessage);
         };
-    }, [handleWsMessage]);
+    }, [handleWsMessage, props.webSocket]);
 
     return (
         <>

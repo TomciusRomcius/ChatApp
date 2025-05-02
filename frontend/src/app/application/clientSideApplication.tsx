@@ -65,7 +65,7 @@ export default function ClientSideApplication(
                 NotificationService.AddNotification(notification);
             }
         },
-        [currentUser, friends],
+        [friends, newMessages],
     );
 
     useEffect(() => {
@@ -80,7 +80,7 @@ export default function ClientSideApplication(
         return () => {
             props.webSocket.removeEventListener("message", handleWsMessage);
         };
-    }, [handleWsMessage]);
+    }, [handleWsMessage, props.webSocket]);
 
     const filteredChatNewMessages = filterNewMessages(currentChat, newMessages);
 

@@ -25,7 +25,7 @@ export default function AddMembers(props: AddMembersProps) {
             props.chatRoomId,
             addedMembers.map((am) => am.userId),
         )
-            .then((res) => {})
+            .then(() => {})
             .catch((err) => alert(err));
     };
 

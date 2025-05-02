@@ -26,7 +26,7 @@ export default function SignInPage() {
             .then(() => {
                 router.replace("/application");
             })
-            .catch((err) => {
+            .catch(() => {
                 console.log("Failed to login");
             });
     };
@@ -51,7 +51,7 @@ export default function SignInPage() {
             />
             <GoogleProviderButton text="Sign in with google!" />
             <p className="text-textLighter">
-                Don't have an account?
+                Don&apos;t have an account?
                 <Link className="text-accent" href="/auth/sign-up">
                     {" "}
                     Register.

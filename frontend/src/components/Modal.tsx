@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -9,9 +9,9 @@ interface ModalProps {
 }
 
 export default function Modal(props: ModalProps) {
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         props.onClose();
-    };
+    }, [props]);
 
     useEffect(() => {
         document.body.addEventListener("click", handleClose);
@@ -21,7 +21,7 @@ export default function Modal(props: ModalProps) {
             document.body.removeEventListener("click", handleClose);
             document.body.removeEventListener("contextmenu", handleClose);
         };
-    }, []);
+    }, [handleClose]);
 
     return createPortal(
         <div style={{ top: props.y, left: props.x }} className="fixed">

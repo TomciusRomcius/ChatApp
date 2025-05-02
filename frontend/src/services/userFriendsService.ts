@@ -11,6 +11,8 @@ class _UserFriendsService {
         let result;
         if (Array.isArray(res.data)) {
             result = res.data.map(
+                // TODO: safety check
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (user: any) =>
                     ({
                         username: user.username,

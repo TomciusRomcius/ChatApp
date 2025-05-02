@@ -2,6 +2,7 @@ import { ChatRoom } from "@/types";
 import { publicConfiguration } from "@/utils/configuration";
 import axios, { isAxiosError } from "axios";
 import User from "@/app/application/_utils/user";
+import { Result } from "@/utils/Result";
 
 interface CreateChatRoomResponse {
     chatRoomId: string;

@@ -1,7 +1,7 @@
 import { CurrentUser } from "@/app/application/_utils/user";
 import { publicConfiguration } from "@/utils/configuration";
+import { Result } from "@/utils/Result";
 import axios from "axios";
-import HttpErrorResponse from "@/utils/httpErrorResponse";
 
 interface UserInfoRequest {
     username: string;
@@ -39,7 +39,7 @@ class _UserService {
     }
 
     async SetUserInfo(userInfo: UserInfoRequest): Promise<void> {
-        const res = await axios.post(
+        await axios.post(
             `${publicConfiguration.BACKEND_URL}/user/user-info`,
             { ...userInfo },
             { withCredentials: true },

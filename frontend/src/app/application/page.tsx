@@ -29,7 +29,7 @@ export default function ApplicationPage() {
                 setCurrentUser(result.data);
             }
         });
-    }, []);
+    }, [router]);
 
     if (!currentUser) {
         return <h1>Loading</h1>;
