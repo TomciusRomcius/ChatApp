@@ -9,6 +9,19 @@ public static class UserFriendStatus
     public const byte REQUEST = 0x00;
     public const byte FRIEND = 0x01;
     public const byte BLOCKED = 0x10;
+    public const byte NOT_FRIEND = 0x11;
+
+    public static Result<string> ByteToString(byte byteValue)
+    {
+        return byteValue switch
+        {
+            REQUEST => new Result<string>("request"),
+            FRIEND => new Result<string>("friend"),
+            BLOCKED => new Result<string>("blocked"),
+            NOT_FRIEND => new Result<string>("not-friend"),
+            _ => new Result<string>([new ResultError(ResultErrorType.VALIDATION_ERROR, "Invalid status")])
+        };
+    }
 }
 
 public class UserFriendEntity

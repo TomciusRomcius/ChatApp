@@ -8,6 +8,10 @@ public interface IUserFriendService
 {
     Task<ResultError?> AcceptFriendRequest(string initiatorUserId, string receiverUserId);
     Result<List<UserModel>> GetUserFriends(string userId, byte status = UserFriendStatus.FRIEND);
+
+    Task<Result<List<UserModel>>> GetUsersByStatus(string userId, byte status,
+        UserRelationshipType relationShipType);
+
     Task<ResultError?> RemoveFromFriends(string user1Id, string user2Id);
     Task<ResultError?> SendFriendRequest(string initiatorUserId, string receiverUserId);
     Task<ResultError?> SendFriendRequestWithUsername(string initiatorUserId, string receiverUsername);

@@ -11,4 +11,8 @@
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="Models\UserRelationshipModel.cs"/>
+    </ItemGroup>
+
 </Project>

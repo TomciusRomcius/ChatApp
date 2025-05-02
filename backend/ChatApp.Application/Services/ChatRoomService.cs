@@ -48,13 +48,11 @@ public class ChatRoomService : IChatRoomService
             .SingleOrDefault(chatroom => chatroom.ChatRoomId == chatRoomId);
 
         if (chatroom == null)
-        {
             return new ResultError(
                 ResultErrorType.VALIDATION_ERROR,
                 "Trying to add friend to a chat room that does not exist"
             );
-        }
-        
+
         List<ChatRoomMemberEntity> chatRoomMembers = [];
 
         // TODO: check if already friends if not, return error        
@@ -74,8 +72,8 @@ public class ChatRoomService : IChatRoomService
 
         _databaseContext.ChatRoomMembers.AddRange(chatRoomMembers);
         await _databaseContext.SaveChangesAsync();
-        
-        
+
+
         var msg = new
         {
             Type = UserWebSocketMessageType.AddedToChatRoom,

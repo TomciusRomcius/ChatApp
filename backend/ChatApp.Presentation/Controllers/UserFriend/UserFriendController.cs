@@ -35,6 +35,24 @@ public class UserFriendController : ControllerBase
         return ControllerUtils.OutputErrorResult(result.Errors.First());
     }
 
+    [HttpGet("relationship")]
+    public async Task<IActionResult> GetUserRelationShips([FromQuery] GetUserRelationshipsDto dto)
+    {
+        string? userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
+            ?.Value;
+
+        if (userId is null) return Unauthorized();
+
+        Result<List<UserModel>> result =
+            await _userFriendService.GetUsersByStatus(userId, (byte)dto.Status, dto.RelationshipType);
+
+        if (result.IsError())
+            return ControllerUtils.OutputErrorResult(result.Errors.First());
+
+        return Ok(result.GetValue());
+    }
+
+
     [HttpPost("request")]
     public async Task<IActionResult> SendFriendRequest([FromBody] AddFriendDto addFriendDto)
     {

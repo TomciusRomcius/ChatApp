@@ -52,6 +52,41 @@ public class UserFriendService : IUserFriendService
         return new Result<List<UserModel>>([..results1, ..results2]);
     }
 
+    public async Task<Result<List<UserModel>>> GetUsersByStatus(string userId, byte status,
+        UserRelationshipType relationShipType)
+    {
+        Result<string> statusStringResult = UserFriendStatus.ByteToString(status);
+        if (statusStringResult.IsError()) return new Result<List<UserModel>>(statusStringResult.Errors);
+
+        List<UserModel> results;
+        if (relationShipType == UserRelationshipType.Initiator)
+            results = await (from userFriends in _databaseContext.UserFriends
+                where userFriends.ReceiverId == userId && userFriends.Status == status
+                join publicUserInfo in _databaseContext.PublicUserInfos
+                    on userFriends.InitiatorId equals publicUserInfo.UserId
+                select new UserModel(
+                    publicUserInfo.UserId,
+                    publicUserInfo.Username
+                )).ToListAsync();
+
+        else if (relationShipType == UserRelationshipType.Receiver)
+            results = await (from userFriends in _databaseContext.UserFriends
+                where userFriends.InitiatorId == userId && userFriends.Status == status
+                join publicUserInfo in _databaseContext.PublicUserInfos
+                    on userFriends.InitiatorId equals publicUserInfo.UserId
+                select new UserModel(
+                    publicUserInfo.UserId,
+                    publicUserInfo.Username
+                )).ToListAsync();
+
+        else
+            return new Result<List<UserModel>>([
+                new ResultError(ResultErrorType.VALIDATION_ERROR, "Invalid relation ship type.")
+            ]);
+
+        return new Result<List<UserModel>>(results);
+    }
+
     public async Task<ResultError?> SendFriendRequest(string initiatorUserId, string receiverUserId)
     {
         // TODO: check if already friends

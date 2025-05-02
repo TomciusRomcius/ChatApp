@@ -25,22 +25,11 @@ class _UserFriendsService {
     async GetAllFriendRequests(): Promise<User[]> {
         // TODO: add enum to avoid hard coded status
         const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend?status=0`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/userfriend/relationship?status=0&relationshipType=0`,
             { withCredentials: true },
         );
 
-        let result;
-        if (Array.isArray(res.data)) {
-            result = res.data.map(
-                (user: any) =>
-                    ({
-                        username: user.username,
-                        userId: user.userId,
-                    }) as User,
-            );
-        }
-
-        return result ?? ([] as User[]);
+        return res.data ?? ([] as User[]);
     }
 
     async SendFriendRequest(username: string): Promise<void> {
