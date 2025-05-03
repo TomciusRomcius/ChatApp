@@ -79,8 +79,8 @@ resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
       ]
       portMappings = [
         {
-          containerPort = 5142
-          hostPort      = 5142
+          containerPort = 8080
+          hostPort      = 8080
           protocol      = "tcp"
           name          = "backend"
           appProtocol   = "http"
@@ -165,10 +165,10 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
         {
           name = "NEXT_PUBLIC_BACKEND_URL",
           // TODO: Incrorrect but temporary
-          value = "http://backend:5142"
+          value = "http://${aws_alb.chatapp-alb.dns_name}/api"
         },
         {
-          name = "HOSTNAME"
+          name  = "HOSTNAME"
           value = "0.0.0.0"
         }
       ]
@@ -242,6 +242,12 @@ resource "aws_ecs_service" "frontend" {
     assign_public_ip = true
   }
 
+  load_balancer {
+    target_group_arn = aws_alb_target_group.chatapp-frontend.arn
+    container_name   = "chatapp-frontend"
+    container_port   = 3000
+  }
+
   launch_type = "FARGATE"
 }
 
@@ -286,6 +292,12 @@ resource "aws_ecs_service" "backend" {
     assign_public_ip = true
   }
 
+  load_balancer {
+    target_group_arn = aws_alb_target_group.chatapp-backend.arn
+    container_name   = "chatapp-backend"
+    container_port   = 8080
+  }
+
   service_connect_configuration {
     enabled   = true
     namespace = aws_service_discovery_http_namespace.chatapp-private.arn
@@ -294,7 +306,7 @@ resource "aws_ecs_service" "backend" {
       port_name      = "backend"
       client_alias {
         dns_name = "backend"
-        port     = 5142
+        port     = 8080
       }
     }
   }
