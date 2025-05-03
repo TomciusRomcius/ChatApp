@@ -42,6 +42,33 @@ namespace ChatApp.Presentation.Auth
             _antiforgery = antiforgery;
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] LoginDto dto)
+        {
+            var user = new IdentityUser(dto.Email);
+
+            IdentityResult result = await _userManager.CreateAsync(
+                user,
+                dto.Password
+            );
+
+            if (result.Errors.Any())
+            {
+                // TODO: explicit messages
+                return BadRequest("Failed to register");
+            }
+
+            SignInResult signInResult = await _signInManager.PasswordSignInAsync(
+                user,
+                dto.Password,
+                true,
+                false
+            );
+
+            _antiforgery.SetCookieTokenAndHeader(HttpContext);
+            return Ok();
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
