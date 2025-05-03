@@ -18,18 +18,18 @@ namespace ChatApp.Presentation.Auth
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class OidcAuthController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IAntiforgery _antiforgery;
         private readonly ICsrfTokenStoreService _csrfTokenStoreService;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<OidcAuthController> _logger;
+        private readonly ILogger<AuthController> _logger;
         private readonly OidcProviderConfigMapService _oidcProviderConfigMapService;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public OidcAuthController(IHttpClientFactory httpClientFactory,
-            OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<OidcAuthController> logger,
+        public AuthController(IHttpClientFactory httpClientFactory,
+            OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<AuthController> logger,
             SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager,
             ICsrfTokenStoreService csrfTokenStoreService, IAntiforgery antiforgery)
         {
@@ -45,7 +45,10 @@ namespace ChatApp.Presentation.Auth
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] LoginDto dto)
         {
-            var user = new IdentityUser(dto.Email);
+            var user = new IdentityUser(dto.Email)
+            {
+                Email = dto.Email
+            };
 
             IdentityResult result = await _userManager.CreateAsync(
                 user,
@@ -55,7 +58,7 @@ namespace ChatApp.Presentation.Auth
             if (result.Errors.Any())
             {
                 // TODO: explicit messages
-                return BadRequest("Failed to register");
+                return BadRequest(result.Errors);
             }
 
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
