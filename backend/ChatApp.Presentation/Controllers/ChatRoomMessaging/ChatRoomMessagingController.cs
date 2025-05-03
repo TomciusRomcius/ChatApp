@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChatApp.Presentation.Controllers.ChatRoomMessaging;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ChatRoomMessagingController : ControllerBase
 {
     private readonly IChatRoomMessagingService _chatRoomMessagingService;

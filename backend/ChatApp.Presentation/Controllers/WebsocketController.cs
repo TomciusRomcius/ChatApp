@@ -18,7 +18,7 @@ public class WebsocketController : ControllerBase
         _webSocketList = webSocketList;
     }
 
-    [Route("ws")]
+    [Route("api/ws")]
     // TODO: temporary disable
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task Get()

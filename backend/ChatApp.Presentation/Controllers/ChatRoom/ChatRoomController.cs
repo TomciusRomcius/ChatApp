@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChatApp.Presentation.Controllers.ChatRoom;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ChatRoomController : ControllerBase
 {
     private readonly IChatRoomService _chatRoomService;

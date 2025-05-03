@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChatApp.Presentation.User;
 
 [ApiController]
-[Route("user")]
+[Route("api/[controller]")]
 public class UserController : ControllerBase
 {
     private readonly SignInManager<IdentityUser> _signInManager;

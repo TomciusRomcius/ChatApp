@@ -17,7 +17,7 @@ internal class OidcResponse
 namespace ChatApp.Presentation.Auth
 {
     [ApiController]
-    [Route("auth")]
+    [Route("api/[controller]")]
     public class OidcAuthController : ControllerBase
     {
         private readonly IAntiforgery _antiforgery;

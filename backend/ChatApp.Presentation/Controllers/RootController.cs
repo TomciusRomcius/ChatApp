@@ -3,7 +3,7 @@
 namespace ChatApp.Presentation.Controllers;
 
 [ApiController]
-[Route("/")]
+[Route("/api")]
 public class RootController : ControllerBase
 {
     [HttpGet]

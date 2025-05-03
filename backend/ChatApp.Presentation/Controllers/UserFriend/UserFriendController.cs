@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChatApp.Presentation.Controllers.UserFriend;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class UserFriendController : ControllerBase
 {
     private readonly IUserFriendService _userFriendService;
