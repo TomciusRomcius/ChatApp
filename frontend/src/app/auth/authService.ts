@@ -6,16 +6,19 @@ class AuthService {
         email: string,
         password: string,
     ): Promise<Response> {
-        const res = await fetch(`${publicConfiguration.BACKEND_URL}/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+        const res = await fetch(
+            `${publicConfiguration.BACKEND_URL}/auth/register`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                }),
             },
-            body: JSON.stringify({
-                email: email,
-                password: password,
-            }),
-        });
+        );
 
         return res;
     }
@@ -25,7 +28,7 @@ class AuthService {
         password: string,
     ): Promise<AxiosResponse> {
         const res = await axios.post(
-            `${publicConfiguration.BACKEND_URL}/login?useCookies=true`,
+            `${publicConfiguration.BACKEND_URL}/auth/login`,
             {
                 email: email,
                 password: password,
