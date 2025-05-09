@@ -7,8 +7,11 @@ import GoogleProviderButton from "@/app/auth/_components/googleProviderButton";
 import ButtonWithPassword from "@/app/auth/_components/buttonWithPassword";
 import Link from "next/link";
 import AuthFlowLayout from "@/app/auth/_components/authFlowLayout";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+    const router = useRouter();
+    
     const handleSignUp = (ev: FormEvent) => {
         // TODO: validate input
 
@@ -28,7 +31,9 @@ export default function SignUpPage() {
             return;
         }
 
-        authService.SignUpWithPassword(email, password);
+        authService.SignUpWithPassword(email, password)
+            .then(() => router.replace("/auth/account-setup"))
+            .catch(() => alert("err"));
     };
 
     return (
