@@ -1,4 +1,5 @@
-﻿using ChatApp.Application.Persistence;
+﻿using System.Data;
+using ChatApp.Application.Persistence;
 using ChatApp.Application.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,5 +15,18 @@ public static class DatabaseInitializer
             var sqlOptions = serviceProvider.GetRequiredService<MsSqlOptions>();
             options.UseSqlServer(sqlOptions.GetConnectionString());
         });
+    }
+
+    public static async Task MigrateAsync(WebApplication app)
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            DatabaseContext? dbContext = scope.ServiceProvider.GetService<DatabaseContext>();
+            if (dbContext == null)
+            {
+                throw new DataException("Failed to get database context");
+            }
+            await dbContext.Database.MigrateAsync();
+        }
     }
 }

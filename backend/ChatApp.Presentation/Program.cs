@@ -54,6 +54,8 @@ string? frontendURL = builder.Configuration["CA_FRONTEND_URL"];
 ArgumentNullException.ThrowIfNull(frontendURL, "CA_FRONTEND_URL");
 app.UseCors(options => options.WithOrigins(frontendURL).AllowCredentials().AllowAnyHeader().AllowAnyMethod());
 
+await DatabaseInitializer.MigrateAsync(app);
+
 app.UseAuthentication();
 app.UseAuthorization();
 
