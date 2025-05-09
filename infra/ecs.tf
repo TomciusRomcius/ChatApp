@@ -68,13 +68,16 @@ resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
           value = "https://accounts.google.com"
         },
         {
-          name = "CA_FRONTEND_URL"
-          # TODO: incorrect but temporarily set to not throw exception at runtime
-          value = "http://frontend.chatapp.local:3000"
+          name  = "CA_FRONTEND_URL"
+          value = "http://${aws_alb.chatapp-alb.dns_name}"
         },
         {
           name  = "CA_MSSQL_HOST"
           value = "mssql,1433"
+        },
+        {
+          name  = "Logging__EventLog__LogLevel__Default"
+          value = "Information"
         }
       ]
       portMappings = [
