@@ -1,3 +1,8 @@
+resource "aws_acm_certificate" "chatapp-certificate" {
+  domain_name       = "tomwpagency.com"
+  validation_method = "DNS"
+}
+
 resource "aws_alb" "chatapp-alb" {
   name               = "chatapp-alb"
   internal           = false
@@ -25,8 +30,11 @@ resource "aws_alb_target_group" "chatapp-backend" {
 
 resource "aws_alb_listener" "chatapp-alb-http-listener" {
   load_balancer_arn = aws_alb.chatapp-alb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-2016-08"
+  certificate_arn = aws_acm_certificate.chatapp-certificate.arn
 
   default_action {
     type             = "forward"
