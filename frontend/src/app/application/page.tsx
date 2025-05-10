@@ -18,9 +18,9 @@ export default function ApplicationPage() {
 
     useEffect(() => {
         UserService.WhoAmI().then((result) => {
-            if (result.errors.length > 0) {
+            if (result.error !== null) {
                 // TODO: Not ideal, implement error codes
-                if (result.errors[0] === "Account setup required!") {
+                if (result.error === "Account setup required!") {
                     router.replace("/auth/account-setup");
                 } else {
                     router.replace("/auth/sign-in");

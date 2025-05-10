@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
     const router = useRouter();
-    
+
     const handleSignUp = (ev: FormEvent) => {
         // TODO: validate input
 
@@ -31,7 +31,8 @@ export default function SignUpPage() {
             return;
         }
 
-        authService.SignUpWithPassword(email, password)
+        authService
+            .SignUpWithPassword(email, password)
             .then(() => router.replace("/auth/account-setup"))
             .catch(() => alert("err"));
     };

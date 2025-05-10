@@ -22,9 +22,9 @@ export default function MembersList(props: MembersListProps) {
 
         ChatRoomService.RemoveChatRoomMembers(props.chatRoomId, [userId]).then(
             (result) => {
-                if (result.errors.length > 0) {
+                if (result.error !== null) {
                     NotificationService.AddNotification(
-                        `Failed to remove user: ${result.errors[0]}`,
+                        `Failed to remove user: ${result.error}`,
                     );
                 } else {
                     setMembers(members.filter((m) => m.userId !== userId));

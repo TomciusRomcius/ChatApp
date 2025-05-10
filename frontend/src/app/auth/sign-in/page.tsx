@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { authService } from "../authService";
 import GoogleProviderButton from "../_components/googleProviderButton";
 import AuthFlowLayout from "../_components/authFlowLayout";
@@ -11,6 +11,7 @@ import Link from "next/link";
 
 export default function SignInPage() {
     const router = useRouter();
+    const [error, setError] = useState("");
 
     const handleSignIn = (ev: FormEvent) => {
         // TODO: validate input
@@ -21,14 +22,11 @@ export default function SignInPage() {
         const email = form.email.value;
         const password = form.password.value;
 
-        authService
-            .SignInWithPassword(email, password)
-            .then(() => {
-                router.replace("/application");
-            })
-            .catch(() => {
-                console.log("Failed to login");
-            });
+        authService.SignInWithPassword(email, password).then((result) => {
+            if (result.error !== null) {
+                setError(result.error);
+            } else router.replace("/application");
+        });
     };
 
     return (

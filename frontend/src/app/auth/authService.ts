@@ -1,14 +1,14 @@
 import { publicConfiguration } from "@/utils/configuration";
-import axios, { AxiosResponse } from "axios";
+import axios, { isAxiosError } from "axios";
+import { Result } from "@/utils/Result";
 
 class AuthService {
     public static async SignUpWithPassword(
         email: string,
         password: string,
-    ): Promise<Response> {
-        const res = await fetch(
-            `${publicConfiguration.BACKEND_URL}/auth/register`,
-            {
+    ): Promise<Result<null, string>> {
+        try {
+            await fetch(`${publicConfiguration.BACKEND_URL}/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -17,26 +17,56 @@ class AuthService {
                     email: email,
                     password: password,
                 }),
-            },
-        );
-
-        return res;
+            });
+            return {
+                data: null,
+                error: null,
+            };
+        } catch (err) {
+            if (isAxiosError(err)) {
+                return {
+                    data: null,
+                    error: err.response?.data?.message ?? "Unexpected error.",
+                };
+            }
+            return {
+                data: null,
+                error: "Unexpected error.",
+            };
+        }
     }
 
+    // Returns error message
     public static async SignInWithPassword(
         email: string,
         password: string,
-    ): Promise<AxiosResponse> {
-        const res = await axios.post(
-            `${publicConfiguration.BACKEND_URL}/auth/login`,
-            {
-                email: email,
-                password: password,
-            },
-            { withCredentials: true },
-        );
-
-        return res;
+    ): Promise<Result<null, string>> {
+        try {
+            await axios.post(
+                `${publicConfiguration.BACKEND_URL}/auth/login`,
+                {
+                    email: email,
+                    password: password,
+                },
+                { withCredentials: true },
+            );
+            return {
+                data: null,
+                error: null,
+            };
+        } catch (err) {
+            if (isAxiosError(err)) {
+                const msg = err.response?.data?.message ?? "Unexpected error";
+                return {
+                    data: null,
+                    error: msg,
+                };
+            }
+            return {
+                data: null,
+                error: "Unexpected error",
+            };
+        }
     }
 }
 

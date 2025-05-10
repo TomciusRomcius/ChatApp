@@ -19,17 +19,17 @@ class _UserService {
 
             result = {
                 data: res.data as CurrentUser | null,
-                errors: [],
+                error: null,
             };
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 result = {
-                    errors: [err.response?.data?.toString()],
+                    error: [err.response?.data?.toString()],
                     data: null,
                 };
             } else {
                 result = {
-                    errors: ["Unexpected error occurred."],
+                    error: ["Unexpected error occurred."],
                     data: null,
                 };
             }

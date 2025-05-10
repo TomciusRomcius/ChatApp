@@ -30,7 +30,7 @@ export default function CreateChatroom(props: CreateChatroomProps) {
                 name,
                 members.map((member) => member.userId),
             ).then((result) => {
-                if (result.errors.length > 0) {
+                if (result.error !== null) {
                     alert("err");
                 } else {
                     props.onCreateChatRoom({

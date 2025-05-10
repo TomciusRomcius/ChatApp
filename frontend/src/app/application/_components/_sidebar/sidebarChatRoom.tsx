@@ -37,9 +37,9 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
 
     const onDeleteChatRoom = () => {
         ChatRoomService.DeleteChatRoom(props.chatRoomId).then((result) => {
-            if (result.errors.length > 0) {
+            if (result.error !== null) {
                 NotificationService.AddNotification(
-                    `Failed to delete chat room: ${result.errors}`,
+                    `Failed to delete chat room: ${result.error}`,
                 );
             } else {
                 props.handleDeletedChatRoom(props.chatRoomId);
@@ -52,9 +52,9 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
 
     const onLeaveChatRoom = () => {
         ChatRoomService.LeaveChatRoom(props.chatRoomId).then((result) => {
-            if (result.errors.length > 0) {
+            if (result.error !== null) {
                 NotificationService.AddNotification(
-                    `Failed to delete chat room: ${result.errors}`,
+                    `Failed to delete chat room: ${result.error}`,
                 );
             } else {
                 props.handleDeletedChatRoom(props.chatRoomId);

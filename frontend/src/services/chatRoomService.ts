@@ -13,8 +13,6 @@ class _ChatRoomService {
         name: string,
         memberIds: string[],
     ): Promise<Result<string, string>> {
-        let result: Result<string, string> | null = null;
-
         try {
             const res = await axios.post(
                 `${publicConfiguration.BACKEND_URL}/chatroom`,
@@ -26,59 +24,51 @@ class _ChatRoomService {
             );
 
             const body = res.data as CreateChatRoomResponse;
-            result = {
+            return {
                 data: body.chatRoomId,
-                errors: [],
+                error: null,
             };
         } catch (err) {
             if (isAxiosError(err)) {
                 const msg = err.response?.data.message;
-                result = {
+                return {
                     data: null,
-                    errors: [msg],
+                    error: msg,
                 };
             }
 
-            result = {
+            return {
                 data: null,
-                errors: ["Unexpected error"],
+                error: "Unexpected error",
             };
         }
-
-        return result;
     }
 
     async DeleteChatRoom(chatRoomId: string): Promise<Result<void, string>> {
-        let result: Result<void, string> | null = null;
-
         try {
             await axios.delete(
                 `${publicConfiguration.BACKEND_URL}/chatroom?chatRoomId=${chatRoomId}`,
                 { withCredentials: true },
             );
 
-            result = { data: null, errors: [] };
+            return { data: null, error: null };
         } catch (err) {
             if (isAxiosError(err)) {
                 const msg = err.response?.data.message;
-                result = {
+                return {
                     data: null,
-                    errors: [msg],
+                    error: msg,
                 };
             }
 
-            result = {
+            return {
                 data: null,
-                errors: ["Unexpected error"],
+                error: "Unexpected error",
             };
         }
-
-        return result;
     }
 
     async LeaveChatRoom(chatRoomId: string): Promise<Result<void, string>> {
-        let result: Result<void, string> | null = null;
-
         try {
             await axios.post(
                 `${publicConfiguration.BACKEND_URL}/chatroom/leave`,
@@ -86,23 +76,20 @@ class _ChatRoomService {
                 { withCredentials: true },
             );
 
-            result = { data: null, errors: [] };
+            return { data: null, error: null };
         } catch (err) {
             if (isAxiosError(err)) {
                 const msg = err.response?.data.message;
-                result = {
+                return {
                     data: null,
-                    errors: [msg],
+                    error: msg,
                 };
             }
-
-            result = {
+            return {
                 data: null,
-                errors: ["Unexpected error"],
+                error: "Unexpected error",
             };
         }
-
-        return result;
     }
 
     async GetChatRooms(): Promise<ChatRoom[]> {
@@ -136,8 +123,6 @@ class _ChatRoomService {
         chatRoomId: string,
         userIds: string[],
     ): Promise<Result<void, string>> {
-        let result: Result<void, string> | null = null;
-
         try {
             await axios.post(
                 `${publicConfiguration.BACKEND_URL}/chatroom/members/remove`,
@@ -149,24 +134,19 @@ class _ChatRoomService {
                     withCredentials: true,
                 },
             );
-
-            result = { data: null, errors: [] };
+            return { data: null, error: null };
         } catch (err) {
             if (isAxiosError(err)) {
-                const msg = err.response?.data.message;
-                result = {
+                return {
                     data: null,
-                    errors: [msg],
+                    error: err.response?.data?.message ?? "Unexpected error",
                 };
             }
-
-            result = {
+            return {
                 data: null,
-                errors: ["Unexpected error"],
+                error: "Unexpected error",
             };
         }
-
-        return result;
     }
 
     async GetChatRoomMembers(chatRoomId: string): Promise<User[]> {
