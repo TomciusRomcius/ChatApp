@@ -1,4 +1,4 @@
-# A Real-time Messaging Web Application
+# A Real-time Chat App
 
 ### Features
 * Register and log in using email and password or OpenID(currently only Google provider).
@@ -6,20 +6,21 @@
 * Create and delete chat rooms; invite friends to join rooms.
 * Send real-time messages to individual friends or within chat rooms.
 
-### Start the app
+### Start in development mode
   #### Database
-  From the root directory:
+  From the root directory: <br>
   ```cd backend && docker compose up -d```
   #### Backend
-  From the root directory:
-  ```cd backend && dotnet watch --project ChatApp.Presentation```
+  Trust and generate a TLS certificate if you don't have one already: <br>
+  ```dotnet dev-certs https --trust``` <br>
+  Run: <br>
+  ```cd backend && dotnet watch --project ChatApp.Presentation --launch-profile https``` <br>
   #### Frontend
-  From the root directory:
+  From the root directory: <br>
   ```cd frontend && npm i && npm run dev:https```
 
 ### Run tests
-* To run the tests, run:
-
+* To run the tests, run from backend directory:
 ```
 dotnet watch --project ChatApp.Presentation
 ```
