@@ -8,6 +8,7 @@ import Input from "@/components/Input";
 import ButtonWithPassword from "@/app/auth/_components/buttonWithPassword";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ErrorMessage from "@/components/errorMessage";
 
 export default function SignInPage() {
     const router = useRouter();
@@ -55,6 +56,7 @@ export default function SignInPage() {
                     Register.
                 </Link>
             </p>
+            <ErrorMessage message={error} />
         </AuthFlowLayout>
     );
 }
