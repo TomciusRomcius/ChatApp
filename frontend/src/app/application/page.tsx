@@ -5,6 +5,7 @@ import ClientSideApplication from "./clientSideApplication";
 import UserService from "../../services/userService";
 import { CurrentUser } from "./_utils/user";
 import { useRouter } from "next/navigation";
+import { publicConfiguration } from "@/utils/configuration";
 
 export default function ApplicationPage() {
     const router = useRouter();
@@ -13,7 +14,9 @@ export default function ApplicationPage() {
     const webSocketRef = useRef<WebSocket | null>(null);
 
     if (webSocketRef.current === null) {
-        webSocketRef.current = new WebSocket("wss://localhost:5112/ws"); // Note: use "wss" for secure WebSocket
+        webSocketRef.current = new WebSocket(
+            `${publicConfiguration.BACKEND_URL.replace("https", "wss")}/ws`,
+        );
     }
 
     useEffect(() => {
