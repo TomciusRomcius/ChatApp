@@ -24,12 +24,12 @@ class _UserService {
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 result = {
-                    error: [err.response?.data?.toString()],
+                    error: err.response?.data?.toString(),
                     data: null,
                 };
             } else {
                 result = {
-                    error: ["Unexpected error occurred."],
+                    error: "Unexpected error occurred.",
                     data: null,
                 };
             }
