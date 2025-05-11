@@ -1,3 +1,8 @@
+variable "chatapp-domain" {
+  type    = string
+  default = "tomwpagency.com"
+}
+
 resource "aws_ecs_cluster" "chatapp-cluster" {
   name = "chatapp-cluster"
 }
@@ -69,7 +74,7 @@ resource "aws_ecs_task_definition" "chatapp-backend-task-definition" {
         },
         {
           name  = "CA_FRONTEND_URL"
-          value = "http://${aws_alb.chatapp-alb.dns_name}"
+          value = "https://${var.chatapp-domain}"
         },
         {
           name  = "CA_MSSQL_HOST"
@@ -167,7 +172,7 @@ resource "aws_ecs_task_definition" "chatapp-frontend-task-definition" {
       environment = [
         {
           name  = "NEXT_PUBLIC_BACKEND_URL",
-          value = "https://tomwpagency.com/api"
+          value = "https://${var.chatapp-domain}/api"
         },
         {
           name  = "HOSTNAME"
