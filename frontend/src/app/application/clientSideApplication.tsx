@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Popup from "../../components/popup";
 import { AppState, AppStateContext } from "@/context/appStateContext";
 import { CurrentChat, CurrentChatContext } from "@/context/currentChatContext";
@@ -12,60 +12,70 @@ import User, { CurrentUser } from "./_utils/user";
 import { FriendsContext } from "@/context/friendsContext";
 import NotificationsContainer from "@/app/application/_components/_popupElements/notificationsContainer";
 import NotificationService from "@/app/application/_components/_notifications/notificationService";
+import MessageSystem from "@/services/messageSystem";
 
 interface ClientSideApplicationProps {
     currentUser: CurrentUser;
     webSocket: WebSocket;
 }
 
-function filterNewMessages(
-    currentChat: CurrentChat | null,
-    newMessages: TextMessage[],
-): TextMessage[] {
-    if (!currentChat) return [];
+function generateMessageSystemKey(currentChat: CurrentChat) {
+    return `${currentChat.type}.${currentChat.id}`;
+}
 
-    const filteredMessages: TextMessage[] = [];
+function handleWsMessage(
+    ev: MessageEvent,
+    messageSystemMap: Map<string, MessageSystem>,
+    friends: User[],
+) {
+    const msg = JSON.parse(ev.data);
+    if (msg.type == "new-message") {
+        const textMessage = msg.body as TextMessage;
+        const isChatRoomMessage = !textMessage.receiverUserId;
+        const chat: CurrentChat = {
+            type: isChatRoomMessage ? "chatroom" : "user",
+            id: isChatRoomMessage
+                ? textMessage.chatRoomId!
+                : textMessage.senderId!,
+        };
 
-    newMessages.forEach((msg) => {
-        if (currentChat.type === "chatroom" && msg.chatRoomId) {
-            filteredMessages.push(msg);
+        // If a message system is created for a chat room, append the text message to the messages array
+        // and notify chatWindow of an update
+        const messageSystem = messageSystemMap.get(
+            generateMessageSystemKey(chat),
+        );
+        console.log(messageSystem?.messageSystemId);
+        if (messageSystem) {
+            messageSystem.AddNewMessage(textMessage);
         }
-        if (currentChat.type === "user" && !msg.chatRoomId) {
-            filteredMessages.push(msg);
-        }
-    });
 
-    return filteredMessages;
+        let notification;
+        if (textMessage.chatRoomId) {
+            // TODO: add chatroom name
+            notification = `New message in chatroom.`;
+        } else {
+            notification = `${friends.find((f) => f.userId == textMessage.senderId)?.username} sent you a message!`;
+        }
+        NotificationService.AddNotification(notification);
+    }
 }
 
 export default function ClientSideApplication(
     props: ClientSideApplicationProps,
 ) {
     const currentUser = props.currentUser;
+    console.log(currentUser);
+    const messageSystemMap = useRef(new Map<string, MessageSystem>());
 
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
     const [currentChat, setCurrentChat] = useState<CurrentChat | null>(null);
     const [friends, setFriends] = useState<User[]>([]);
-    const [newMessages, setNewMessages] = useState<TextMessage[]>([]);
-
-    const handleWsMessage = useCallback(
+    
+    const onWebSocketMessage = useCallback(
         (ev: MessageEvent) => {
-            const msg = JSON.parse(ev.data);
-
-            if (msg.type == "new-message") {
-                const textMessage = msg.body as TextMessage;
-                setNewMessages([...newMessages, textMessage]);
-                let notification;
-                if (textMessage.chatRoomId) {
-                    // TODO: add chatroom name
-                    notification = `New message in chatroom.`;
-                } else {
-                    notification = `${friends.find((f) => f.userId == textMessage.senderId)?.username} sent you a message!`;
-                }
-                NotificationService.AddNotification(notification);
-            }
+            handleWsMessage(ev, messageSystemMap.current, friends);
         },
-        [friends, newMessages],
+        [messageSystemMap, friends],
     );
 
     useEffect(() => {
@@ -75,14 +85,29 @@ export default function ClientSideApplication(
     }, []);
 
     useEffect(() => {
-        props.webSocket.addEventListener("message", handleWsMessage);
+        props.webSocket.addEventListener("message", onWebSocketMessage);
 
         return () => {
-            props.webSocket.removeEventListener("message", handleWsMessage);
+            props.webSocket.removeEventListener("message", onWebSocketMessage);
         };
-    }, [handleWsMessage, props.webSocket]);
+    }, [onWebSocketMessage, props.webSocket]);
 
-    const filteredChatNewMessages = filterNewMessages(currentChat, newMessages);
+    let currentMessageSystem = null;
+
+    if (currentChat) {
+        const messageSystemKey = generateMessageSystemKey(currentChat);
+        currentMessageSystem = messageSystemMap.current.get(messageSystemKey);
+        if (!currentMessageSystem) {
+            currentMessageSystem = new MessageSystem(
+                currentChat,
+                messageSystemKey,
+            );
+            messageSystemMap.current.set(
+                messageSystemKey,
+                currentMessageSystem,
+            );
+        }
+    }
 
     return (
         <CurrentUserContext.Provider
@@ -119,7 +144,9 @@ export default function ClientSideApplication(
                             friends={friends}
                         />
                     </FriendsContext>
-                    <ChatWindow newMessages={filteredChatNewMessages} />
+                    {currentChat && (
+                        <ChatWindow messageSystem={currentMessageSystem!} />
+                    )}
                     <NotificationsContainer />
                 </CurrentChatContext.Provider>
             </AppStateContext.Provider>

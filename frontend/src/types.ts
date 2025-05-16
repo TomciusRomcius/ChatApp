@@ -1,6 +1,6 @@
 export default interface TextMessage {
     senderId: string;
-    receiverId?: string;
+    receiverUserId?: string;
     chatRoomId?: string;
     content: string;
     createdAt: Date;
