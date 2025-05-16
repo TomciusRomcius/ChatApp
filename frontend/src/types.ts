@@ -3,7 +3,7 @@ export default interface TextMessage {
     receiverUserId?: string;
     chatRoomId?: string;
     content: string;
-    createdAt: Date;
+    createdAt: string;
 }
 
 export interface ChatRoom {

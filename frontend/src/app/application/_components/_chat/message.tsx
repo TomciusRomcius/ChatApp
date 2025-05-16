@@ -11,6 +11,18 @@ export default function Message(props: MessageProps) {
 
     const isSender = props.message.senderId == currentUser.userId;
 
+    const formattedDate = new Date(props.message.createdAt).toLocaleString(
+        "en-US",
+        {
+            month: "long",
+            weekday: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        },
+    );
+
     return (
         <div
             className={`${isSender ? "self-end bg-background-100" : "self-start bg-background-100"} flex flex-col gap-4 rounded-md p-4`}
@@ -18,7 +30,7 @@ export default function Message(props: MessageProps) {
             <div
                 className={`flex flex-col gap-2 ${isSender ? "items-end" : "items-start"}`}
             >
-                <small className="text-textLighter">TODO: add date</small>
+                <small className="text-textLighter">{formattedDate}</small>
             </div>
             <p>{props.message.content}</p>
         </div>

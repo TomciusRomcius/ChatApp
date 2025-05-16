@@ -42,7 +42,11 @@ export default function SidebarUser(props: SidebarUserProps) {
                 </Modal>
             )}
 
-            <SidebarChatEntry name={props.username} chatId={props.userId} />
+            <SidebarChatEntry
+                type="user"
+                name={props.username}
+                chatId={props.userId}
+            />
         </div>
     );
 }

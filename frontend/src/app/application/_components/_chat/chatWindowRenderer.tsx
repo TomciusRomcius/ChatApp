@@ -1,6 +1,7 @@
 import TextMessage from "@/types";
 import Message from "./message";
 import { useRef } from "react";
+import SendIcon from "@/components/icons/sendIcon";
 
 interface ChatWindowRendererProps {
     sendMessage: (content: string) => void;
@@ -25,9 +26,9 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
     };
 
     return (
-        <div className="h-screen w-full md:col-span-4 md:px-8 md:py-32 lg:col-span-5 lg:px-64 lg:py-8">
-            <div className="rows-10 grid h-full w-full">
-                <div className="row-span-9 flex h-full flex-col gap-4 overflow-y-auto">
+        <div className="h-screen w-full md:px-8 md:py-32 lg:px-64 lg:py-8">
+            <div className="flex h-full w-full flex-col">
+                <div className="flex h-full flex-col gap-4 overflow-y-auto">
                     {props.messages.map((textMessage) => (
                         <Message
                             key={Math.random() * 100}
@@ -36,15 +37,18 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
                     ))}
                 </div>
 
-                <div className="flex items-center justify-center">
-                    <div className="flex w-full items-center justify-between rounded-md bg-background-100">
+                <div className="flex items-center justify-center overflow-hidden rounded-md border-[1px] border-background-200">
+                    <div className="flex w-full items-center justify-between bg-background-100">
                         <input
                             ref={sendMessageRef}
-                            className="h-auto w-full p-4"
+                            className="full w-full p-4"
                             placeholder="Send message"
                         />
-                        <button onClick={onSendMessage} className="p-4">
-                            Send
+                        <button
+                            onClick={onSendMessage}
+                            className="mx-2 flex items-center justify-center rounded-md bg-accent p-2"
+                        >
+                            <SendIcon></SendIcon>
                         </button>
                     </div>
                 </div>

@@ -70,7 +70,7 @@ export default function ClientSideApplication(
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
     const [currentChat, setCurrentChat] = useState<CurrentChat | null>(null);
     const [friends, setFriends] = useState<User[]>([]);
-    
+
     const onWebSocketMessage = useCallback(
         (ev: MessageEvent) => {
             handleWsMessage(ev, messageSystemMap.current, friends);

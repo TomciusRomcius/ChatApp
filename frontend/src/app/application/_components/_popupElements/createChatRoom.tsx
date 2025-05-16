@@ -62,15 +62,28 @@ export default function CreateChatroom(props: CreateChatroomProps) {
         <div className="flex flex-col gap-4 px-4">
             <h1 className="text-center text-2xl">Create chatroom</h1>
             <div className="flex flex-col gap-1">
-                <label className="text-sm text-textLighter">
-                    Chatroom name
-                </label>
+                <label className="text-sm">Chatroom name</label>
                 <input
                     ref={chatRoomNameRef}
                     placeholder="Enter chatroom name"
                 />
             </div>
-            <h2 className="text-xl">Members</h2>
+            <div className="h-[1px] bg-background-100"></div>
+
+            <h2 className="text-center text-xl">Add members</h2>
+
+            {potentialMembers.map((friend) => (
+                <button
+                    className="flex w-full items-center justify-between"
+                    key={friend.userId}
+                    onClick={() => addToChatroom(friend.userId)}
+                >
+                    {friend.username}
+                    <small className="text-textLighter">Add</small>
+                </button>
+            ))}
+
+            <h2 className="mt-8 text-base">Added members:</h2>
             {members.length > 0 ? (
                 members.map((member) => (
                     <button
@@ -87,18 +100,7 @@ export default function CreateChatroom(props: CreateChatroomProps) {
                     No members, start by adding or create an empty group chat
                 </small>
             )}
-            <h2 className="text-xl">Add</h2>
-
-            {potentialMembers.map((friend) => (
-                <button
-                    className="flex w-full items-center justify-between"
-                    key={friend.userId}
-                    onClick={() => addToChatroom(friend.userId)}
-                >
-                    {friend.username}
-                    <small className="text-textLighter">Add</small>
-                </button>
-            ))}
+            <div className="h-[1px] bg-background-100"></div>
             <AccentButton onClick={onCreateChatRoom}>Create</AccentButton>
         </div>
     );

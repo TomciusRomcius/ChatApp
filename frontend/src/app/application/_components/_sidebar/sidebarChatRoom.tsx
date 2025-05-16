@@ -98,6 +98,7 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
                 )}
 
             <SidebarChatEntry
+                type="chatroom"
                 name={props.chatRoomName}
                 chatId={props.chatRoomId}
             />

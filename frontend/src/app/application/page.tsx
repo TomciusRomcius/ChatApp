@@ -39,7 +39,7 @@ export default function ApplicationPage() {
     }
 
     return (
-        <div className="grid min-h-screen w-screen grid-cols-6 grid-rows-1 gap-0">
+        <div className="flex min-h-screen w-screen gap-0">
             <ClientSideApplication
                 currentUser={currentUser}
                 webSocket={webSocketRef.current}

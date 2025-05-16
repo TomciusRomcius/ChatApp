@@ -14,6 +14,7 @@ import CreateChatroom from "@/app/application/_components/_popupElements/createC
 import CurrentUserContext from "@/context/currentUserContext";
 import SidebarChatRoom from "@/app/application/_components/_sidebar/sidebarChatRoom";
 import NotificationService from "@/app/application/_components/_notifications/notificationService";
+import HamburgerMenu from "@/components/icons/hamburgerMenu";
 
 interface SidebarProps {
     webSocket: WebSocket;
@@ -21,6 +22,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar(props: SidebarProps) {
+    const [isOpen, setIsOpen] = useState(true);
     const { appState, setAppState } = useContext(AppStateContext);
     const { setCurrentChat } = useContext(CurrentChatContext);
     const { friends, setFriends } = useContext(FriendsContext);
@@ -113,6 +115,10 @@ export default function Sidebar(props: SidebarProps) {
         setChatRooms(chatRooms.filter((cr) => cr.chatRoomId !== chatRoomId));
     };
 
+    const onToggleSidebar = () => {
+        setIsOpen(!isOpen);
+    };
+
     useEffect(() => {
         UserFriendsService.GetAllFriendRequests().then((requests) => {
             setFriendRequests(requests);
@@ -160,13 +166,32 @@ export default function Sidebar(props: SidebarProps) {
                   )
                 : null}
 
-            <div className="col-span-2 flex flex-col items-start gap-12 bg-background-100 p-8 lg:col-span-1">
+            <div className={`fixed left-4 top-4`}>
+                <button onClick={onToggleSidebar}>
+                    <HamburgerMenu width={32} height={32} />
+                </button>
+            </div>
+
+            <div
+                className={`${!isOpen ? "hidden" : ""} col-span-2 flex flex-col items-start gap-12 border-r-[1px] border-background-200 bg-background-100 p-10 lg:col-span-1`}
+            >
                 <div className="flex w-full flex-col items-start gap-4">
-                    <button onClick={onClickAddFriend}>Add friend</button>
-                    <button onClick={onClickFriendRequests}>
+                    <button
+                        className="text-textLighter transition hover:text-text"
+                        onClick={onClickAddFriend}
+                    >
+                        Add friend
+                    </button>
+                    <button
+                        className="text-textLighter transition hover:text-text"
+                        onClick={onClickFriendRequests}
+                    >
                         Friend requests
                     </button>
-                    <button onClick={onClickCreateChatRoom}>
+                    <button
+                        className="text-textLighter transition hover:text-text"
+                        onClick={onClickCreateChatRoom}
+                    >
                         Create a group
                     </button>
                 </div>

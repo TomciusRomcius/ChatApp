@@ -116,6 +116,9 @@
     <Script Include="src\app\auth\account-setup\page.tsx" />
     <Script Include="src\app\auth\_components\authFlowLayout.tsx" />
     <Script Include="src\app\auth\_components\buttonWithPassword.tsx" />
+    <Script Include="src\components\icons\circleIcon.tsx" />
+    <Script Include="src\components\icons\hamburgerMenu.tsx" />
+    <Script Include="src\components\icons\sendIcon.ts" />
     <Script Include="src\components\Input.tsx" />
     <Script Include="src\components\Modal.tsx" />
     <Script Include="src\context\friendsContext.ts" />
