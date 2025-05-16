@@ -33,7 +33,7 @@ export default function ChatWindow(props: ChatWindowProps) {
             senderId: currentUser.userId,
             receiverUserId: currentChat.id,
             content: content,
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
         } as TextMessage);
     };
 
