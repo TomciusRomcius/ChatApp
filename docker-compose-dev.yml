@@ -18,6 +18,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       target: development
+    environment:
+      - CA_OIDC_GOOGLE_AUTHORITY=https://accounts.google.com
+      - CA_MSSQL_HOST=localhost,1433
+      - CA_MSSQL_PASSWORD=localhost,1433
     ports:
       - 5112:5112
 
