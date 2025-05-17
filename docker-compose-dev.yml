@@ -8,9 +8,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - CA_MSSQL_HOST=127.0.0.1,1433,
-      - CA_MSSQL_PASSWORD=DevelopmentPassword.2025,
-      - CA_FRONTEND_URL=https://localhost:3000,
+      - NEXT_PUBLIC_BACKEND_URL=https://localhost:8080/api
 
   backend:
     container_name: backend
@@ -22,6 +20,7 @@ services:
       - CA_OIDC_GOOGLE_AUTHORITY=https://accounts.google.com
       - CA_MSSQL_HOST=localhost,1433
       - CA_MSSQL_PASSWORD=localhost,1433
+      - CA_FRONTEND_URL=https://localhost:3000
     ports:
       - 5112:5112
 
