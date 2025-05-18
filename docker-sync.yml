@@ -1,0 +1,8 @@
+version: "2"
+syncs:
+  backend-sync:
+    src: "./backend"
+    sync_excludes: ["**/obj/**", "**/bin/**"]
+  frontend-sync:
+    src: "./frontend"
+    sync_excludes: ["node_modules"]

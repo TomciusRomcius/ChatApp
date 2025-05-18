@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     command: ["npm", "run", "dev:https"]
     volumes:
-      - .:/app
+      - frontend-sync:/app
     environment:
       - NEXT_PUBLIC_BACKEND_URL=https://localhost:8080/api
 
@@ -16,13 +16,15 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       target: development
+    volumes:
+      - backend-sync:/app
     environment:
       - CA_OIDC_GOOGLE_AUTHORITY=https://accounts.google.com
-      - CA_MSSQL_HOST=localhost,1433
-      - CA_MSSQL_PASSWORD=localhost,1433
-      - CA_FRONTEND_URL=https://localhost:3000
+      - CA_MSSQL_HOST=db,1433
+      - CA_MSSQL_PASSWORD=DevelopmentPassword.2025
+      - CA_FRONTEND_URL=https://frontend:3000
     ports:
-      - 5112:5112
+      - 8080:8080
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-preview-ubuntu-22.04
@@ -37,4 +39,10 @@ services:
   adminer:
     image: adminer
     ports:
-      - 8080:8080
+      - 8081:8080
+
+volumes:
+  backend-sync:
+    external: true
+  frontend-sync:
+    external: true
