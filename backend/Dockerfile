@@ -20,7 +20,7 @@ CMD ["dotnet", "test", "--no-build", "--no-restore"]
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS development
 WORKDIR /app
 COPY --from=build /app .
-CMD [ "dotnet", "watch", "--project", "ChatApp.Presentation" ]
+CMD [ "dotnet", "watch", "--project", "ChatApp.Presentation", "--no-restore" ]
 
 FROM build AS publish
 WORKDIR /app
