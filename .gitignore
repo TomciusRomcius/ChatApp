@@ -3,6 +3,7 @@
 bin
 obj
 node_modules
+.docker-sync
 .env.local*
 appsettings.json
 /publish
