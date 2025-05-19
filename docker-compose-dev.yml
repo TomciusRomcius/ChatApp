@@ -4,11 +4,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: development
     command: ["npm", "run", "dev:https"]
     volumes:
       - frontend-sync:/app
+      - /app/node_modules
     environment:
       - NEXT_PUBLIC_BACKEND_URL=https://localhost:8080/api
+    ports:
+      - 3000:3000
 
   backend:
     container_name: backend

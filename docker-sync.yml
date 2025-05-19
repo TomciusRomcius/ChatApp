@@ -5,4 +5,4 @@ syncs:
     sync_excludes: ["**/obj/**", "**/bin/**"]
   frontend-sync:
     src: "./frontend"
-    sync_excludes: ["node_modules"]
+    sync_excludes: ["./node_modules"]
