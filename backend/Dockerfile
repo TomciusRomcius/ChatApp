@@ -19,7 +19,8 @@ CMD ["dotnet", "test", "--no-build", "--no-restore"]
 
 FROM build AS development
 WORKDIR /app
-CMD [ "dotnet", "watch", "--project", "ChatApp.Presentation", "--no-restore" ]
+RUN dotnet dev-certs https 
+CMD [ "dotnet", "watch", "--project", "ChatApp.Presentation", "--launch-profile", "https", "--no-restore" ]
 
 FROM build AS publish
 WORKDIR /app

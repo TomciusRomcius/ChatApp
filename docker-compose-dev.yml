@@ -26,7 +26,7 @@ services:
       - CA_OIDC_GOOGLE_AUTHORITY=https://accounts.google.com
       - CA_MSSQL_HOST=db,1433
       - CA_MSSQL_PASSWORD=DevelopmentPassword.2025
-      - CA_FRONTEND_URL=https://frontend:3000
+      - CA_FRONTEND_URL=https://localhost:3000
     ports:
       - 8080:8080
 
