@@ -9,17 +9,33 @@ public static class ControllerUtils
 {
     public static IActionResult OutputErrorResult(ResultError error)
     {
-        return error.Type switch
+        var problemDetails = new ProblemDetails
         {
-            ResultErrorType.VALIDATION_ERROR => new BadRequestObjectResult(GenerateResponseMessage(error)),
-            ResultErrorType.FORBIDDEN_ERROR => new ForbidResult(GenerateResponseMessage(error)),
-            _ => new StatusCodeResult(StatusCodes.Status500InternalServerError)
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.5.16",
+            Title = error.Message,
+            Detail = error.Message,
+            Status = GenerateStatusCode(error.Type),
+        };
+
+        return new ObjectResult(problemDetails)
+        {
+            StatusCode = problemDetails.Status
         };
     }
 
     public static string? GetCurrentUserId(HttpContext httpContext)
     {
         return httpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+    }
+
+    private static int GenerateStatusCode(ResultErrorType type)
+    {
+        return type switch
+        {
+            ResultErrorType.VALIDATION_ERROR => 400,
+            ResultErrorType.FORBIDDEN_ERROR => 403,
+            _ => 500
+        };
     }
 
     private static string GenerateResponseMessage(ResultError error)
