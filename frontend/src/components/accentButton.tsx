@@ -5,8 +5,8 @@ export default function AccentButton(
 ) {
     return (
         <button
-            className="rounded-md bg-accent px-4 py-2 transition hover:bg-accentHover"
             {...props}
+            className={`rounded-md bg-accent px-4 py-2 transition hover:bg-accentHover ${props.className}`}
         ></button>
     );
 }
