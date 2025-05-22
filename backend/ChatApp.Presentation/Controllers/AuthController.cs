@@ -4,6 +4,7 @@ using ChatApp.Application.Interfaces;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
 using ChatApp.Presentation.Dtos;
+using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -58,7 +59,9 @@ namespace ChatApp.Presentation.Auth
             if (result.Errors.Any())
             {
                 // TODO: explicit messages
-                return BadRequest(result.Errors);
+                return ControllerUtils.OutputErrorResult(
+                    new ResultError(ResultErrorType.VALIDATION_ERROR, result.Errors.First().Description)
+                );
             }
 
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
@@ -77,7 +80,12 @@ namespace ChatApp.Presentation.Auth
         {
             IdentityUser? user = await _userManager.FindByEmailAsync(dto.Email);
 
-            if (user is null) return BadRequest("Login failed");
+            if (user is null)
+            {
+                return ControllerUtils.OutputErrorResult(
+                    new ResultError(ResultErrorType.VALIDATION_ERROR,"Email or password is incorrect.")
+                );   
+            }
 
             // Automatically sets user cookie
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
@@ -87,7 +95,10 @@ namespace ChatApp.Presentation.Auth
                 false
             );
 
-            if (!signInResult.Succeeded) return BadRequest("Login failed");
+            if (!signInResult.Succeeded)
+                return ControllerUtils.OutputErrorResult(
+                    new ResultError(ResultErrorType.VALIDATION_ERROR,"Email or password is incorrect.")
+                );
 
             _antiforgery.SetCookieTokenAndHeader(HttpContext);
 
