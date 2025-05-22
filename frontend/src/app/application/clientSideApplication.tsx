@@ -64,7 +64,6 @@ export default function ClientSideApplication(
     props: ClientSideApplicationProps,
 ) {
     const currentUser = props.currentUser;
-    console.log(currentUser);
     const messageSystemMap = useRef(new Map<string, MessageSystem>());
 
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);

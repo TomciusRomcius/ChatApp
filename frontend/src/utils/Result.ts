@@ -1,4 +1,5 @@
 export interface Result<TData, TError> {
-    data: TData | null;
-    error: TError | null;
+    data: TData;
+    error: TError;
+    didSucceed: boolean;
 }

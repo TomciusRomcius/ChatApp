@@ -30,14 +30,14 @@ export default function CreateChatroom(props: CreateChatroomProps) {
                 name,
                 members.map((member) => member.userId),
             ).then((result) => {
-                if (result.error !== null) {
-                    alert("err");
-                } else {
+                if (result.didSucceed) {
                     props.onCreateChatRoom({
                         name: name,
                         chatRoomId: result.data!,
                         adminUserId: currentUser.userId,
                     });
+                } else {
+                    // TODO: handle error
                 }
             });
             setAppState(AppState.DEFAULT);

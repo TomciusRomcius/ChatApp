@@ -11,3 +11,9 @@ export interface ChatRoom {
     name: string;
     adminUserId: string;
 }
+export interface ApiErrorResponse {
+    type: string;
+    title: string;
+    detail: string;
+    status: number;
+}

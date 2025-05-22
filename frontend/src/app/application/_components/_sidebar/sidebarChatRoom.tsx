@@ -37,14 +37,14 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
 
     const onDeleteChatRoom = () => {
         ChatRoomService.DeleteChatRoom(props.chatRoomId).then((result) => {
-            if (result.error !== null) {
-                NotificationService.AddNotification(
-                    `Failed to delete chat room: ${result.error}`,
-                );
-            } else {
+            if (result.didSucceed) {
                 props.handleDeletedChatRoom(props.chatRoomId);
                 NotificationService.AddNotification(
                     `Successfully deleted chatroom: ${props.chatRoomName}`,
+                );
+            } else {
+                NotificationService.AddNotification(
+                    `Failed to delete chat room: ${result.error}`,
                 );
             }
         });
@@ -52,12 +52,12 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
 
     const onLeaveChatRoom = () => {
         ChatRoomService.LeaveChatRoom(props.chatRoomId).then((result) => {
-            if (result.error !== null) {
+            if (result.didSucceed) {
+                props.handleDeletedChatRoom(props.chatRoomId);
+            } else {
                 NotificationService.AddNotification(
                     `Failed to delete chat room: ${result.error}`,
                 );
-            } else {
-                props.handleDeletedChatRoom(props.chatRoomId);
             }
         });
     };

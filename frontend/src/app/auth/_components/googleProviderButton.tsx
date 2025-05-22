@@ -22,7 +22,7 @@ export default function GoogleProviderButton({ text }: { text: string }) {
     return (
         <button
             type="button"
-            className="rounded-md bg-white p-2 text-background-0"
+            className="rounded-md bg-white p-2 text-background-0 transition hover:bg-gray-200"
             onClick={handleClick}
         >
             {text}

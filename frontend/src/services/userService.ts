@@ -2,6 +2,7 @@ import { CurrentUser } from "@/app/application/_utils/user";
 import { publicConfiguration } from "@/utils/configuration";
 import { Result } from "@/utils/Result";
 import axios from "axios";
+import { ApiErrorResponse } from "@/types";
 
 interface UserInfoRequest {
     username: string;
@@ -10,7 +11,6 @@ interface UserInfoRequest {
 class _UserService {
     async WhoAmI(): Promise<Result<CurrentUser | null, string>> {
         let result: Result<CurrentUser | null, string> | null;
-
         try {
             const res = await axios.get(
                 `${publicConfiguration.BACKEND_URL}/user/whoami`,
@@ -19,18 +19,22 @@ class _UserService {
 
             result = {
                 data: res.data as CurrentUser | null,
-                error: null,
+                error: "",
+                didSucceed: true,
             };
         } catch (err) {
             if (axios.isAxiosError(err)) {
+                const response = err.response?.data as ApiErrorResponse;
                 result = {
-                    error: err.response?.data?.toString(),
                     data: null,
+                    error: response.detail,
+                    didSucceed: false,
                 };
             } else {
                 result = {
                     error: "Unexpected error occurred.",
                     data: null,
+                    didSucceed: false,
                 };
             }
         }

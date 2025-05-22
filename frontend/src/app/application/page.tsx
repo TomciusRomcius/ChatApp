@@ -21,15 +21,15 @@ export default function ApplicationPage() {
 
     useEffect(() => {
         UserService.WhoAmI().then((result) => {
-            if (result.error !== null) {
-                // TODO: Not ideal, implement error codes
+            // TODO: Not ideal, implement error codes
+            if (result.didSucceed) {
+                setCurrentUser(result.data);
+            } else {
                 if (result.error === "Account setup required!") {
                     router.replace("/auth/account-setup");
                 } else {
                     router.replace("/auth/sign-in");
                 }
-            } else {
-                setCurrentUser(result.data);
             }
         });
     }, [router]);
