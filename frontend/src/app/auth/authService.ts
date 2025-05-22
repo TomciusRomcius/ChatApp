@@ -8,16 +8,10 @@ class AuthService {
         password: string,
     ): Promise<Result<null, string>> {
         try {
-            await fetch(`${publicConfiguration.BACKEND_URL}/auth/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                }),
-            });
+            await axios.post(`${publicConfiguration.BACKEND_URL}/auth/register`, {
+                email: email,
+                password: password,
+            }, {withCredentials: true});
             return {
                 data: null,
                 error: null,
