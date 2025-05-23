@@ -42,28 +42,26 @@ export default class OidcProviderService {
                 data,
                 { withCredentials: true },
             );
-            
+
             return {
                 data: response.data.isPublicInfoSetup,
                 error: ApiErrorCodes.NO_ERROR,
                 didSucceed: true,
             };
-        }
-        
-        catch (error) {
+        } catch (error) {
             if (isAxiosError(error)) {
                 const response = error.response?.data as ApiErrorResponse;
                 return {
                     data: null,
                     error: response.status,
                     didSucceed: false,
-                }
+                };
             }
             return {
                 data: null,
                 error: ApiErrorCodes.UNKNOWN,
                 didSucceed: false,
-            }
+            };
         }
     }
 }

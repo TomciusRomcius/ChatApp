@@ -138,9 +138,7 @@ export default function ClientSideApplication(
                     <FriendsContext
                         value={{ friends: friends, setFriends: setFriends }}
                     >
-                        <Sidebar
-                            webSocket={props.webSocket}
-                        />
+                        <Sidebar webSocket={props.webSocket} />
                     </FriendsContext>
                     {currentChat && (
                         <ChatWindow messageSystem={currentMessageSystem!} />

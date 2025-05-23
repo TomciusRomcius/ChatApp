@@ -11,7 +11,7 @@ import ErrorMessage from "@/components/errorMessage";
 export default function Page() {
     const router = useRouter();
     const [error, setError] = useState<string>("");
-    
+
     const handleSetup = (ev: FormEvent) => {
         ev.preventDefault();
 
@@ -21,7 +21,7 @@ export default function Page() {
         if (!username) {
             return;
         }
-        
+
         if (username.length < 2) {
             setError("Username must be at least 3 characters long");
             return;
@@ -55,7 +55,7 @@ export default function Page() {
                 value="Setup"
                 className="cursor-pointer rounded-md bg-accent p-2"
             />
-            <ErrorMessage message={error}/>
+            <ErrorMessage message={error} />
         </AuthFlowLayout>
     );
 }

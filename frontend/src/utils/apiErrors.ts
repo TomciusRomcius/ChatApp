@@ -5,5 +5,5 @@ export enum ApiErrorCodes {
     UNAUTHORIZED,
     FORBIDDEN,
     NOT_FOUND,
-    ACCOUNT_SETUP_REQUIRED
+    ACCOUNT_SETUP_REQUIRED,
 }
