@@ -42,6 +42,7 @@ export default function SignInPage() {
             />
             <Input
                 className="text-textLighter"
+                type="password"
                 name="password"
                 placeholder="Password"
             />

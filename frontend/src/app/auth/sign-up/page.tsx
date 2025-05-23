@@ -49,8 +49,8 @@ export default function SignUpPage() {
         <AuthFlowLayout onSubmit={handleSignUp}>
             <h1 className="text-center text-xl">Register</h1>
             <Input name="email" placeholder="Email" />
-            <Input name="password" placeholder="Password" />
-            <Input name="repeatPassword" placeholder="Repeat password" />
+            <Input type="password" name="password" placeholder="Password" />
+            <Input type="password" name="repeatPassword" placeholder="Repeat password" />
             <ButtonWithPassword type="submit" value="Sign up" />
             <GoogleProviderButton text="Sign up with Google" />
             <p className="text-textLighter">
