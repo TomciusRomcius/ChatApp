@@ -58,7 +58,7 @@ export default function Sidebar(props: SidebarProps) {
     const onCreateChatRoom = (chatRoom: ChatRoom) => {
         setChatRooms([...chatRooms, chatRoom]);
     };
-
+    // TODO: refactor
     const handleWsMessage = useCallback(
         (ev: MessageEvent) => {
             const msg = JSON.parse(ev.data);
@@ -100,6 +100,11 @@ export default function Sidebar(props: SidebarProps) {
                     chatRooms.filter(
                         (cr) => cr.chatRoomId !== chatRoom.chatRoomId,
                     ),
+                );
+            } else if (msg.type === "removed-from-friends") {
+                const userId = msg.body.id;
+                setFriends(
+                    friends.filter((friend) => friend.userId !== userId),
                 );
             }
         },
