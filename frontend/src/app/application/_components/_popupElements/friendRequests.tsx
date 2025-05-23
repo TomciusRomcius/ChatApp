@@ -6,13 +6,14 @@ import { FriendsContext } from "@/context/friendsContext";
 
 interface FriendRequestsProps {
     friendRequests: User[];
+    onAcceptFriendRequest: (friendId: string) => void;
 }
 
 export default function FriendRequests(props: FriendRequestsProps) {
     const { setAppState } = useContext(AppStateContext);
     const { friends, setFriends } = useContext(FriendsContext);
 
-    const onAcceptRequest = (userId: string) => {
+    const onClickAccept = (userId: string) => {
         UserFriendsService.AcceptFriendRequest(userId).then(() => {
             const friendRequestUser = props.friendRequests.find(
                 (fr) => fr.userId === userId,
@@ -22,6 +23,7 @@ export default function FriendRequests(props: FriendRequestsProps) {
                 return;
             }
             setFriends([...friends, friendRequestUser]);
+            props.onAcceptFriendRequest(userId);
             setAppState(AppState.DEFAULT);
         });
     };
@@ -32,7 +34,7 @@ export default function FriendRequests(props: FriendRequestsProps) {
             {props.friendRequests.map((user) => (
                 <div key={user.userId} className="flex gap-4">
                     <small className="text-base">{user.username}</small>
-                    <button onClick={() => onAcceptRequest(user.userId)}>
+                    <button onClick={() => onClickAccept(user.userId)}>
                         Accept
                     </button>
                 </div>

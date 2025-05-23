@@ -111,6 +111,10 @@ export default function Sidebar(props: SidebarProps) {
         setFriends(friends.filter((f) => f.userId !== deletedId));
     };
 
+    const onAcceptFriendRequest = (friendId: string) => {
+        setFriendRequests(friendRequests.filter((f) => f.userId !== friendId));
+    };
+
     const handleDeletedChatRoom = (chatRoomId: string) => {
         setChatRooms(chatRooms.filter((cr) => cr.chatRoomId !== chatRoomId));
     };
@@ -145,7 +149,10 @@ export default function Sidebar(props: SidebarProps) {
                           onClose={() => setAppState(AppState.DEFAULT)}
                           className="flex flex-col gap-2"
                       >
-                          <FriendRequests friendRequests={friendRequests} />
+                          <FriendRequests
+                              friendRequests={friendRequests}
+                              onAcceptFriendRequest={onAcceptFriendRequest}
+                          />
                       </Popup>,
                       document.body,
                   )
