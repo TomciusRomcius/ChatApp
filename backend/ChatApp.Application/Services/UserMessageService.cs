@@ -14,11 +14,15 @@ namespace ChatApp.Application.Services;
 public class UserMessageService : IUserMessageService
 {
     private readonly DatabaseContext _databaseContext;
+    private readonly IUserFriendService _userFriendService;
     private readonly IWebSocketOperationsManager _webSocketOperationsManager;
 
-    public UserMessageService(DatabaseContext databaseContext, IWebSocketOperationsManager webSocketOperationsManager)
+    public UserMessageService(DatabaseContext databaseContext
+        ,IUserFriendService userFriendService
+        ,IWebSocketOperationsManager webSocketOperationsManager)
     {
         _databaseContext = databaseContext;
+        _userFriendService = userFriendService;
         _webSocketOperationsManager = webSocketOperationsManager;
     }
 
@@ -58,6 +62,17 @@ public class UserMessageService : IUserMessageService
     /// <returns>Message id</returns>
     public async Task<Result<string>> SendMessage(string senderId, string receiverId, string messageContent)
     {
+        bool isFriends = await _userFriendService.CheckIfFriends(senderId, [receiverId]);
+        if (!isFriends)
+        {
+            var error = new ResultError(
+                ResultErrorType.FORBIDDEN_ERROR,
+                "Trying to send a message to an user who you are not friends with"
+            );
+            
+            return new Result<string>([error]);
+        }
+        
         var msg = new TextMessageEntity
         {
             TextMessageId = Guid.NewGuid().ToString(),
