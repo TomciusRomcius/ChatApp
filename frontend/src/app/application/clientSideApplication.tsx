@@ -44,7 +44,7 @@ function handleWsMessage(
         const messageSystem = messageSystemMap.get(
             generateMessageSystemKey(chat),
         );
-        console.log(messageSystem?.messageSystemId);
+
         if (messageSystem) {
             messageSystem.AddNewMessage(textMessage);
         }
@@ -140,7 +140,6 @@ export default function ClientSideApplication(
                     >
                         <Sidebar
                             webSocket={props.webSocket}
-                            friends={friends}
                         />
                     </FriendsContext>
                     {currentChat && (

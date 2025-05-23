@@ -18,7 +18,6 @@ import HamburgerMenu from "@/components/icons/hamburgerMenu";
 
 interface SidebarProps {
     webSocket: WebSocket;
-    friends: User[];
 }
 
 export default function Sidebar(props: SidebarProps) {
