@@ -14,12 +14,12 @@ public static class ControllerUtils
             Type = "https://tools.ietf.org/html/rfc9110#section-15.5.16",
             Title = error.Message,
             Detail = error.Message,
-            Status = GenerateStatusCode(error.Type),
+            Status = (int)error.Type,
         };
 
         return new ObjectResult(problemDetails)
         {
-            StatusCode = problemDetails.Status
+            StatusCode = GenerateStatusCode(error.Type)
         };
     }
 
@@ -33,7 +33,9 @@ public static class ControllerUtils
         return type switch
         {
             ResultErrorType.VALIDATION_ERROR => 400,
+            ResultErrorType.UNAUTHORIZED_ERROR => 401,
             ResultErrorType.FORBIDDEN_ERROR => 403,
+            ResultErrorType.ACCOUNT_SETUP_REQUIRED => 403,
             _ => 500
         };
     }
