@@ -2,10 +2,12 @@ namespace ChatApp.Domain.Utils;
 
 public enum ResultErrorType
 {
+    UNKNOWN_ERROR = 0,
     VALIDATION_ERROR,
+    UNAUTHORIZED_ERROR,
     FORBIDDEN_ERROR,
     NOT_FOUND,
-    UNKNOWN_ERROR
+    ACCOUNT_SETUP_REQUIRED,
 }
 
 public class ResultError
