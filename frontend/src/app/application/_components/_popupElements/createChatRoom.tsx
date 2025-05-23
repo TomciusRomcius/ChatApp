@@ -96,9 +96,9 @@ export default function CreateChatroom(props: CreateChatroomProps) {
                     </button>
                 ))
             ) : (
-                <small className="text-center text-textLighter">
+                <i className="text-center text-sm text-textLighter">
                     No members, start by adding or create an empty group chat
-                </small>
+                </i>
             )}
             <div className="h-[1px] bg-background-100"></div>
             <AccentButton onClick={onCreateChatRoom}>Create</AccentButton>

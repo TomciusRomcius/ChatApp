@@ -15,7 +15,7 @@ export default function NotificationsContainer() {
     let notificationKey = 0;
 
     return (
-        <div className="fixed bottom-0 right-0 w-1/6 p-2">
+        <div className="fixed bottom-0 right-0 w-1/2 p-2 xl:w-1/6">
             <div className="flex flex-col gap-2">
                 {notifications.map((notification) => (
                     <div

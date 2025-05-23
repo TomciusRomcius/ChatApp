@@ -26,7 +26,7 @@ export default function ChatWindowRenderer(props: ChatWindowRendererProps) {
     };
 
     return (
-        <div className="h-screen w-full md:px-8 md:py-32 lg:px-64 lg:py-8">
+        <div className="h-screen flex-1 px-4 py-16 lg:px-16 lg:py-32 xl:px-32 xl:py-8">
             <div className="flex h-full w-full flex-col">
                 <div className="flex h-full flex-col gap-4 overflow-y-auto">
                     {props.messages.map((textMessage) => (

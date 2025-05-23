@@ -184,7 +184,7 @@ export default function Sidebar(props: SidebarProps) {
             </div>
 
             <div
-                className={`${!isOpen ? "hidden" : ""} col-span-2 flex flex-col items-start gap-12 border-r-[1px] border-background-200 bg-background-100 p-10 lg:col-span-1`}
+                className={`${!isOpen ? "hidden" : ""} w:1/2 flex h-screen flex-col items-start gap-12 overflow-y-auto border-r-[1px] border-background-200 bg-background-100 p-12 md:w-2/6 xl:w-1/6`}
             >
                 <div className="flex w-full flex-col items-start gap-4">
                     <button
