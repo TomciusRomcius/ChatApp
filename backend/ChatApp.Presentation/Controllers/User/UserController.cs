@@ -29,20 +29,30 @@ public class UserController : ControllerBase
     {
         string? userId = ControllerUtils.GetCurrentUserId(HttpContext);
         if (userId is null)
-            return Unauthorized();
+        {
+            return ControllerUtils.OutputErrorResult(
+                new ResultError(ResultErrorType.UNAUTHORIZED_ERROR, "Please login again.")
+            );   
+        }
 
         IdentityUser? user = await _userManager.FindByIdAsync(userId);
         // If user is invalid, then expire the cookie
         if (user is null)
-            // await _signInManager.SignOutAsync();
-            return Unauthorized("Expired");
+        {
+            await _signInManager.SignOutAsync();
+            return Unauthorized("Expired");   
+        }
 
-        if (!await _userService.IsPublicInfoSetup(userId)) return Unauthorized("Account setup required!");
+        if (!await _userService.IsPublicInfoSetup(userId))
+        {
+            return ControllerUtils.OutputErrorResult(new ResultError(ResultErrorType.ACCOUNT_SETUP_REQUIRED, "Account setup required"));
+        }
 
         Result<List<PublicUserInfoEntity>> publicInfoResult = await _userService.GetPublicUserInfos([userId]);
         if (publicInfoResult.IsError())
-            // Should never happen
-            return Unauthorized("Account setup required!");
+            // Should never happen, TODO: log
+            return ControllerUtils.OutputErrorResult(new ResultError(ResultErrorType.UNKNOWN_ERROR, "Getting current user info failed for unknown reasons."));
+
 
         return Ok(publicInfoResult.GetValue().First());
     }

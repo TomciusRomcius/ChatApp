@@ -6,6 +6,7 @@ import UserService from "../../services/userService";
 import { CurrentUser } from "./_utils/user";
 import { useRouter } from "next/navigation";
 import { publicConfiguration } from "@/utils/configuration";
+import { ApiErrorCodes } from "@/utils/apiErrors";
 
 export default function ApplicationPage() {
     const router = useRouter();
@@ -25,9 +26,9 @@ export default function ApplicationPage() {
             if (result.didSucceed) {
                 setCurrentUser(result.data);
             } else {
-                if (result.error === "Account setup required!") {
+                if (result.error === ApiErrorCodes.ACCOUNT_SETUP_REQUIRED) {
                     router.replace("/auth/account-setup");
-                } else {
+                } else if (result.error === ApiErrorCodes.UNAUTHORIZED) {
                     router.replace("/auth/sign-in");
                 }
             }

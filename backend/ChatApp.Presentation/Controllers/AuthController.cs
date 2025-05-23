@@ -28,11 +28,12 @@ namespace ChatApp.Presentation.Auth
         private readonly OidcProviderConfigMapService _oidcProviderConfigMapService;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IUserService _userService;
 
         public AuthController(IHttpClientFactory httpClientFactory,
             OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<AuthController> logger,
             SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager,
-            ICsrfTokenStoreService csrfTokenStoreService, IAntiforgery antiforgery)
+            ICsrfTokenStoreService csrfTokenStoreService, IAntiforgery antiforgery, IUserService userService)
         {
             _httpClientFactory = httpClientFactory;
             _oidcProviderConfigMapService = oidcProviderConfigMapService;
@@ -41,6 +42,7 @@ namespace ChatApp.Presentation.Auth
             _userManager = userManager;
             _csrfTokenStoreService = csrfTokenStoreService;
             _antiforgery = antiforgery;
+            _userService = userService;
         }
 
         [HttpPost("register")]
@@ -160,14 +162,21 @@ namespace ChatApp.Presentation.Auth
                     Email = email,
                     UserName = email
                 });
-
+                
+                // TODO: make sure that the user was actually created else, return an error
                 user = await _userManager.FindByEmailAsync(email);
             }
 
             await _signInManager.SignInAsync(user, true);
             _antiforgery.SetCookieTokenAndHeader(HttpContext);
 
-            return Ok(jsonToken.Subject);
+            bool isPublicInfoSetup = await _userService.IsPublicInfoSetup(user.Id);
+
+            return Ok(new
+            {
+                subject = jsonToken.Subject,
+                isPublicInfoSetup = isPublicInfoSetup,
+            });
         }
     }
 }

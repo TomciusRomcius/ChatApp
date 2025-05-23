@@ -122,6 +122,7 @@
     <Script Include="src\components\Input.tsx" />
     <Script Include="src\components\Modal.tsx" />
     <Script Include="src\context\friendsContext.ts" />
+    <Script Include="src\utils\apiErrors.ts" />
     <Script Include="src\utils\httpErrorResponse.ts" />
     <Script Include="src\utils\Result.ts" />
     <Script Include="tailwind.config.ts" />

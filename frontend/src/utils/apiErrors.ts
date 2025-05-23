@@ -1,0 +1,9 @@
+export enum ApiErrorCodes {
+    NO_ERROR = -1,
+    UNKNOWN = 0,
+    VALIDATION_ERROR,
+    UNAUTHORIZED,
+    FORBIDDEN,
+    NOT_FOUND,
+    ACCOUNT_SETUP_REQUIRED
+}

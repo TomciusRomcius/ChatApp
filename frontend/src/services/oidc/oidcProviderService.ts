@@ -1,5 +1,8 @@
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { OidcProvider } from "./oidcProviders";
+import { Result } from "@/utils/Result";
+import { ApiErrorResponse } from "@/types";
+import { ApiErrorCodes } from "@/utils/apiErrors";
 
 export default class OidcProviderService {
     RequestAuthorizationCode(
@@ -21,21 +24,46 @@ export default class OidcProviderService {
         window.location.href = url.toString();
     }
 
+    // <returns>Whether the user has setup public info</returns>
     async SignInUsingAuthorizationCode(
         provider: OidcProvider,
         authorizationCode: string,
         securityToken: string,
-    ): Promise<void> {
+    ): Promise<Result<boolean, number>> {
         const data = {
             authorizationCode: authorizationCode,
             provider: provider.providerName,
             securityToken: securityToken,
         };
 
-        await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL!}/auth/oidc`,
-            data,
-            { withCredentials: true },
-        );
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL!}/auth/oidc`,
+                data,
+                { withCredentials: true },
+            );
+            
+            return {
+                data: response.data.isPublicInfoSetup,
+                error: ApiErrorCodes.NO_ERROR,
+                didSucceed: true,
+            };
+        }
+        
+        catch (error) {
+            if (isAxiosError(error)) {
+                const response = error.response?.data as ApiErrorResponse;
+                return {
+                    data: null,
+                    error: response.status,
+                    didSucceed: false,
+                }
+            }
+            return {
+                data: null,
+                error: ApiErrorCodes.UNKNOWN,
+                didSucceed: false,
+            }
+        }
     }
 }
