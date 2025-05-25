@@ -22,6 +22,12 @@ export default function SidebarUser(props: SidebarUserProps) {
         setIsModalOpen(true);
     };
 
+    const onClickThreeDots = (x: number, y: number) => {
+        modalX.current = x;
+        modalY.current = y;
+        setIsModalOpen(!isModalOpen);
+    };
+
     const onRemoveFriend = () => {
         UserFriendsService.RemoveFriend(props.userId).then(() => {
             props.onDeleteFriend(props.userId);
@@ -46,6 +52,7 @@ export default function SidebarUser(props: SidebarUserProps) {
                 type="user"
                 name={props.username}
                 chatId={props.userId}
+                onToggleContextMenu={onClickThreeDots}
             />
         </div>
     );

@@ -29,7 +29,7 @@ export default function Sidebar(props: SidebarProps) {
         chatRooms,
         setChatRooms,
     } = useSidebar(props.webSocket);
-    
+
     const onClickAddFriend = () => {
         setAppState(AppState.ADD_FRIEND);
     };
@@ -140,7 +140,8 @@ export default function Sidebar(props: SidebarProps) {
                 {/* Friends and group list */}
                 <div className="flex h-full w-full flex-col items-start gap-4">
                     {friends.map((friend) => (
-                        <button
+                        <div
+                            className="w-full cursor-pointer"
                             key={friend.userId}
                             onClick={() => onSelectUserChat(friend.userId)}
                         >
@@ -151,11 +152,12 @@ export default function Sidebar(props: SidebarProps) {
                                 chatId={friend.userId}
                                 onDeleteFriend={handleDeletedFriend}
                             ></SidebarUser>
-                        </button>
+                        </div>
                     ))}
 
                     {chatRooms.map((chatRoom) => (
-                        <button
+                        <div
+                            className="w-full cursor-pointer"
                             key={chatRoom.chatRoomId}
                             onClick={() =>
                                 onSelectChatRoom(chatRoom.chatRoomId)
@@ -168,7 +170,7 @@ export default function Sidebar(props: SidebarProps) {
                                 adminUserId={chatRoom.adminUserId}
                                 handleDeletedChatRoom={handleDeletedChatRoom}
                             ></SidebarChatRoom>
-                        </button>
+                        </div>
                     ))}
                 </div>
                 <div className="h-[10%]">

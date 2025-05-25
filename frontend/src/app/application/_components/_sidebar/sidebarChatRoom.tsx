@@ -28,7 +28,13 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
         e.preventDefault();
         modalX.current = e.clientX;
         modalY.current = e.clientY;
-        setIsModalOpen(true);
+        setIsModalOpen(!isModalOpen);
+    };
+
+    const onClickThreeDots = (x: number, y: number) => {
+        modalX.current = x;
+        modalY.current = y;
+        setIsModalOpen(!isModalOpen);
     };
 
     const onToogleMembersList = () => {
@@ -101,6 +107,7 @@ export default function SidebarChatRoom(props: SidebarChatRoomProps) {
                 type="chatroom"
                 name={props.chatRoomName}
                 chatId={props.chatRoomId}
+                onToggleContextMenu={onClickThreeDots}
             />
         </div>
     );
