@@ -2,6 +2,7 @@ using ChatApp.Application.Interfaces;
 using ChatApp.Application.Persistence;
 using ChatApp.Application.Services;
 using ChatApp.Application.Services.WebSockets;
+using ChatApp.Domain.Entities;
 using ChatApp.Domain.Entities.UserFriend;
 using ChatApp.Domain.Utils;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +28,7 @@ public class UserFriendServiceTest : IAsyncLifetime
         await _databaseContext.Database.MigrateAsync();
 
         _friendService = new UserFriendService(_databaseContext, new Mock<IWebSocketOperationsManager>().Object,
-            new Mock<IUserService>().Object);
+            new UserService(_databaseContext));
     }
 
     public async Task DisposeAsync()
@@ -36,16 +37,28 @@ public class UserFriendServiceTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task SendFriendRequestAcceptRequestShouldWork()
+    public async Task SendFriendRequestWithUsername_ShouldCreateAFriendRequest()
     {
         var user1 = new IdentityUser("User1");
         var user2 = new IdentityUser("User2");
 
-        await _databaseContext!.Users.AddAsync(user1);
-        await _databaseContext.Users.AddAsync(user2);
+        var userPublicInfo1 = new PublicUserInfoEntity
+        {
+            UserId = user1.Id,
+            Username = "User1"
+        };
+
+        var userPublicInfo2 = new PublicUserInfoEntity
+        {
+            UserId = user2.Id,
+            Username = "User2"
+        };
+
+        await _databaseContext!.Users.AddRangeAsync(user1, user2);
+        await _databaseContext.PublicUserInfos.AddRangeAsync(userPublicInfo1, userPublicInfo2);
         await _databaseContext.SaveChangesAsync();
 
-        ResultError? error = await _friendService.SendFriendRequest(user1.Id, user2.Id);
+        ResultError? error = await _friendService.SendFriendRequestWithUsername(user1.Id, userPublicInfo2.Username);
 
         List<UserFriendEntity> friends = _databaseContext.UserFriends
             .Where(uf => uf.InitiatorId == user1.Id && uf.ReceiverId == user2.Id).ToList();
@@ -56,7 +69,7 @@ public class UserFriendServiceTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AcceptFriendRequestShouldWork()
+    public async Task AcceptFriendRequest_ShouldUpdateUserFriendStatusToFriend()
     {
         var user1 = new IdentityUser("User1");
         var user2 = new IdentityUser("User2");
@@ -81,7 +94,7 @@ public class UserFriendServiceTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task RemoveFriendShouldWork()
+    public async Task RemoveFriend_ShouldRemoveUserFriendEntry()
     {
         var user1 = new IdentityUser("User1");
         var user2 = new IdentityUser("User2");
