@@ -59,12 +59,10 @@ namespace ChatApp.Presentation.Auth
             );
 
             if (result.Errors.Any())
-            {
                 // TODO: explicit messages
                 return ControllerUtils.OutputErrorResult(
                     new ResultError(ResultErrorType.VALIDATION_ERROR, result.Errors.First().Description)
                 );
-            }
 
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
                 user,
@@ -83,11 +81,9 @@ namespace ChatApp.Presentation.Auth
             IdentityUser? user = await _userManager.FindByEmailAsync(dto.Email);
 
             if (user is null)
-            {
                 return ControllerUtils.OutputErrorResult(
-                    new ResultError(ResultErrorType.VALIDATION_ERROR,"Email or password is incorrect.")
-                );   
-            }
+                    new ResultError(ResultErrorType.VALIDATION_ERROR, "Email or password is incorrect.")
+                );
 
             // Automatically sets user cookie
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
@@ -99,7 +95,7 @@ namespace ChatApp.Presentation.Auth
 
             if (!signInResult.Succeeded)
                 return ControllerUtils.OutputErrorResult(
-                    new ResultError(ResultErrorType.VALIDATION_ERROR,"Email or password is incorrect.")
+                    new ResultError(ResultErrorType.VALIDATION_ERROR, "Email or password is incorrect.")
                 );
 
             _antiforgery.SetCookieTokenAndHeader(HttpContext);
@@ -162,7 +158,7 @@ namespace ChatApp.Presentation.Auth
                     Email = email,
                     UserName = email
                 });
-                
+
                 // TODO: make sure that the user was actually created else, return an error
                 user = await _userManager.FindByEmailAsync(email);
             }
@@ -174,8 +170,7 @@ namespace ChatApp.Presentation.Auth
 
             return Ok(new
             {
-                subject = jsonToken.Subject,
-                isPublicInfoSetup = isPublicInfoSetup,
+                subject = jsonToken.Subject, isPublicInfoSetup
             });
         }
     }

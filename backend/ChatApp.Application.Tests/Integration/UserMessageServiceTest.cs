@@ -12,10 +12,10 @@ namespace ChatApp.Application.Tests.Integration;
 
 public class UserMessageServiceTest : IAsyncLifetime
 {
+    private readonly Mock<IUserFriendService> _userFriendService = new();
     private DatabaseContext _databaseContext;
     private MsSqlContainer _msSqlContainer;
     private UserMessageService _userMessageService;
-    private Mock<IUserFriendService> _userFriendService = new Mock<IUserFriendService>();
 
     public async Task InitializeAsync()
     {
@@ -24,7 +24,8 @@ public class UserMessageServiceTest : IAsyncLifetime
         string connectionString = _msSqlContainer.GetConnectionString();
         _databaseContext = new DatabaseContext(new DbContextOptionsBuilder().UseSqlServer(connectionString).Options);
         await _databaseContext.Database.MigrateAsync();
-        _userMessageService = new UserMessageService(_databaseContext, _userFriendService.Object, new Mock<IWebSocketOperationsManager>().Object);
+        _userMessageService = new UserMessageService(_databaseContext, _userFriendService.Object,
+            new Mock<IWebSocketOperationsManager>().Object);
     }
 
     public async Task DisposeAsync()
@@ -42,7 +43,7 @@ public class UserMessageServiceTest : IAsyncLifetime
         _userFriendService
             .Setup(ufs => ufs.CheckIfFriends(It.IsAny<string>(), It.IsAny<List<string>>()))
             .ReturnsAsync(true);
-        
+
         // Note: there is no need to add a friend entity between users because
         // UserFriendService CheckIfFriends is mocked to return true
         _databaseContext.AddRange(user1, user2);

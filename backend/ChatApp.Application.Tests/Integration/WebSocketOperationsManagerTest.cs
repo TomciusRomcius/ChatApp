@@ -22,7 +22,8 @@ public class WebSocketOperationsManagerTest
             _webSocketMessenger.Object
         );
     }
-    /* TODO: add test that runs the IOBackgroundRunner for some time and checks whether the messages 
+
+    /* TODO: add test that runs the IOBackgroundRunner for some time and checks whether the messages
      * to websockets were sent.
      */
     [Fact]

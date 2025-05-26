@@ -19,13 +19,10 @@ public static class DatabaseInitializer
 
     public static async Task MigrateAsync(WebApplication app)
     {
-        using (var scope = app.Services.CreateScope())
+        using (IServiceScope scope = app.Services.CreateScope())
         {
-            DatabaseContext? dbContext = scope.ServiceProvider.GetService<DatabaseContext>();
-            if (dbContext == null)
-            {
-                throw new DataException("Failed to get database context");
-            }
+            var dbContext = scope.ServiceProvider.GetService<DatabaseContext>();
+            if (dbContext == null) throw new DataException("Failed to get database context");
             await dbContext.Database.MigrateAsync();
         }
     }

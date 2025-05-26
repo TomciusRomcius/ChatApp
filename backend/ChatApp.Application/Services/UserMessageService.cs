@@ -18,8 +18,8 @@ public class UserMessageService : IUserMessageService
     private readonly IWebSocketOperationsManager _webSocketOperationsManager;
 
     public UserMessageService(DatabaseContext databaseContext
-        ,IUserFriendService userFriendService
-        ,IWebSocketOperationsManager webSocketOperationsManager)
+        , IUserFriendService userFriendService
+        , IWebSocketOperationsManager webSocketOperationsManager)
     {
         _databaseContext = databaseContext;
         _userFriendService = userFriendService;
@@ -69,10 +69,10 @@ public class UserMessageService : IUserMessageService
                 ResultErrorType.FORBIDDEN_ERROR,
                 "Trying to send a message to an user who you are not friends with"
             );
-            
+
             return new Result<string>([error]);
         }
-        
+
         var msg = new TextMessageEntity
         {
             TextMessageId = Guid.NewGuid().ToString(),

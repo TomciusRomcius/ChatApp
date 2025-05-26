@@ -7,7 +7,7 @@ public enum ResultErrorType
     UNAUTHORIZED_ERROR,
     FORBIDDEN_ERROR,
     NOT_FOUND,
-    ACCOUNT_SETUP_REQUIRED,
+    ACCOUNT_SETUP_REQUIRED
 }
 
 public class ResultError

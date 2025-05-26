@@ -14,7 +14,7 @@ public static class ControllerUtils
             Type = "https://tools.ietf.org/html/rfc9110#section-15.5.16",
             Title = error.Message,
             Detail = error.Message,
-            Status = (int)error.Type,
+            Status = (int)error.Type
         };
 
         return new ObjectResult(problemDetails)
@@ -45,7 +45,7 @@ public static class ControllerUtils
         return JsonSerializer.Serialize(new
         {
             message = error.Message,
-            errorCode = error.Type,
+            errorCode = error.Type
         });
     }
 }
