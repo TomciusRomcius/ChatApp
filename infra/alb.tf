@@ -1,6 +1,5 @@
-resource "aws_acm_certificate" "chatapp-certificate" {
-  domain_name       = "tomwpagency.com"
-  validation_method = "DNS"
+data "aws_acm_certificate" "chatapp-certificate" {
+  domain = "tomwpagency.com"
 }
 
 resource "aws_alb" "chatapp-alb" {
@@ -34,7 +33,7 @@ resource "aws_alb_listener" "chatapp-alb-http-listener" {
   protocol          = "HTTPS"
 
   ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.chatapp-certificate.arn
+  certificate_arn = data.aws_acm_certificate.chatapp-certificate.arn
 
   default_action {
     type             = "forward"
