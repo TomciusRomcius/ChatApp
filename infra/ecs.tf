@@ -245,7 +245,7 @@ resource "aws_ecs_service" "frontend" {
 
   network_configuration {
     subnets          = [aws_subnet.chatapp-private.id]
-    security_groups  = [aws_security_group.allow-all.id]
+    security_groups  = [aws_security_group.frontend.id]
     assign_public_ip = true
   }
 
@@ -266,7 +266,7 @@ resource "aws_ecs_service" "mssql" {
 
   network_configuration {
     subnets         = [aws_subnet.chatapp-private.id]
-    security_groups = [aws_security_group.allow-all.id]
+    security_groups = [aws_security_group.mssql.id]
   }
 
   service_connect_configuration {
@@ -294,7 +294,7 @@ resource "aws_ecs_service" "backend" {
 
   network_configuration {
     subnets         = [aws_subnet.chatapp-private.id]
-    security_groups = [aws_security_group.allow-all.id]
+    security_groups = [aws_security_group.backend.id]
   }
 
   load_balancer {
