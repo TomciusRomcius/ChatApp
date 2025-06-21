@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 EXPOSE 5112
 COPY ./backend.sln .
+COPY ./Directory.Build.props .
 COPY ./ChatApp.Presentation/ChatApp.Presentation.csproj ./ChatApp.Presentation/
 COPY ./ChatApp.Application/ChatApp.Application.csproj ./ChatApp.Application/
 COPY ./ChatApp.Domain/ChatApp.Domain.csproj ./ChatApp.Domain/
