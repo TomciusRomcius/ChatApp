@@ -1,0 +1,48 @@
+services:
+  frontend:
+    container_name: chatapp-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    command: ["npm", "run", "dev:https"]
+    volumes:
+      - ./frontend:/app
+      - /app/.next
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=https://localhost:8080/api
+    ports:
+      - 3000:3000
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - ./backend:/app
+      - /app/bin
+      - /app/obj
+    environment:
+      - CA_OIDC_GOOGLE_AUTHORITY=https://accounts.google.com
+      - CA_MSSQL_HOST=db,1433
+      - CA_MSSQL_PASSWORD=DevelopmentPassword.2025
+      - CA_FRONTEND_URL=https://localhost:3000
+    ports:
+      - 8080:8080
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-preview-ubuntu-22.04
+    container_name: chatapp-mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=DevelopmentPassword.2025
+    ports:
+      - 1433:1433
+  adminer:
+    image: adminer
+    container_name: chatapp-adminer
+    ports:
+      - 8081:8080
