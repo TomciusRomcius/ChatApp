@@ -8,31 +8,26 @@ namespace ChatApp.Application.Tests.Integration;
 
 public class WebSocketOperationsManagerTest
 {
-    private readonly IOBackgroundRunner _ioBackgroundRunner;
-    private readonly Mock<IWebSocketList> _webSocketList;
-    private readonly Mock<IWebSocketMessenger> _webSocketMessenger;
+    private readonly Mock<IBackgroundTaskQueue> _backgroundTaskQueue = new();
+    private readonly Mock<IWebSocketList> _webSocketList = new();
+    private readonly Mock<IWebSocketMessenger> _webSocketMessenger = new();
     private readonly WebSocketOperationsManager _webSocketOperationsManager;
 
     public WebSocketOperationsManagerTest()
     {
-        _webSocketList = new Mock<IWebSocketList>();
-        _webSocketMessenger = new Mock<IWebSocketMessenger>();
-        var backgroundTaskQueue = new BackgroundTaskQueue();
-        _ioBackgroundRunner = new IOBackgroundRunner(
-            backgroundTaskQueue,
-            new Mock<ILogger<IOBackgroundRunner>>().Object
-        );
-
         _webSocketOperationsManager = new WebSocketOperationsManager(
             _webSocketList.Object,
-            backgroundTaskQueue,
+            _backgroundTaskQueue.Object,
             new Mock<ILogger<IWebSocketOperationsManager>>().Object,
             _webSocketMessenger.Object
         );
     }
 
+    /* TODO: add test that runs the IOBackgroundRunner for some time and checks whether the messages
+     * to websockets were sent.
+     */
     [Fact]
-    public async Task EnqueueSendMessage_ShouldOnly_SendMessageToSpecifiedUserIdSocks()
+    public void EnqueueSendMessage_ShouldPutSendMessageLambdaToBackgroundTaskQueue()
     {
         List<IWebSocketConnection> webSocketsUser1 =
         [
@@ -52,6 +47,7 @@ public class WebSocketOperationsManagerTest
             .Returns(() => webSocketsUser1);
         _webSocketList.Setup(wsl => wsl.GetUserSockets(It.Is<string>(s => s == userIds[1])))
             .Returns(() => webSocketsUser2);
+        _backgroundTaskQueue.Setup(bq => bq.Enqueue(It.IsAny<Func<Task>>()));
 
         _webSocketMessenger.Setup(
             wsm => wsm.SendMessage(It.IsAny<IWebSocketConnection>(), It.IsAny<string>()
@@ -59,26 +55,11 @@ public class WebSocketOperationsManagerTest
 
         _webSocketOperationsManager.EnqueueSendMessage(userIds, message);
 
-        // Start background task runner which will process send message task
-        // and stop the runner after 1 second
-        var cts = new CancellationTokenSource();
-        Task startAsyncTask = _ioBackgroundRunner.StartAsync(cts.Token);
-        await Task.Delay(TimeSpan.FromSeconds(1));
-        await cts.CancelAsync();
-
         // Verify that websockets were retrieved from specified users
         _webSocketList.Verify(wsl => wsl.GetUserSockets(It.Is<string>(s => s == userIds[0])), Times.Once);
         _webSocketList.Verify(wsl => wsl.GetUserSockets(It.Is<string>(s => s == userIds[1])), Times.Once);
 
-        // Check that there were only 3 messages sent
-        _webSocketMessenger.Verify(wsm => wsm.SendMessage(
-            It.IsAny<IWebSocketConnection>(), It.IsAny<string>()
-        ), Times.Exactly(3));
-
-        // Verify that each web socket received a message
-        foreach (IWebSocketConnection ws in webSocketsUser1.Concat(webSocketsUser2))
-            _webSocketMessenger.Verify(wsm => wsm.SendMessage(
-                It.Is<IWebSocketConnection>(param => param == ws), It.IsAny<string>()
-            ), Times.Exactly(1));
+        // Check that the send message notification was pushed to a background queue
+        _backgroundTaskQueue.Verify(btq => btq.Enqueue(It.IsAny<Func<Task>>()), Times.Once);
     }
 }

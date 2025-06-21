@@ -4,6 +4,7 @@ using ChatApp.Application.Interfaces;
 using ChatApp.Application.Services;
 using ChatApp.Domain.Utils;
 using ChatApp.Presentation.Dtos;
+using ChatApp.Presentation.Utils;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,12 @@ namespace ChatApp.Presentation.Auth
         private readonly OidcProviderConfigMapService _oidcProviderConfigMapService;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IUserService _userService;
 
         public AuthController(IHttpClientFactory httpClientFactory,
             OidcProviderConfigMapService oidcProviderConfigMapService, ILogger<AuthController> logger,
             SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager,
-            ICsrfTokenStoreService csrfTokenStoreService, IAntiforgery antiforgery)
+            ICsrfTokenStoreService csrfTokenStoreService, IAntiforgery antiforgery, IUserService userService)
         {
             _httpClientFactory = httpClientFactory;
             _oidcProviderConfigMapService = oidcProviderConfigMapService;
@@ -40,6 +42,7 @@ namespace ChatApp.Presentation.Auth
             _userManager = userManager;
             _csrfTokenStoreService = csrfTokenStoreService;
             _antiforgery = antiforgery;
+            _userService = userService;
         }
 
         [HttpPost("register")]
@@ -56,10 +59,10 @@ namespace ChatApp.Presentation.Auth
             );
 
             if (result.Errors.Any())
-            {
                 // TODO: explicit messages
-                return BadRequest(result.Errors);
-            }
+                return ControllerUtils.OutputErrorResult(
+                    new ResultError(ResultErrorType.VALIDATION_ERROR, result.Errors.First().Description)
+                );
 
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
                 user,
@@ -77,7 +80,10 @@ namespace ChatApp.Presentation.Auth
         {
             IdentityUser? user = await _userManager.FindByEmailAsync(dto.Email);
 
-            if (user is null) return BadRequest("Login failed");
+            if (user is null)
+                return ControllerUtils.OutputErrorResult(
+                    new ResultError(ResultErrorType.VALIDATION_ERROR, "Email or password is incorrect.")
+                );
 
             // Automatically sets user cookie
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
@@ -87,7 +93,10 @@ namespace ChatApp.Presentation.Auth
                 false
             );
 
-            if (!signInResult.Succeeded) return BadRequest("Login failed");
+            if (!signInResult.Succeeded)
+                return ControllerUtils.OutputErrorResult(
+                    new ResultError(ResultErrorType.VALIDATION_ERROR, "Email or password is incorrect.")
+                );
 
             _antiforgery.SetCookieTokenAndHeader(HttpContext);
 
@@ -150,13 +159,19 @@ namespace ChatApp.Presentation.Auth
                     UserName = email
                 });
 
+                // TODO: make sure that the user was actually created else, return an error
                 user = await _userManager.FindByEmailAsync(email);
             }
 
             await _signInManager.SignInAsync(user, true);
             _antiforgery.SetCookieTokenAndHeader(HttpContext);
 
-            return Ok(jsonToken.Subject);
+            bool isPublicInfoSetup = await _userService.IsPublicInfoSetup(user.Id);
+
+            return Ok(new
+            {
+                subject = jsonToken.Subject, isPublicInfoSetup
+            });
         }
     }
 }

@@ -1,17 +1,23 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { CurrentChatContext } from "@/context/currentChatContext";
 import CircleIcon from "@/components/icons/circleIcon";
+import MoreIcon from "@/components/icons/moreIcon";
 
 export interface SidebarChatEntry {
     name: string;
     chatId: string;
     type: "user" | "chatroom";
+    onToggleContextMenu: (x: number, y: number) => void;
 }
 
 export default function SidebarChatEntry(props: SidebarChatEntry) {
     const { currentChat } = useContext(CurrentChatContext);
 
     const isCurrentChat = props.chatId === currentChat?.id;
+
+    const handleClickMore = (e: React.MouseEvent<HTMLButtonElement>) => {
+        props.onToggleContextMenu(e.clientX, e.clientY);
+    };
 
     return (
         <div className="flex w-full items-center gap-4">
@@ -21,7 +27,7 @@ export default function SidebarChatEntry(props: SidebarChatEntry) {
                     size={8}
                     color={
                         props.type === "user"
-                            ? "var(--color-accentLighter}"
+                            ? "var(--color-accentLighter)"
                             : "var(--color-accent)"
                     }
                 />
@@ -31,6 +37,9 @@ export default function SidebarChatEntry(props: SidebarChatEntry) {
             >
                 {props.name}
             </small>
+            <button onClick={handleClickMore}>
+                <MoreIcon />
+            </button>
         </div>
     );
 }

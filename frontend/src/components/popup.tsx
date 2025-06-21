@@ -43,7 +43,7 @@ export default function Popup(props: PopupProps) {
             <div
                 onClick={onContainerMouseDown}
                 ref={containerRef}
-                className={`z-10 w-1/6 rounded-md bg-background-0 p-4 ${props.className}`}
+                className={`z-10 w-1/2 rounded-md bg-background-0 p-4 xl:w-1/6 ${props.className}`}
             >
                 {props.children}
             </div>

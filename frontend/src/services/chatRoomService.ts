@@ -1,4 +1,4 @@
-import { ChatRoom } from "@/types";
+import { ChatRoom, ApiErrorResponse } from "@/types";
 import { publicConfiguration } from "@/utils/configuration";
 import axios, { isAxiosError } from "axios";
 import User from "@/app/application/_utils/user";
@@ -26,49 +26,54 @@ class _ChatRoomService {
             const body = res.data as CreateChatRoomResponse;
             return {
                 data: body.chatRoomId,
-                error: null,
+                error: "",
+                didSucceed: true,
             };
         } catch (err) {
             if (isAxiosError(err)) {
                 const msg = err.response?.data.message;
                 return {
-                    data: null,
+                    data: null!, // TODO: not ideal, create function for asserting
                     error: msg,
+                    didSucceed: false,
                 };
             }
 
             return {
-                data: null,
+                data: null!,
                 error: "Unexpected error",
+                didSucceed: false,
             };
         }
     }
 
-    async DeleteChatRoom(chatRoomId: string): Promise<Result<void, string>> {
+    async DeleteChatRoom(chatRoomId: string): Promise<Result<null, string>> {
         try {
             await axios.delete(
                 `${publicConfiguration.BACKEND_URL}/chatroom?chatRoomId=${chatRoomId}`,
                 { withCredentials: true },
             );
 
-            return { data: null, error: null };
+            return { data: null, error: "", didSucceed: true };
         } catch (err) {
             if (isAxiosError(err)) {
                 const msg = err.response?.data.message;
                 return {
                     data: null,
                     error: msg,
+                    didSucceed: false,
                 };
             }
 
             return {
                 data: null,
                 error: "Unexpected error",
+                didSucceed: false,
             };
         }
     }
 
-    async LeaveChatRoom(chatRoomId: string): Promise<Result<void, string>> {
+    async LeaveChatRoom(chatRoomId: string): Promise<Result<null, string>> {
         try {
             await axios.post(
                 `${publicConfiguration.BACKEND_URL}/chatroom/leave`,
@@ -76,18 +81,20 @@ class _ChatRoomService {
                 { withCredentials: true },
             );
 
-            return { data: null, error: null };
+            return { data: null, error: "", didSucceed: true };
         } catch (err) {
             if (isAxiosError(err)) {
-                const msg = err.response?.data.message;
+                const response = err.response?.data as ApiErrorResponse;
                 return {
                     data: null,
-                    error: msg,
+                    error: response.detail,
+                    didSucceed: false,
                 };
             }
             return {
                 data: null,
                 error: "Unexpected error",
+                didSucceed: false,
             };
         }
     }
@@ -122,7 +129,7 @@ class _ChatRoomService {
     async RemoveChatRoomMembers(
         chatRoomId: string,
         userIds: string[],
-    ): Promise<Result<void, string>> {
+    ): Promise<Result<null, string>> {
         try {
             await axios.post(
                 `${publicConfiguration.BACKEND_URL}/chatroom/members/remove`,
@@ -134,17 +141,19 @@ class _ChatRoomService {
                     withCredentials: true,
                 },
             );
-            return { data: null, error: null };
+            return { data: null, error: "", didSucceed: true };
         } catch (err) {
             if (isAxiosError(err)) {
                 return {
                     data: null,
                     error: err.response?.data?.message ?? "Unexpected error",
+                    didSucceed: false,
                 };
             }
             return {
                 data: null,
                 error: "Unexpected error",
+                didSucceed: false,
             };
         }
     }

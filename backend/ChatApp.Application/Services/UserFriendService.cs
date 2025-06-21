@@ -195,6 +195,14 @@ public class UserFriendService : IUserFriendService
         await _databaseContext.UserFriends.Where(uf => uf.InitiatorId == user2Id && uf.ReceiverId == user1Id)
             .ExecuteDeleteAsync();
 
+        string wsMessage = JsonSerializer.Serialize(new
+        {
+            Type = UserWebSocketMessageType.RemovedFromFriends,
+            Body = new { Id = user1Id }
+        }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+        _webSocketOperationsManager.EnqueueSendMessage([user2Id], wsMessage);
+
         return null;
     }
 }

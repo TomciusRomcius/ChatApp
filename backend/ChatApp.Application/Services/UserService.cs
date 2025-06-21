@@ -20,8 +20,8 @@ public class UserService : IUserService
     {
         IQueryable<int>? query = _databaseContext.PublicUserInfos.Where(pui => pui.UserId == userId).Select(_ => 1);
 
-        List<int> resultList = await query.ToListAsync();
-        return resultList.Count == 1;
+        int count = await query.CountAsync();
+        return count == 1;
     }
 
     public async Task<Result<List<PublicUserInfoEntity>>> GetPublicUserInfos(List<string> userIds)

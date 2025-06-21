@@ -44,7 +44,7 @@ function handleWsMessage(
         const messageSystem = messageSystemMap.get(
             generateMessageSystemKey(chat),
         );
-        console.log(messageSystem?.messageSystemId);
+
         if (messageSystem) {
             messageSystem.AddNewMessage(textMessage);
         }
@@ -64,7 +64,6 @@ export default function ClientSideApplication(
     props: ClientSideApplicationProps,
 ) {
     const currentUser = props.currentUser;
-    console.log(currentUser);
     const messageSystemMap = useRef(new Map<string, MessageSystem>());
 
     const [appState, setAppState] = useState<AppState>(AppState.DEFAULT);
@@ -139,10 +138,7 @@ export default function ClientSideApplication(
                     <FriendsContext
                         value={{ friends: friends, setFriends: setFriends }}
                     >
-                        <Sidebar
-                            webSocket={props.webSocket}
-                            friends={friends}
-                        />
+                        <Sidebar webSocket={props.webSocket} />
                     </FriendsContext>
                     {currentChat && (
                         <ChatWindow messageSystem={currentMessageSystem!} />

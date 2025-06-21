@@ -1,6 +1,7 @@
 import { publicConfiguration } from "@/utils/configuration";
 import axios, { isAxiosError } from "axios";
 import { Result } from "@/utils/Result";
+import { ApiErrorResponse } from "@/types";
 
 class AuthService {
     public static async SignUpWithPassword(
@@ -8,30 +9,33 @@ class AuthService {
         password: string,
     ): Promise<Result<null, string>> {
         try {
-            await fetch(`${publicConfiguration.BACKEND_URL}/auth/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
+            await axios.post(
+                `${publicConfiguration.BACKEND_URL}/auth/register`,
+                {
                     email: email,
                     password: password,
-                }),
-            });
+                },
+                { withCredentials: true },
+            );
             return {
                 data: null,
-                error: null,
+                error: "",
+                didSucceed: true,
             };
         } catch (err) {
             if (isAxiosError(err)) {
+                const response = err.response?.data as ApiErrorResponse;
+
                 return {
                     data: null,
-                    error: err.response?.data?.message ?? "Unexpected error.",
+                    error: response.detail ?? "Unexpected error.",
+                    didSucceed: false,
                 };
             }
             return {
                 data: null,
                 error: "Unexpected error.",
+                didSucceed: false,
             };
         }
     }
@@ -52,19 +56,22 @@ class AuthService {
             );
             return {
                 data: null,
-                error: null,
+                error: "",
+                didSucceed: true,
             };
         } catch (err) {
             if (isAxiosError(err)) {
-                const msg = err.response?.data?.message ?? "Unexpected error";
+                const response = err.response?.data as ApiErrorResponse;
                 return {
                     data: null,
-                    error: msg,
+                    error: response.detail,
+                    didSucceed: false,
                 };
             }
             return {
                 data: null,
                 error: "Unexpected error",
+                didSucceed: false,
             };
         }
     }

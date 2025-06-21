@@ -12,7 +12,6 @@ export default function GoogleProviderButton({ text }: { text: string }) {
             )
         ).data.csrf;
 
-        // This method redirects
         providerService.RequestAuthorizationCode(
             OidcProviders.GOOGLE,
             process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
@@ -22,7 +21,8 @@ export default function GoogleProviderButton({ text }: { text: string }) {
 
     return (
         <button
-            className="rounded-md bg-white p-2 text-background-0"
+            type="button"
+            className="rounded-md bg-white p-2 text-background-0 transition hover:bg-gray-200"
             onClick={handleClick}
         >
             {text}

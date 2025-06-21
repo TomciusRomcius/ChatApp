@@ -16,15 +16,20 @@ public class OidcProviderConfigMapService
         string? googleSecretClientId = _configuration["CA_OIDC_GOOGLE_SECRET_CLIENT_ID"];
         string? googleAuthority = _configuration["CA_OIDC_GOOGLE_AUTHORITY"];
 
-        ArgumentNullException.ThrowIfNull(googleClientId);
-        ArgumentNullException.ThrowIfNull(googleSecretClientId);
-        ArgumentNullException.ThrowIfNull(googleAuthority);
+        if (googleClientId is not null)
+        {
+            ArgumentNullException.ThrowIfNull(googleSecretClientId);
+            ArgumentNullException.ThrowIfNull(googleAuthority);
 
-        AddProvider("google", new OidcProvider(
-            googleClientId,
-            googleSecretClientId,
-            googleAuthority
-        ));
+            AddProvider(
+                "google",
+                new OidcProvider(
+                    googleClientId,
+                    googleSecretClientId,
+                    googleAuthority
+                )
+            );
+        }
     }
 
     public void AddProvider(string providerName, OidcProvider provider)
