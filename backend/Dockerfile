@@ -14,7 +14,6 @@ RUN dotnet build --no-restore
 
 FROM build AS test
 WORKDIR /app
-COPY --from=build /app .
 CMD ["dotnet", "test", "--no-build", "--no-restore"]
 
 FROM build AS development
