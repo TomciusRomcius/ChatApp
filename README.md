@@ -1,7 +1,7 @@
 # A Real-time Chat App
 
 ### Features
-* Register and log in using email and password or OpenID(currently only Google provider).
+* Register and log in using your email and password, or OpenID (currently only Google provider).
 * Add and remove friends.
 * Create and delete chat rooms; invite friends to join rooms.
 * Send real-time messages to individual friends or within chat rooms.
@@ -20,7 +20,7 @@
   ```cd frontend && npm i && npm run dev:https```
 
 ### Run tests
-* To run the tests, run from backend directory:
+* To run the tests, run from the backend directory:
 ```
 dotnet watch --project ChatApp.Presentation
 ```
