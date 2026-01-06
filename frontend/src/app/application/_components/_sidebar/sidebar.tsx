@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import SidebarUser from "./sidebarUser";
 import { AppState, AppStateContext } from "@/context/appStateContext";
 import { CurrentChatContext } from "@/context/currentChatContext";
@@ -11,6 +11,7 @@ import CurrentUserContext from "@/context/currentUserContext";
 import SidebarChatRoom from "@/app/application/_components/_sidebar/sidebarChatRoom";
 import HamburgerMenu from "@/components/icons/hamburgerMenu";
 import { useSidebar } from "@/app/application/_components/_sidebar/_context/useSidebar";
+import UserFriendsService from "@/services/userFriendsService";
 
 interface SidebarProps {
     webSocket: WebSocket;
@@ -75,6 +76,12 @@ export default function Sidebar(props: SidebarProps) {
     const onToggleSidebar = () => {
         setIsOpen(!isOpen);
     };
+
+    useEffect(() => {
+        UserFriendsService.GetAllFriendRequests().then(friendReqs => {
+            setFriendRequests(friendReqs);
+        });
+    }, [setFriendRequests]);
 
     return (
         <>
